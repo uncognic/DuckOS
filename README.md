@@ -14,6 +14,7 @@
   •
   <a href="https://discord.gg/8pDMf44t6R">Discord Server</a>
 </p>
+
 # DuckOS
 
 ## What is DuckOS?
