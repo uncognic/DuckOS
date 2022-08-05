@@ -66,13 +66,12 @@ Those features are:
 - [Spectre](https://spectreattack.com/spectre.pdf)
 - [Meltdown](https://meltdownattack.com/meltdown.pdf)
 - [DMA Remapping](https://docs.microsoft.com/en-us/windows/security/information-protection/kernel-dma-protection-for-thunderbolt)
-- [(P) ATMFD Exploit](https://msrc.microsoft.com/update-guide/en-US/vulnerability/CVE-2020-1020)
-- [(P) Print Nightmare](https://us-cert.cisa.gov/ncas/current-activity/2021/06/30/printnightmare-critical-windows-print-spooler-vulnerability)
+- [(Patched) ATMFD Exploit](https://msrc.microsoft.com/update-guide/en-US/vulnerability/CVE-2020-1020)
+- [(Patched) Print Nightmare](https://us-cert.cisa.gov/ncas/current-activity/2021/06/30/printnightmare-critical-windows-print-spooler-vulnerability)
 - [Remote Desktop](https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=Windows+Remote+Desktop)
-- [NetBIOS](https://en.wikipedia.org/wiki/NetBIOS) (*Possible Information Retrieval*)
+- [NetBIOS](https://en.wikipedia.org/wiki/NetBIOS)
 
 *NOTE: Clicking on the blue text will re-direct you to a link with a explanation for each and every feature.*
-*NOTE2: Some features/mitigations that have been fixed, if they contain a (P) they are security risks for that feature have been fixed:*
 
 But we aren't perfect, and here's some things you shoud considered before installing DuckOS on your computer:
 - More likely to crash (not always the case)
