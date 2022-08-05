@@ -12,9 +12,7 @@
   •
   <a href="place link here">Building From Source</a>
   •
-  <a href="https://C:\Windows\System32\cmd.exe">Command Prompt</a>
-  •
-  <a href="place link here">https://discord.gg/8pDMf44t6R</a>
+  <a href="https://discord.gg/8pDMf44t6R">Discord Server</a>
 </p>
 # DuckOS
 
