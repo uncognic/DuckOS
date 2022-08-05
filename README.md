@@ -47,6 +47,7 @@ Also, most computers don't have wifi on the first boot when they install it, so 
 DuckOS is really good at many things, here's a list that why you **shoud use** DuckOS and **not** Windows 10 Original (*stock*):
 - Processes, while it doesn't matter as much, it's good too see that not much is running on your system.. which is a good sign of good component removing.
 - Ram Usage, matters, because Windows 10 Original wastes your RAM doing nothing, we made sure that doesn't happen on DuckOS by removing lot's of components.
+- CPU at 0% usage idle, but this really depends on the processor.
 - Less services
 - Less unneeded drivers
 - More FPS, less lags in general
