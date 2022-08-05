@@ -2,7 +2,7 @@
   <br>
   <a href="https://discord.gg/8pDMf44t6R/"><img src="https://github.com/DuckOS-GitHub/DuckOS/raw/main/branding/banner.jpg" alt="DuckOS" width="900"></a>
   <br>
-  Atlas
+  DuckOS
   <br>
 </h1>
 <h4 align="center">A open-sourced Windows operating system, which is a modification of the original windows 10, designed to reduce performance and latency.</h4>
