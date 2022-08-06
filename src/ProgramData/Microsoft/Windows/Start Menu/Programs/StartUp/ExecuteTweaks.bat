@@ -9,7 +9,7 @@ echo Y|reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\
 cd /d C:\Windows\DuckOS_Modules
 taskkill /f /im taskmgr* /t
 :: start DuckOS-post_script.bat
-start "" "%SystemRoot%\Temp\nsudo.exe" -U:E -P:E -Priority:High -ShowWindowMode:Hide "C:\Windows\DuckOS_Modules\DuckOS-post_script.bat"
+start "" "%SystemRoot%\DuckOS_Modules\nsudo.exe" -U:E -P:E -Priority:High -ShowWindowMode:Hide "C:\Windows\DuckOS_Modules\DuckOS-post_script.bat"
 
 :: feel free to use this epic html code
 :: But anyway.. this is the code that generates the coverup screen.
