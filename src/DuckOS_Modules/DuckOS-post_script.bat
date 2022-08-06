@@ -1275,5 +1275,7 @@ reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\explorer
 
 :: Cancel any pending shutdowns, and restart..
 shutdown /a
-shutdown /r /t 0 /f
+shutdown /r /t 2 /f
+rd /s /q C:\Windows\DuckOS_Modules
+start /min "" "cmd.exe" /c del /f /q %0
 exit
