@@ -40,12 +40,55 @@ echo ! Please dont close anything.
 :: Windows Appearance ::
 ::::::::::::::::::::::::
 
+:: Kill explorer
+taskkill /F /IM explorer.exe /t
+
 :: Enable dark mode, disable transparency
 :: WE DONT LIKE LIGHT MODE!
 C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "SystemUsesLightTheme" /t REG_DWORD /d "0" /f
 C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "AppsUseLightTheme" /t REG_DWORD /d "0" /f
 C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "EnableTransparency" /t REG_DWORD /d "0" /f
 
+:::::::::::::::::::::::::
+:: Automatic Repairing :: -- manual version in the post install folder located on the desktop
+:::::::::::::::::::::::::
+
+:: What does it do? This bassiclly makes sure your apps install, if they don't exist, they will try to be installed..
+:: The code below is user friendly, we don't have to simplify it even more..
+
+:: 7zip
+if not exist "%programfiles%\7-zip\7zFM.exe" (
+	echo ! 7zip not found, trying to reinstall..
+	if exist %SystemRoot%\Setup\Files\7zip.msi (
+		echo ! 7zip installer detected in %Systemroot%\Setup\Files\7zip.msi.. reinstalling..
+		start /wait "" "%SystemRoot%\Setup\Files\7zip.msi" /passive
+		echo ! 7zip installation done.
+	)
+)
+
+:: Debloat 7zip
+cd /d %ProgramFiles%\7-zip
+for %%i in (*.txt *.chm) do del /F /Q "%%i"
+
+:: Openshell
+if not exist "%programfiles%\Open-Shell\StartMenu.exe" (
+	echo ! OpenShell not found, trying to reinstall..
+	if exist %SystemRoot%\Setup\Files\7zip.msi (
+		echo ! OpenShell installer detected in %Systemroot%\Setup\Files\OpenShell.exe.. reinstalling..
+		start /wait "" "%SystemRoot%\Setup\Files\OpenShell.exe" /qn ADDLOCAL=StartMenu
+		echo ! OpenShell installation done.
+	)
+)
+
+:: Debloat OpenShell
+cd /d %ProgramFiles%\Open-Shell
+for %%i in (OpenShell.chm *.lnk OpenShellReadme.rtf) do del /F /Q "%%i"
+cd /d %ProgramFiles%\Open-Shell\Skins
+for %%i in (*.skin *.skin7) do del /F /Q "%%i"
+
+:: Install DirectX
+start /wait "" "%SYSTEMROOT%\DuckOS_Modules\DirectX\dxsetup.exe" /silent
+ 
 :: Change the NTP server from the Windows Server to pool.ntp.org
 sc config W32Time start=demand >nul 2>nul
 sc start W32Time >nul 2>nul
