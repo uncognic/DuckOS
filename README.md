@@ -54,6 +54,10 @@ DuckOS is really good at many things, here's a list that why you **shoud use** D
 - Faster wifi due to tweaks
 - and more!
 
+### **Debloated**
+
+DuckOS is heavily debloated, pre-installed applications and other components are removed. Although this can break some compatibility, it significantly reduces ISO and install size, making the iso 1.30GB average. Functionalities such as Windows Defender, and such are stripped completely. This modification is focused on pure gaming, but most work and business.
+
 ### Security
 
 Since there are a lot of features disabled like for performance, we also matter about security..
@@ -78,7 +82,3 @@ But we aren't perfect, and here's some things you shoud considered before instal
 - Lots of features disabled/broken/limited due to lots of stuff removed
 - More likely to give you weird, but fixable errors.
 - You have to manually install drivers.. 
-
-### **Debloated**
-
-DuckOS is heavily debloated, pre-installed applications and other components are removed. Although this can break some compatibility, it significantly reduces ISO and install size, making the iso 1.30GB average. Functionalities such as Windows Defender, and such are stripped completely. This modification is focused on pure gaming, but most work and business.
