@@ -8,7 +8,7 @@
 <h4 align="center">A open-sourced Windows operating system, which is a modification of the original windows 10, designed to reduce performance and latency.</h4>
 
 <p align="center">
-  <a href="link here">Post Install Script</a>
+  <a href="https://github.com/DuckOS-GitHub/DuckOS/blob/main/src/DuckOS_Modules/DuckOS-post_script.bat">Post Install Script</a>
   •
   <a href="place link here">Building From Source</a>
   •
