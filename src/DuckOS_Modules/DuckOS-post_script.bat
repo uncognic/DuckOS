@@ -144,8 +144,8 @@ del /F /Q "%WinDir%\System32\mcupdate_authenticamd.dll" >nul 2>nul
 powercfg -import "C:\Windows\DuckOS_Modules\Duck.pow" 11111111-1111-1111-1111-111111111111
 powercfg /s 11111111-1111-1111-1111-111111111111
 
-:: MAKE THE CACHE CLEANER START ON STARTUP -- with a custom scheduled task that runs on logon, as SYSTEM, starts after a 0:30 second delay..
-schtasks /create /f /sc ONLOGON /ru "nt authority\system" /tn "\DuckOS Cache Cleaner" /tr "\"C:\ProgramData\cache-cleaner.bat\"" /delay 0000:30 >nul 2>&1
+:: MAKE THE CACHE CLEANER START ON STARTUP by modifying the shell value..
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v Shell /t REG_SZ /d "C:\Windows\explorer.exe, C:\ProgramData\cache_cleaner.bat" /F
 
 :: Disable unneeded Tasks -- already credited
 schtasks /Change /Disable /TN "\Microsoft\Windows\Power Efficiency Diagnostics\AnalyzeSystem" >nul 2>nul
