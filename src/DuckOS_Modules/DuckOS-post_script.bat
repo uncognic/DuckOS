@@ -904,6 +904,7 @@ bcdedit /set {current} description DuckOS
 
 
 :: Disable Devices with DevManView
+cd /d C:\Windows\DuckOS_Modules
 devmanview /disable "Composite Bus Enumerator"
 devmanview /disable "System Speaker" MemoryDiagnostic
 devmanview /disable "System Timer"
