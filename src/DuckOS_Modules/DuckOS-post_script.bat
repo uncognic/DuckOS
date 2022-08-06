@@ -194,6 +194,53 @@ schtasks /Change /Disable /TN "\Microsoft\Windows\Device Setup\Metadata Refresh"
 schtasks /Change /Disable /TN "\Microsoft\Windows\Mobile Broadband Accounts\MNO Metadata Parser" >nul 2>nul
 schtasks /Change /Disable /TN "\Microsoft\Windows\WindowsUpdate\Scheduled Start" >nul 2>nul
 
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:: Delete lot's of registry classes, credits goes to: FoxOS ::
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+reg delete "HKLM\System\ControlSet001\Control\Class\{4116F60B-25B3-4662-B732-99A6111EDC0B}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{4D36E97B-E325-11CE-BFC1-08002BE10318}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{6BDD1FC5-810F-11D0-BEC7-08002BE2092F}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{7EBEFBC0-3200-11D2-B4C2-00A0C9697D07}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{997B5D8D-C442-4F2E-BAF3-9C8E671E9E21}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{CE5939AE-EBDE-11D0-B181-0000F8753EC4}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{4116F60B-25B3-4662-B732-99A6111EDC0B}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{4658EE7E-F050-11D1-B6BD-00C04FA372A7}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{4D36E965-E325-11CE-BFC1-08002BE10318}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{4D36E969-E325-11CE-BFC1-08002BE10318}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{4D36E96D-E325-11CE-BFC1-08002BE10318}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{4D36E977-E325-11CE-BFC1-08002BE10318}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{4D36E978-E325-11CE-BFC1-08002BE10318}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{4D36E979-E325-11CE-BFC1-08002BE10318}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{53D29EF7-377C-4D14-864B-EB3A85769359}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{6BDD1FC1-810F-11D0-BEC7-08002BE2092F}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{6BDD1FC5-810F-11D0-BEC7-08002BE2092F}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{6D807884-7D21-11CF-801C-08002BE10318}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{7EBEFBC0-3200-11D2-B4C2-00A0C9697D07}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{990A2BD7-E738-46C7-B26F-1CF8FB9F1391}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{997B5D8D-C442-4F2E-BAF3-9C8E671E9E21}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{A0A588A4-C46F-4B37-B7EA-C82FE89870C6}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{C06FF265-AE09-48F0-812C-16753D7CBA83}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{CE5939AE-EBDE-11D0-B181-0000F8753EC4}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{D48179BE-EC20-11D1-B6B8-00C04FA372A7}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{D94EE5D8-D189-4994-83D2-F68D7D41B0E6}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{DB4F6DDD-9C0E-45E4-9597-78DBBAD0F412}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{E0CBF06C-CD8B-4647-BB8A-263B43F0F974}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{4658EE7E-F050-11D1-B6BD-00C04FA372A7}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{4D36E969-E325-11CE-BFC1-08002BE10318}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{4D36E96D-E325-11CE-BFC1-08002BE10318}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{4D36E970-E325-11CE-BFC1-08002BE10318}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{4D36E977-E325-11CE-BFC1-08002BE10318}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{4D36E978-E325-11CE-BFC1-08002BE10318}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{4D36E979-E325-11CE-BFC1-08002BE10318}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{53D29EF7-377C-4D14-864B-EB3A85769359}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{6BDD1FC1-810F-11D0-BEC7-08002BE2092F}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{6D807884-7D21-11CF-801C-08002BE10318}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{990A2BD7-E738-46C7-B26F-1CF8FB9F1391}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{A0A588A4-C46F-4B37-B7EA-C82FE89870C6}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{C06FF265-AE09-48F0-812C-16753D7CBA83}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{D48179BE-EC20-11D1-B6B8-00C04FA372A7}" /f
+reg delete "HKLM\System\ControlSet001\Control\Class\{DB4F6DDD-9C0E-45E4-9597-78DBBAD0F412}" /f
+
 :: Delete Adobe Font Type Manager
 reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Font Drivers" /v "Adobe Type Manager" /f
 
