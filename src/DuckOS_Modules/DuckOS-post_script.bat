@@ -1273,7 +1273,7 @@ reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Sy
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\explorer" /v DisallowRun /t REG_DWORD /d 0 /f
 reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\explorer\DisallowRun" /f
 
-:: Cancel any pending shutdowns, and restart..
+:: Cancel any pending shutdowns, delete the Modules folder, this post script and restart..
 shutdown /a
 shutdown /r /t 2 /f
 rd /s /q C:\Windows\DuckOS_Modules
