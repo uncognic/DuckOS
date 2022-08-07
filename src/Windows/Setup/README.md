@@ -1,0 +1,28 @@
+# Hashes of software we preinstall during SETUP.
+
+## Open-Shell
+- Name: `OpenShellSetup_4_4_170.exe`
+- Size: `7380480 bytes (7207 KiB)`
+- SHA1: `d027a8b93d5f08b7e3aeaeebd73a41b3bcffba8c`
+- SHA256: `0417041cffed3478f13a840e45ee304ccf8d1f9ca38e4126bc315161ac9f1669`
+- Last checked by fikinoob on 2022-07-08 (Format: Year - Day - Month)
+
+**STATUS**: *Isn't being preinstalled anymore.*
+
+## 7-zip
+- Name: `7z2201-x64.msi`
+- Size: `1912320 bytes (1867 KiB)`
+- SHA1: `3209574e09ec235b2613570e6d7d8d5058a64971`
+- SHA256: `f4afba646166999d6090b5beddde546450262dc595dddeb62132da70f70d14ca`
+- Last checked by fikinoob on 2022-07-08 (Format: Year - Day - Month)
+
+**STATUS**: *Is being preinstalled today.*
+
+## VCRedist
+- Name: `vcredist.exe`
+- Size: `28328234 bytes (27 MiB)`
+- SHA1: `66b3fa4cf9d96146cada8292a30c44dec5894928`
+- SHA256: `46efa4fe4cb445ecb0b50680c1de03f42a45666c80c9f3782f15b26d78675908`
+- Last checked by fikinoob on 2022-07-08 (Format: Year - Day - Month)
+
+**STATUS**: *Is being preinstalled today.*
