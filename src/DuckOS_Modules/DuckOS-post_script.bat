@@ -103,18 +103,8 @@ if errorlevel 7 (
 :: Ask the user if they want to use OpenShell instead of the Windows 10's start menu
 call :MsgBox "Would you like to install OpenShell -- includes renaming the Window 10's start menu, breaking icon's functionality on the taskbar.."  "VBYesNo+VBQuestion" "Configuration"
 if errorlevel 7 (
-	if not exist %programfiles%\Open-Shell\StartMenu.exe (
-		echo ! OpenShell not found, trying to reinstall..
-		if exist %SystemRoot%\Setup\Files\OpenShellSetup_4_4_170.exe (
-			echo ! OpenShell installer detected in %Systemroot%\Setup\Files\OpenShellSetup_4_4_170.exe .. reinstalling..
-			start /wait "" "%SystemRoot%\Setup\Files\OpenShellSetup_4_4_170.exe" /qn ADDLOCAL=StartMenu
-			echo ! OpenShell installation done.
-	)
-	echo ! Renaming the Windows 10's start menu.
-	for %%i in (ShellExperienceHost_cw5n1h2txyewy) do (
-	cd /d C:\Windows\SystemApps
-	taskkill /f /im ShellExperienceHost.exe /t
-	rename %%i %%i.old
+	:: i got bored of debuging this so im just making it go to a label
+	call InstallOpenShell 2>nul
 )
 
 :: Debloat OpenShell -- if it exists
@@ -1288,6 +1278,22 @@ shutdown /r /t 2 /f
 rd /s /q C:\Windows\DuckOS_Modules
 start /min "" "cmd.exe" /c del /f /q %0
 exit
+
+:InstallOpenShell
+if not exist "%programfiles%\Open-Shell\StartMenu.exe" (
+	echo ! OpenShell not found, trying to reinstall..
+	if exist %SystemRoot%\Setup\Files\OpenShellSetup_4_4_170.exe (
+		echo ! OpenShell installer detected in %Systemroot%\Setup\Files\OpenShellSetup_4_4_170.exe .. reinstalling..
+		start /wait "" "%SystemRoot%\Setup\Files\OpenShellSetup_4_4_170.exe" /qn ADDLOCAL=StartMenu
+		echo ! OpenShell installation done.
+	)
+)
+
+echo ! Renaming the Windows 10's start menu.
+for %%i in (ShellExperienceHost_cw5n1h2txyewy) do (
+cd /d C:\Windows\SystemApps
+taskkill /f /im ShellExperienceHost.exe /t
+rename %%i %%i.old
 
 :MsgBox [Prompt] [Type] [Title]
     setlocal enableextensions
