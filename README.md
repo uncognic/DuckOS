@@ -40,7 +40,7 @@ DuckOS is pre-tweaked. While maintaining compatibility, but also good for perfor
 #### Why shoud we trust you?
 
 DuckOS is a new OS made in early July of 2022. Since it's really new, lot's of bugs are expected, but, we are open sourced, meaning every line we have on our GitHub (this page), will execute on your System once you install the operating system, of course, not everything, but the most essential tweaks and etc.
-Also, most computers don't have wifi on the first boot when they install it, so even if we DID, but we don't, grab IP adresses, they wouldn't send because internet is probably not working..
+Also, most computers don't have wifi on the first boot when they install it, so even if we DID, but we don't, grab IP adresses, they wouldn't send because internet is probably not working.. Not only that but your not connected the first time you boot into windows, unless using a enthernet cable.. And drivers must be installed for the wifi to work.. 
 
 ## DuckOS vs Windows 10 Original (*stock*)
 
