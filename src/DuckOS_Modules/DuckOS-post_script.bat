@@ -103,8 +103,7 @@ if errorlevel 7 (
 :: Ask the user if they want to use OpenShell instead of the Windows 10's start menu
 call :MsgBox "Would you like to install OpenShell -- includes renaming the Window 10's start menu, breaking icon's functionality on the taskbar.."  "VBYesNo+VBQuestion" "Configuration"
 if errorlevel 7 (
-	:: Openshell
-	if not exist "%programfiles%\Open-Shell\StartMenu.exe" (
+	if not exist %programfiles%\Open-Shell\StartMenu.exe (
 		echo ! OpenShell not found, trying to reinstall..
 		if exist %SystemRoot%\Setup\Files\OpenShellSetup_4_4_170.exe (
 			echo ! OpenShell installer detected in %Systemroot%\Setup\Files\OpenShellSetup_4_4_170.exe .. reinstalling..
@@ -116,7 +115,7 @@ if errorlevel 7 (
 )
 
 :: Debloat OpenShell -- if it exists
-if exist "%ProgramFiles%\Open-Shell" (
+if exist %ProgramFiles%\Open-Shell (
 	cd /d %ProgramFiles%\Open-Shell
 	for %%i in (OpenShell.chm *.lnk OpenShellReadme.rtf) do del /F /Q "%%i"
 	cd /d %ProgramFiles%\Open-Shell\Skins
