@@ -40,9 +40,6 @@ echo ! Please dont close anything.
 :: Windows Appearance ::
 ::::::::::::::::::::::::
 
-:: Kill explorer
-taskkill /F /IM explorer.exe /t
-
 :: Enable dark mode, disable transparency
 :: WE DONT LIKE LIGHT MODE!
 C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "SystemUsesLightTheme" /t REG_DWORD /d "0" /f
