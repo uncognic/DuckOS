@@ -79,22 +79,6 @@ if not exist "%programfiles%\7-zip\7zFM.exe" (
 cd /d %ProgramFiles%\7-zip
 for %%i in (*.txt *.chm) do del /F /Q "%%i"
 
-:: Openshell
-if not exist "%programfiles%\Open-Shell\StartMenu.exe" (
-	echo ! OpenShell not found, trying to reinstall..
-	if exist %SystemRoot%\Setup\Files\OpenShellSetup_4_4_170.exe (
-		echo ! OpenShell installer detected in %Systemroot%\Setup\Files\OpenShellSetup_4_4_170.exe .. reinstalling..
-		start /wait "" "%SystemRoot%\Setup\Files\OpenShellSetup_4_4_170.exe" /qn ADDLOCAL=StartMenu
-		echo ! OpenShell installation done.
-	)
-)
-
-:: Debloat OpenShell
-cd /d %ProgramFiles%\Open-Shell
-for %%i in (OpenShell.chm *.lnk OpenShellReadme.rtf) do del /F /Q "%%i"
-cd /d %ProgramFiles%\Open-Shell\Skins
-for %%i in (*.skin *.skin7) do del /F /Q "%%i"
-
 :: Install DirectX
 start /wait "" "%SYSTEMROOT%\DuckOS_Modules\DirectX\dxsetup.exe" /silent
 
@@ -114,6 +98,29 @@ if errorlevel 7 (
 	reg add "HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\SharedAccess\Parameters\FirewallPolicy\PublicProfile" /v "DoNotAllowExceptions" /t REG_DWORD /d "1" /f
 ) else if errorlevel 6 (
 	echo ! Ok... Removal skipped..
+)
+
+:: Ask the user if they want to use OpenShell instead of the Windows 10's start menu
+call :MsgBox "Would you like to install OpenShell -- includes renaming the Window 10's start menu, breaking icon's functionality on the taskbar.."  "VBYesNo+VBQuestion" "Configuration"
+if errorlevel 7 (
+	:: Openshell
+	if not exist "%programfiles%\Open-Shell\StartMenu.exe" (
+		echo ! OpenShell not found, trying to reinstall..
+		if exist %SystemRoot%\Setup\Files\OpenShellSetup_4_4_170.exe (
+			echo ! OpenShell installer detected in %Systemroot%\Setup\Files\OpenShellSetup_4_4_170.exe .. reinstalling..
+			start /wait "" "%SystemRoot%\Setup\Files\OpenShellSetup_4_4_170.exe" /qn ADDLOCAL=StartMenu
+			echo ! OpenShell installation done.
+	)
+	echo ! Renaming the Windows 10's start menu.
+	for %%i in (C:\Windows\SystemApps\StartMenuExperience*) do taskkill /f /im startMenuExperienceHost.exe /t && rename %%i %%i.old
+)
+
+:: Debloat OpenShell -- if it exists
+if exist "%ProgramFiles%\Open-Shell" (
+	cd /d %ProgramFiles%\Open-Shell
+	for %%i in (OpenShell.chm *.lnk OpenShellReadme.rtf) do del /F /Q "%%i"
+	cd /d %ProgramFiles%\Open-Shell\Skins
+	for %%i in (*.skin *.skin7) do del /F /Q "%%i"
 )
 
 :: Change the NTP server from the Windows Server to pool.ntp.org
