@@ -111,7 +111,10 @@ if errorlevel 7 (
 			echo ! OpenShell installation done.
 	)
 	echo ! Renaming the Windows 10's start menu.
-	for %%i in (C:\Windows\SystemApps\StartMenuExperience*) do taskkill /f /im startMenuExperienceHost.exe /t && rename %%i %%i.old
+	for %%i in (ShellExperienceHost_cw5n1h2txyewy) do (
+	cd /d C:\Windows\SystemApps
+	taskkill /f /im ShellExperienceHost.exe /t
+	rename %%i %%i.old
 )
 
 :: Debloat OpenShell -- if it exists
