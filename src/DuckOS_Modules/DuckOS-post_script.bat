@@ -59,9 +59,9 @@ C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait reg add "HKEY_CURRENT_USER\S
 :: 7zip
 if not exist "%programfiles%\7-zip\7zFM.exe" (
 	echo ! 7zip not found, trying to reinstall..
-	if exist %SystemRoot%\Setup\Files\7zip.msi (
-		echo ! 7zip installer detected in %Systemroot%\Setup\Files\7zip.msi.. reinstalling..
-		start /wait "" "%SystemRoot%\Setup\Files\7zip.msi" /passive
+	if exist %SystemRoot%\Setup\Files\7z2201-x64.msi (
+		echo ! 7zip installer detected in %Systemroot%\Setup\Files\7z2201-x64.msi.. reinstalling..
+		start /wait "" "%SystemRoot%\Setup\Files\7z2201-x64.msi" /passive
 		echo ! 7zip installation done.
 	)
 )
@@ -73,9 +73,9 @@ for %%i in (*.txt *.chm) do del /F /Q "%%i"
 :: Openshell
 if not exist "%programfiles%\Open-Shell\StartMenu.exe" (
 	echo ! OpenShell not found, trying to reinstall..
-	if exist %SystemRoot%\Setup\Files\7zip.msi (
-		echo ! OpenShell installer detected in %Systemroot%\Setup\Files\OpenShell.exe.. reinstalling..
-		start /wait "" "%SystemRoot%\Setup\Files\OpenShell.exe" /qn ADDLOCAL=StartMenu
+	if exist %SystemRoot%\Setup\Files\OpenShellSetup_4_4_170.exe (
+		echo ! OpenShell installer detected in %Systemroot%\Setup\Files\OpenShellSetup_4_4_170.exe .. reinstalling..
+		start /wait "" "%SystemRoot%\Setup\Files\OpenShellSetup_4_4_170.exe" /qn ADDLOCAL=StartMenu
 		echo ! OpenShell installation done.
 	)
 )
