@@ -32,3 +32,19 @@
 no upload because it's 27MB, but github only allows 25mb max
 
 **STATUS**: *Is being preinstalled today.*
+
+# Arguments
+
+## 7zip
+- Arguments: `/quiet` or `/passive`
+- We use: `/quiet`
+- Source: `msiexec /?`
+
+## OpenShell
+- Arguments: `/qn ADDLOCAL=StartMenu`
+- Source: `OpenShellSetup_4_4_170.exe /?`
+
+## VCRedist
+- Arguments: `/ai` or `/ai /gm2`
+- We use: `/ai`
+- Source: `vcredist.exe /?`
