@@ -6,6 +6,4 @@
 - SHA1: `0dfcf31ad455abd48d35b0250b5b03265052fba6`
 - CRC32: `74DDCBC1`
 - CRC64: `E456C6375B3273FC`
-- Source: https://github.com/abbodi1406/vcredist/releases/tag/v0.61.0
-- Repository: https://github.com/abbodi1406/vcredist
 - Last checked by fikinoob on 2022-07-08 (FORMAT: Year - Day - Month)
