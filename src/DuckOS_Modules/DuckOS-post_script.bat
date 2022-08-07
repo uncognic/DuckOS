@@ -88,7 +88,25 @@ for %%i in (*.skin *.skin7) do del /F /Q "%%i"
 
 :: Install DirectX
 start /wait "" "%SYSTEMROOT%\DuckOS_Modules\DirectX\dxsetup.exe" /silent
- 
+
+:: Ask the user if they use "Windows Firewall", if not, disable it.. if yes, do nothing..
+call :MsgBox "Would you like to use Windows Firewall?"  "VBYesNo+VBQuestion" "Configuration"
+if errorlevel 7 (
+	reg add "HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\mpssvc" /v "Start" /t REG_DWORD /d "4" /f
+	reg add "HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\BFE" /v "Start" /t REG_DWORD /d "4" /f
+	reg add "HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile" /v "EnableFirewall" /t REG_DWORD /d "0" /f
+	reg add "HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile" /v "DisableNotifications" /t REG_DWORD /d "1" /f
+	reg add "HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile" /v "DoNotAllowExceptions" /t REG_DWORD /d "1" /f
+	reg add "HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\SharedAccess\Parameters\FirewallPolicy\DomainProfile" /v "EnableFirewall" /t REG_DWORD /d "0" /f
+	reg add "HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\SharedAccess\Parameters\FirewallPolicy\DomainProfile" /v "DisableNotifications" /t REG_DWORD /d "1" /f
+	reg add "HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\SharedAccess\Parameters\FirewallPolicy\DomainProfile" /v "DoNotAllowExceptions" /t REG_DWORD /d "1" /f
+	reg add "HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\SharedAccess\Parameters\FirewallPolicy\PublicProfile" /v "EnableFirewall" /t REG_DWORD /d "0" /f
+	reg add "HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\SharedAccess\Parameters\FirewallPolicy\PublicProfile" /v "DisableNotifications" /t REG_DWORD /d "1" /f
+	reg add "HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\SharedAccess\Parameters\FirewallPolicy\PublicProfile" /v "DoNotAllowExceptions" /t REG_DWORD /d "1" /f
+) else if errorlevel 6 (
+	echo ! Ok... Removal skipped..
+)
+
 :: Change the NTP server from the Windows Server to pool.ntp.org
 sc config W32Time start=demand >nul 2>nul
 sc start W32Time >nul 2>nul
@@ -1252,3 +1270,10 @@ shutdown /r /t 2 /f
 rd /s /q C:\Windows\DuckOS_Modules
 start /min "" "cmd.exe" /c del /f /q %0
 exit
+
+:MsgBox [Prompt] [Type] [Title]
+    setlocal enableextensions
+    set "tempFile=%temp%\%~nx0.%random%%random%%random%vbs.tmp"
+    >"%tempFile%" echo(WScript.Quit msgBox("%~1",%~2,"%~3") & cscript //nologo //e:vbscript "%tempFile%"
+    set "exitCode=%errorlevel%" & del "%tempFile%" >nul 2>nul
+    endlocal & exit /b %exitCode%
