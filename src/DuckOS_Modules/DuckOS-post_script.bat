@@ -83,7 +83,7 @@ for %%i in (*.txt *.chm) do del /F /Q "%%i"
 start /wait "" "%SYSTEMROOT%\DuckOS_Modules\DirectX\dxsetup.exe" /silent
 
 :: Ask the user if they use "Windows Firewall", if not, disable it.. if yes, do nothing..
-call :MsgBox "Would you like to use Windows Firewall?"  "VBYesNo+VBQuestion" "Configuration"
+call :MsgBox "Do you use Windows Firewall?"  "VBYesNo+VBQuestion" "Configuration"
 if errorlevel 7 (
 	reg add "HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\mpssvc" /v "Start" /t REG_DWORD /d "4" /f
 	reg add "HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\BFE" /v "Start" /t REG_DWORD /d "4" /f
