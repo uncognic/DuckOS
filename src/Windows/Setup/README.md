@@ -26,6 +26,8 @@
 - SHA1: `66b3fa4cf9d96146cada8292a30c44dec5894928`
 - SHA256: `46efa4fe4cb445ecb0b50680c1de03f42a45666c80c9f3782f15b26d78675908`
 - Last checked by fikinoob on 2022-07-08 (Format: Year - Day - Month)
+- Source: https://github.com/abbodi1406/vcredist/releases/tag/v0.61.0
+- Repository: https://github.com/abbodi1406/vcredist
 
 no upload because it's 27MB, but github only allows 25mb max
 
