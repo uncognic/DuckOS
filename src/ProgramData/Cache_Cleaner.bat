@@ -1,6 +1,4 @@
 set temp=C:\Users\Duck\AppData\Local\Temp
-del /F /Q C:\Windows\SystemApps\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy
-del /F /Q C:\Windows\SystemApps\Microsoft.Windows.Search_cw5n1h2txyewy
 del /s /f /q c:\windows\temp\*.*
 del /s /f /q C:\WINDOWS\Prefetch\*.*
 del /s /f /q %temp%\*.*
