@@ -112,21 +112,6 @@ if exist %ProgramFiles%\Open-Shell (
 	for %%i in (*.skin *.skin7) do del /F /Q "%%i"
 )
 
-:: Change the NTP server from the Windows Server to pool.ntp.org
-sc config W32Time start=demand >nul 2>nul
-sc start W32Time >nul 2>nul
-w32tm /config /syncfromflags:manual /manualpeerlist:"0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org"
-sc queryex "w32time"|Find "STATE"|Find /v "RUNNING"||(
-    net stop w32time
-    net start w32time
-) >nul 2>nul
-
-:: Re-sync the time to pool.ntp.org
-w32tm /config /update
-w32tm /resync
-sc stop W32Time
-sc config W32Time start=disabled
-
 :: Known Issues when adding languages in Windows 10 -- link https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/language-packs-known-issue?view=windows-10
 schtasks /Change /Disable /TN "\Microsoft\Windows\LanguageComponentsInstaller\Uninstallation" >nul 2>nul
 reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Control Panel\International" /v "BlockCleanupOfUnusedPreinstalledLangPacks" /t REG_DWORD /d "1" /f
@@ -402,14 +387,15 @@ C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait reg add "HKEY_CURRENT_USER\C
 :: May cause internet icon to show it is disconnected
 reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\NlaSvc\Parameters\Internet" /v "EnableActiveProbing" /t REG_DWORD /d "0" /f
 
-:: Disable Data Collection
+:: Disable Data Collection (telemetry)
+:: Gives you privacy :)
 reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "AllowTelemetry" /t REG_DWORD /d "0" /f
 reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "MaxTelemetryAllowed" /t REG_DWORD /d "0" /f
 reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "AllowDeviceNameInTelemetry" /t REG_DWORD /d "0" /f
 reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "DoNotShowFeedbackNotifications" /t REG_DWORD /d "1" /f
 reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\DataCollection" /v "LimitEnhancedDiagnosticDataWindowsAnalytics" /t REG_DWORD /d "0" /f
 
-:: Misc
+:: Misc Quality of Life
 C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Privacy" /v "TailoredExperiencesWithDiagnosticDataEnabled" /t REG_DWORD /d "0" /f
 C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Diagnostics\DiagTrack" /v "ShowedToastAtLevel" /t REG_DWORD /d "1" /f
 C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait reg add "HKEY_CURRENT_USER\Software\Microsoft\Input\TIPC" /v "Enabled" /t REG_DWORD /d "0" /f
@@ -563,11 +549,9 @@ fsutil behavior set disableencryption 1 >NUL 2>&1
 fsutil behavior set disablelastaccess 1 >NUL 2>&1
 fsutil behavior set encryptpagingfile 0 >NUL 2>&1
 
-
 ::::::::::::::::::::::::::
 :: Memory Optimizations ::
 ::::::::::::::::::::::::::
-
 
 :: Memory Management
 reg add "HKLM\System\CurrentControlSet\Control\Session Manager" /v "ProtectionMode" /t reg_DWORD /d "0" /f >NUL 2>&1
@@ -586,6 +570,7 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management
 :: Startup
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "DelayedDesktopSwitchTimeout" /t reg_DWORD /d "0" /f >NUL 2>&1
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /v "StartupDelayInMSec" /t reg_DWORD /d "0" /f >NUL 2>&1
+
 
 :::::::::::::::::
 :: Mitigations ::
@@ -830,56 +815,54 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Services\DXGKrnl" /v "DxgkWaitForVertical
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\DXGKrnl" /v "SwapChainBackBuffer" /t REG_DWORD /d "1" /f >NUL 2>&1
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\DXGKrnl" /v "TdrResetFromTimeoutAsync" /t REG_DWORD /d "1" /f >NUL 2>&1
 
-:::::::::::::::::::::
-:: MSI Mode Tweaks ::
-:::::::::::::::::::::
+::::::::::::::
+:: MSI Mode ::
+::::::::::::::
 
-:: MSI MODE
-:: SET TO UNDEFINED
-for /f "tokens=*" %%i in ('reg query "HKLM\SYSTEM\CurrentControlSet\Enum\PCI"^| findstr "HKEY"') do (
-	for /f "tokens=*" %%a in ('reg query "%%i"^| findstr "HKEY"') do reg delete "%%a\Device Parameters\Interrupt Management\Affinity Policy" /v "DevicePriority" /f >NUL 2>&1
-)
-
-:: SET FOR NETWORK ADAPTER
-for /f %%a in ('wmic path Win32_NetworkAdapter get PNPDeviceID ^| findstr /L "VEN_"') do (
-	reg add "HKLM\SYSTEM\CurrentControlSet\Enum\%%a\Device Parameters\Interrupt Management\MessageSignaledInterruptProperties" /v "MSISupported" /t reg_DWORD /d "1" /f >NUL 2>&1
-)
-
-:: SET FOR USB
-for /f %%a in ('wmic path Win32_USBController get PNPDeviceID^| findstr /L "VEN_"') do (
-	reg add "HKLM\SYSTEM\CurrentControlSet\Enum\%%a\Device Parameters\Interrupt Management\MessageSignaledInterruptProperties" /v "MSISupported" /t reg_DWORD /d "1" /f >NUL 2>&1
-)
-
-:: SET FOR GPU
+:: Set for the graphics card.
 for /f %%i in ('wmic path Win32_VideoController get PNPDeviceID') do set "str=%%i" & if "!str:PCI\VEN_=!" neq "!str!" reg delete "HKLM\SYSTEM\CurrentControlSet\Enum\%%i\Device Parameters\Interrupt Management\MessageSignaledInterruptProperties" /v "MessageNumberLimit" /f >NUL 2>&1
 for /f %%a in ('wmic path Win32_VideoController get PNPDeviceID^| findstr /L "VEN_"') do (
 	reg add "HKLM\SYSTEM\CurrentControlSet\Enum\%%a\Device Parameters\Interrupt Management\MessageSignaledInterruptProperties" /v "MSISupported" /t reg_DWORD /d "1" /f >NUL 2>&1
 )
 
-:: Power Saving
+:: Set for USB / portable devices.
+for /f %%a in ('wmic path Win32_USBController get PNPDeviceID^| findstr /L "VEN_"') do (
+	reg add "HKLM\SYSTEM\CurrentControlSet\Enum\%%a\Device Parameters\Interrupt Management\MessageSignaledInterruptProperties" /v "MSISupported" /t reg_DWORD /d "1" /f >NUL 2>&1
+)
+
+:: Set for networking devices.
+for /f %%a in ('wmic path Win32_NetworkAdapter get PNPDeviceID ^| findstr /L "VEN_"') do (
+	reg add "HKLM\SYSTEM\CurrentControlSet\Enum\%%a\Device Parameters\Interrupt Management\MessageSignaledInterruptProperties" /v "MSISupported" /t reg_DWORD /d "1" /f >NUL 2>&1
+)
+for /f "tokens=*" %%i in ('reg query "HKLM\SYSTEM\CurrentControlSet\Enum\PCI"^| findstr "HKEY"') do (
+	for /f "tokens=*" %%a in ('reg query "%%i"^| findstr "HKEY"') do reg delete "%%a\Device Parameters\Interrupt Management\Affinity Policy" /v "DevicePriority" /f >NUL 2>&1
+)
+
+:: Disable Power Saving
 for /f "tokens=*" %%i in ('reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Enum" /s /f "StorPort"^| findstr "StorPort"') do reg add "%%i" /v "EnableIdlePowerManagement" /t reg_DWORD /d "0" /f >NUL 2>&1
 for /f "tokens=*" %%i in ('wmic PATH Win32_PnPEntity GET DeviceID ^| findstr "USB\VID_"') do (
- reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "EnhancedPowerManagementEnabled" /t reg_DWORD /d "0" /f >NUL 2>&1
- reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "AllowIdleIrpInD3" /t reg_DWORD /d "0" /f >NUL 2>&1
- reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "EnableSelectiveSuspend" /t reg_DWORD /d "0" /f >NUL 2>&1
- reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "DeviceSelectiveSuspended" /t reg_DWORD /d "0" /f >NUL 2>&1
- reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "SelectiveSuspendEnabled" /t reg_DWORD /d "0" /f >NUL 2>&1
- reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "SelectiveSuspendOn" /t reg_DWORD /d "0" /f >NUL 2>&1 >NUL 2>&1
- reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "D3ColdSupported" /t reg_DWORD /d "0" /f >NUL 2>&1
+ reg add "HKLM\SYSTEM\CurrentControlSet\Control\Storage" /v "StorageD3InModernStandby" /t REG_DWORD /d "0" /f
+ reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "EnhancedPowerManagementEnabled" /t reg_DWORD /d "0" /f
+ reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "AllowIdleIrpInD3" /t reg_DWORD /d "0" /f
+ reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "EnableSelectiveSuspend" /t reg_DWORD /d "0" /f
+ reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling" /v "PowerThrottlingOff" /t REG_DWORD /d "1" /f
+ reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "DeviceSelectiveSuspended" /t reg_DWORD /d "0" /f
+ reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "SelectiveSuspendEnabled" /t reg_DWORD /d "0" /f
+ reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "SelectiveSuspendOn" /t reg_DWORD /d "0" /f
+ reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm\Global\NVTweak" /v "DisplayPowerSaving" /t REG_DWORD /d "0" /f
+ reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "D3ColdSupported" /t reg_DWORD /d "0" /f
+ reg add "HKLM\SYSTEM\CurrentControlSet\Services\stornvme\Parameters\Device" /v "IdlePowerMode" /t REG_DWORD /d "0" /f
+ reg add "HKLM\SYSTEM\CurrentControlSet\Services\pci\Parameters" /v "ASPMOptOut" /t REG_DWORD /d "1" /f
 )
 
 :: Import and set the powerplan
-powercfg -delete a1841308-3541-4fab-bc81-f71556f20b4a >NUL 2>&1
-powercfg -delete 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c >NUL 2>&1
-powercfg -delete e9a42b02-d5df-448d-aa00-03f14749eb61 >NUL 2>&1
+powercfg -delete a1841308-3541-4fab-bc81-f71556f20b4a
+powercfg -delete 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
+powercfg -delete e9a42b02-d5df-448d-aa00-03f14749eb61
 
-:: Power
-if %LAPTOP%==0 (
-	reg add "HKLM\SYSTEM\CurrentControlSet\Control\Storage" /v "StorageD3InModernStandby" /t REG_DWORD /d "0" /f >NUL 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm\Global\NVTweak" /v "DisplayPowerSaving" /t REG_DWORD /d "0" /f >NUL 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\pci\Parameters" /v "ASPMOptOut" /t REG_DWORD /d "1" /f >NUL 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\stornvme\Parameters\Device" /v "IdlePowerMode" /t REG_DWORD /d "0" /f >NUL 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling" /v "PowerThrottlingOff" /t REG_DWORD /d "1" /f >NUL 2>&1
+:: Power Quality Of Life
+:: Credits: zusier
+if %LAPTOP% EQU 0 (
 	for %%a in (AllowIdleIrpInD3 D3ColdSupported DeviceSelectiveSuspended EnableIdlePowerManagement	EnableSelectiveSuspend
 		EnhancedPowerManagementEnabled IdleInWorkingState SelectiveSuspendEnabled SelectiveSuspendOn WaitWakeEnabled 
 		WakeEnabled WdfDirectedPowerTransitionEnable) do (
@@ -907,16 +890,20 @@ bcdedit /set disabledynamictick yes > NUL 2>&1
 bcdedit /set useplatformtick yes > NUL 2>&1
 bcdedit /timeout 10 > NUL 2>&1
 bcdedit /set bootux disabled > NUL 2>&1
-bcdedit /set bootmenupolicy standard > NUL 2>&1
+bcdedit /set bootmenupolicy Legacy > NUL 2>&1
 bcdedit /set hypervisorlaunchtype off > NUL 2>&1
 bcdedit /set tpmbootentropy ForceDisable > NUL 2>&1
 bcdedit /set quietboot yes > NUL 2>&1
 bcdedit /set {globalsettings} custom:16000067 true > NUL 2>&1
 bcdedit /set {globalsettings} custom:16000069 true > NUL 2>&1
 bcdedit /set {globalsettings} custom:16000068 true > NUL 2>&1
-bcdedit /set {current} recoveryenabled no > NUL 2>&1
+
+:: Set the DuckOS' name to DuckOS.. so it can be easily identified when dualbooting.
 bcdedit /set {current} description DuckOS
 
+:: Disable Recovery
+reagentc /disable
+bcdedit /set {current} recoveryenabled no
 
 :: Disable Devices with DevManView
 cd /d C:\Windows\DuckOS_Modules
@@ -949,20 +936,20 @@ devmanview /disable "WAN Miniport (SSTP)"
 :: Disable unneeded Tasks
 schtasks /Change /Disable /TN "\MicrosoftEdgeUpdateTaskMachineCore" >NUL 2>&1
 schtasks /Change /Disable /TN "\MicrosoftEdgeUpdateTaskMachineUA" >NUL 2>&1
+schtasks /Change /Disable /TN "\Microsoft\Windows\Autochk\Proxy" >NUL 2>&1
 schtasks /Change /Disable /TN "\Microsoft\Windows\Power Efficiency Diagnostics\AnalyzeSystem" >NUL 2>&1
 schtasks /Change /Disable /TN "\Microsoft\Windows\Windows Error Reporting\QueueReporting" >NUL 2>&1
 schtasks /Change /Disable /TN "\Microsoft\Windows\DiskFootprint\Diagnostics" >NUL 2>&1
 schtasks /Change /Disable /TN "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser" >NUL 2>&1
 schtasks /Change /Disable /TN "\Microsoft\Windows\Application Experience\StartupAppTask" >NUL 2>&1
-schtasks /Change /Disable /TN "\Microsoft\Windows\Autochk\Proxy" >NUL 2>&1
 schtasks /Change /Disable /TN "\Microsoft\Windows\Application Experience\PcaPatchDbTask" >NUL 2>&1
 schtasks /Change /Disable /TN "\Microsoft\Windows\BrokerInfrastructure\BgTaskregistrationMaintenanceTask" >NUL 2>&1
 schtasks /Change /Disable /TN "\Microsoft\Windows\CloudExperienceHost\CreateObjectTask" >NUL 2>&1
 schtasks /Change /Disable /TN "\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector" >NUL 2>&1
 schtasks /Change /Disable /TN "\Microsoft\Windows\Defrag\ScheduledDefrag" >NUL 2>&1
 schtasks /Change /Disable /TN "\Microsoft\Windows\DiskFootprint\StorageSense" >NUL 2>&1
-schtasks /Change /Disable /TN "\MicrosoftEdgeUpdateBrowserReplacementTask" >NUL 2>&1
 schtasks /Change /Disable /TN "\Microsoft\Windows\registry\regIdleBackup" >NUL 2>&1
+schtasks /Change /Disable /TN "\MicrosoftEdgeUpdateBrowserReplacementTask" >NUL 2>&1
 schtasks /Change /Disable /TN "\Microsoft\Windows\Windows Filtering Platform\BfeOnLoltartTypeChange" >NUL 2>&1
 schtasks /Change /Disable /TN "\Microsoft\Windows\Shell\IndexerAutomaticMaintenance" >NUL 2>&1
 schtasks /Change /Disable /TN "\Microsoft\Windows\SoftwareProtectionPlatform\SvcRestartTaskNetwork" >NUL 2>&1
@@ -976,9 +963,6 @@ schtasks /Change /Disable /TN "\Microsoft\Windows\UpdateOrchestrator\Schedule Wo
 schtasks /Change /Disable /TN "\Microsoft\Windows\UPnP\UPnPHostConfig" >NUL 2>&1
 schtasks /Change /Disable /TN "\Microsoft\Windows\RetailDemo\CleanupOfflineContent" >NUL 2>&1
 schtasks /Change /Disable /TN "\Microsoft\Windows\Shell\FamilySafetyMonitor" >NUL 2>&1
-schtasks /Change /Disable /TN "\Microsoft\Windows\InstallService\ScanForUpdates" >NUL 2>&1
-schtasks /Change /Disable /TN "\Microsoft\Windows\InstallService\ScanForUpdatesAsUser" >NUL 2>&1
-schtasks /Change /Disable /TN "\Microsoft\Windows\InstallService\SmartRetry" >NUL 2>&1
 schtasks /Change /Disable /TN "\Microsoft\Windows\International\Synchronize Language Settings" >NUL 2>&1
 schtasks /Change /Disable /TN "\Microsoft\Windows\MemoryDiagnostic\ProcessMemoryDiagnosticEvents" >NUL 2>&1
 schtasks /Change /Disable /TN "\Microsoft\Windows\MemoryDiagnostic\RunFullMemoryDiagnostic" >NUL 2>&1
@@ -1005,6 +989,21 @@ schtasks /Change /Disable /TN "\Microsoft\Windows\WindowsUpdate\Scheduled Start"
  
 :: Misc Tweaks
 lodctr /r >nul 2>&1
+
+:: Change the NTP server from the Windows Server to pool.ntp.org
+sc config W32Time start=demand >nul 2>nul
+sc start W32Time >nul 2>nul
+w32tm /config /syncfromflags:manual /manualpeerlist:"0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org"
+sc queryex "w32time"|Find "STATE"|Find /v "RUNNING"||(
+    net stop w32time
+    net start w32time
+) >nul 2>nul
+
+:: Re-sync the time to pool.ntp.org
+w32tm /config /update
+w32tm /resync
+sc stop W32Time
+sc config W32Time start=disabled
 
 :: Disable USB Autorun/play
 reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoAutorun" /t REG_DWORD /d "1" /f
