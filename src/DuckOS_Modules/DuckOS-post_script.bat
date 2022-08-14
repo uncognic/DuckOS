@@ -15,6 +15,7 @@ echo Please wait. This may take a moment.
 :: 2. Unixcorn - We use this power plan to achieve good performance
 :: 3. Zusier - We use some tweaks he wrote for AtlasOS, which is an another good modified operating system based on windows!
 :: 4. Imribiy - NIC settings
+:: 5. CatGamerOP - I used his commands.. that delete registry classes :skull: :skull:
 :: Various different sources and google..
 
 
@@ -147,6 +148,9 @@ del /F /Q "%WinDir%\System32\GameBarPresenceWriter.exe" >nul 2>nul
 del /F /Q "%WinDir%\System32\mobsync.exe" >nul 2>nul
 del /F /Q "%WinDir%\System32\mcupdate_genuineintel.dll" >nul 2>nul
 del /F /Q "%WinDir%\System32\mcupdate_authenticamd.dll" >nul 2>nul
+
+:: Set up the toolbox to be in the context menu
+reg add "HKEY_CLASSES_ROOT\Directory\Background\shell\DuckOS Toolbox\command" /v "" /d "C:\Windows\DuckOS_Toolbox\DuckOS_Toolbox.exe" /t REG_SZ /f
 
 :: Import the powerplan
 powercfg -import "C:\Windows\DuckOS_Modules\Duck.pow" 11111111-1111-1111-1111-111111111111
