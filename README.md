@@ -34,7 +34,7 @@ DuckOS is pre-tweaked. While maintaining compatibility, but also good for perfor
 - Disabled Unneeded Devices
 - Boot Configuration Optimization
 - Optimized Process Scheduling
-- 600+ Components removed.
+- ~ 705 Components removed.
 - Removed almost every unneeded windows boot entry, including clearing scheduled tasks...
 
 #### Why shoud we trust you?
