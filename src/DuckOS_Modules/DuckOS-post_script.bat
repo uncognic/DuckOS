@@ -1,5 +1,5 @@
-@echo off && CLS && echo ! Post Script Loaded, tweaking is starting soon!
-echo Please wait. This may take a moment.
+@echo off && CLS && call :echoC Green "! Post Script Loaded, tweaking is starting soon!"
+call :echoC Red "Please wait. This may take a moment."
 
 :: DuckOS Post Install Script.
 :: made by fikinoob#0001
@@ -17,7 +17,6 @@ echo Please wait. This may take a moment.
 :: 4. Imribiy - NIC settings
 :: 5. CatGamerOP - I used his commands.. that delete registry classes :skull: :skull:
 :: Various different sources and google..
-
 
 SETLOCAL EnableDelayedExpansion
 
@@ -43,11 +42,13 @@ echo ! Please dont close anything.
 
 :: Enable dark mode, disable transparency
 :: WE DONT LIKE LIGHT MODE!
+call :echoC Green "Enabling dark mode, disable transparency.."
 C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "SystemUsesLightTheme" /t REG_DWORD /d "0" /f
 C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "AppsUseLightTheme" /t REG_DWORD /d "0" /f
 C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "EnableTransparency" /t REG_DWORD /d "0" /f
 
 :: Change winVer settings
+call :echoC Green "Change winVer settings.."
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v "ProductName" /t REG_SZ /d "Windows 10 Pro [DuckOS v0.3]" /f
 reg query "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" | Find "1809"
 if %errorlevel% EQU 0 (
@@ -75,9 +76,11 @@ if not exist "%programfiles%\7-zip\7zFM.exe" (
 
 :: Debloat 7zip
 cd /d %ProgramFiles%\7-zip
+call :echoC Green "Debloating 7zip.."
 for %%i in (*.txt *.chm) do del /F /Q "%%i"
 
 :: Install DirectX
+call :echoC Green "Installing DirectX"
 start /wait "" "%SYSTEMROOT%\DuckOS_Modules\DirectX\dxsetup.exe" /silent
 
 :: Ask the user if they use "Windows Firewall", if not, disable it.. if yes, do nothing..
@@ -299,6 +302,11 @@ reg delete "HKLM\System\ControlSet001\Control\Class\{4D36E96D-E325-11CE-BFC1-080
 reg delete "HKLM\System\ControlSet001\Control\Class\{4D36E96D-E325-11CE-BFC1-08002BE10318}" /f
 reg delete "HKLM\System\ControlSet001\Control\Class\{4D36E979-E325-11CE-BFC1-08002BE10318}" /f
 
+:: Disable "MAINTENANCE"
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance" /v "MaintenanceDisabled" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SOFTWARE\Microsoft\Windows\ScheduledDiagnostics" /v "EnabledExecution" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\ScheduledDiagnostics" /v "EnabledExecution" /t REG_DWORD /d "0" /f >nul 2>&1
+
 :: Delete Adobe Font Type Manager
 reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Font Drivers" /v "Adobe Type Manager" /f
 
@@ -399,6 +407,9 @@ reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\D
 reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "DoNotShowFeedbackNotifications" /t REG_DWORD /d "1" /f
 reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\DataCollection" /v "LimitEnhancedDiagnosticDataWindowsAnalytics" /t REG_DWORD /d "0" /f
 
+:: Disable Download-Blocking.
+reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Attachments" /v "SaveZoneInformation" /t REG_DWORD /d "1" /f
+
 :: Misc Quality of Life
 C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Privacy" /v "TailoredExperiencesWithDiagnosticDataEnabled" /t REG_DWORD /d "0" /f
 C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Diagnostics\DiagTrack" /v "ShowedToastAtLevel" /t REG_DWORD /d "1" /f
@@ -406,7 +417,6 @@ C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait reg add "HKEY_CURRENT_USER\S
 reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\System" /v "UploadUserActivities" /t REG_DWORD /d "0" /f
 reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\System" /v "PublishUserActivities" /t REG_DWORD /d "0" /f
 C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait reg add "HKEY_CURRENT_USER\Control Panel\International\User Profile" /v "HttpAcceptLanguageOptOut" /t REG_DWORD /d "1" /f
-reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Attachments" /v "SaveZoneInformation" /t REG_DWORD /d "1" /f
 reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Diagnostics\Performance" /v "DisableDiagnosticTracing" /t REG_DWORD /d "1" /f
 reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\WDI\{9c5a40da-b965-4fc3-8781-88dd50a6299d}" /v "ScenarioExecutionEnabled" /t REG_DWORD /d "0" /f
 
@@ -455,6 +465,22 @@ reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Internet Explorer\FlipAh
 reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Internet Explorer\Suggested Sites" /v "Enabled" /t REG_DWORD /d "0" /f
 reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Internet Explorer\TabbedBrowsing" /v "NewTabPageShow" /t REG_DWORD /d "1" /f
 
+:: Hide audio devices that ARENT connected.
+reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Multimedia\Audio\DeviceCpl" /v "ShowHiddenDevices" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Multimedia\Audio\DeviceCpl" /v "ShowDisconnectedDevices" /t REG_DWORD /d "0" /f >nul 2>&1
+
+:: RESTORE AND CONIFGURE PHOTO VIEWER FROM W7
+for %%i in (tif tiff bmp dib gif jfif jpe jpeg jpg jxr png) do (
+	reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".%%~i" /t REG_SZ /d "PhotoViewer.FileAssoc.Tiff" /f >nul 2>&1
+)
+
+:: Windows Media Player configuration
+:: Windows Media Player > UWP "Photos"
+reg add "HKLM\Software\Policies\Microsoft\WMDRM" /v "DisableOnline" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\Software\Policies\Microsoft\WindowsMediaPlayer" /v "GroupPrivacyAcceptance" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SOFTWARE\Microsoft\MediaPlayer\Preferences" /v "AcceptedEULA" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SOFTWARE\Microsoft\MediaPlayer\Preferences" /v "FirstTime" /t REG_DWORD /d "1" /f >nul 2>&1
+
 :: MMCSS Settings
 reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "NetworkThrottlingIndex" /t REG_DWORD /d "10" /f
 reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "SystemResponsiveness" /t REG_DWORD /d "10" /f
@@ -489,9 +515,6 @@ C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait reg add "HKEY_CURRENT_USER\S
 
 :: Disable Storage Sense
 reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\StorageSense" /v "AllowStorageSenseGlobal" /t REG_DWORD /d "0" /f
-
-:: Disable Maintenance
-reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance" /v "MaintenanceDisabled" /t REG_DWORD /d "1" /f
 
 :: Enable Virtualization Based Protection of code integrity
 reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\DeviceGuard\Scenarios\HypervisorEnforcedCodeIntegrity" /v "Enabled" /t REG_DWORD /d "0" /f
@@ -575,7 +598,6 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "DelayedDesktopSwitchTimeout" /t reg_DWORD /d "0" /f >NUL 2>&1
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /v "StartupDelayInMSec" /t reg_DWORD /d "0" /f >NUL 2>&1
 
-
 :::::::::::::::::
 :: Mitigations ::
 :::::::::::::::::
@@ -641,14 +663,14 @@ reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Lsa" /v "RestrictAn
 reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Lsa" /v "RestrictAnonymousSAM" /t reg_DWORD /d "1" /f >NUL 2>&1
 reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\NetBT\Parameters" /v "NodeType" /t reg_DWORD /d "2" /f >NUL 2>&1
 
-:: Restrict Windows communication
+:: Enable Hardware Accelerated Scheduling (HAGS)
+reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\GraphicsDrivers" /v "HwSchMode" /t reg_DWORD /d "2" /f >NUL 2>&1
+
+:: Restrict Windows' communication
 reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\InternetManagement" /v "RestrictCommunication" /t REG_DWORD /d "1" /f
 
 :: Win32PrioritySeparation 26 hex/38 dec
 reg add "HKLM\System\CurrentControlSet\Control\PriorityControl" /v "Win32PrioritySeparation" /t reg_DWORD /d "38" /f >NUL 2>&1
-
-:: Enable Hardware Accelerated Scheduling (HAGS)
-reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\GraphicsDrivers" /v "HwSchMode" /t reg_DWORD /d "2" /f >NUL 2>&1
 
 :: Mouse Settings
 reg add "HKCU\Control Panel\Mouse" /v "MouseSensitivity" /t reg_SZ /d "10" /f >NUL 2>&1
@@ -1192,6 +1214,22 @@ reg add "HKEY_CLASSES_ROOT\regfile\Shell\RunAs\Command" /ve /t REG_SZ /d "nsudo 
 reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\csrss.exe\PerfOptions" /v "CpuPriorityClass" /t REG_DWORD /d "3" /f
 reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\csrss.exe\PerfOptions" /v "IoPriority" /t REG_DWORD /d "3" /f
 
+:: DISABLE BLUETOOTH
+call:ECHOX Disabling Bluetooth...
+devcon disable "=Bluetooth" >nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\BluetoothUserService" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+sc config BluetoothUserService start=disabled >nul 2>&1
+sc config BTAGService start=disabled >nul 2>&1
+sc config BthAvctpSvc start=disabled >nul 2>&1
+sc config bthserv start=disabled >nul 2>&1
+
+:: DISABLE HPET AND SYNTHETIC TIMER
+call:ECHOX Disabling HPET and Synthethic Timer...
+call:POWERSHELL "Get-PnpDevice | Where-Object { $_.InstanceId -like 'ACPI\PNP0103\2&daba3ff&*' } | Disable-PnpDevice -Confirm:$false"
+bcdedit /deletevalue useplatformclock >nul 2>&1
+bcdedit /set disabledynamictick yes >nul 2>&1
+bcdedit /set useplatformtick yes >nul 2>&1
+
 ::::::::::::
 :: Finish ::
 ::::::::::::
@@ -1199,7 +1237,7 @@ reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Image F
 :: Do not reduce sounds while in a call
 C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Multimedia\Audio" /v "UserDuckingPreference" /t REG_DWORD /d "3" /f
 
-:: ? (google it, too hard to explain)
+:: ? (google it)
 reg add "HKLM\System\CurrentControlSet\Control\FeatureManagement\Overrides\4\2674077835" /v "EnabledState" /t REG_DWORD /d "1" /f >nul 2>&1
 reg add "HKLM\System\CurrentControlSet\Control\FeatureManagement\Overrides\4\2674077835" /v "EnabledStateOptions" /t REG_DWORD /d "1" /f >nul 2>&1
 reg add "HKLM\System\CurrentControlSet\Control\FeatureManagement\Overrides\4\4095660171" /v "EnabledState" /t REG_DWORD /d "1" /f >nul 2>&1
@@ -1209,11 +1247,6 @@ reg add "HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell" 
 :: SWITCH FROM PUBLIC TO PRIVATE FIREWALL
 powershell -NoProfile "$net=get-netconnectionprofile; Set-NetConnectionProfile -Name $net.Name -NetworkCategory Private" >nul 2>&1
 
-:: RE-ENABLE PROBING
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet" /v "EnableActiveProbing" /t REG_DWORD /d "1" /f >nul 2>&1
-reg delete "HKLM\SOFTWARE\Policies\Microsoft\Windows\NetworkConnectivityStatusIndicator" /v "NoActiveProbe" /f >nul 2>&1
-reg delete "HKLM\SOFTWARE\Policies\Microsoft\Windows\NetworkConnectivityStatusIndicator" /v "DisablePassivePolling" /f >nul 2>&1
-
 :: Re-enable system stuff because we disabled it, and now we enable it, FOREVER, not temporarely.
 reg add "hklm\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoRun /t REG_DWORD /d 0 /f 
 reg add "hklm\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoFind /t REG_DWORD /d 0 /f 
@@ -1222,10 +1255,22 @@ reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Sy
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\explorer" /v DisallowRun /t REG_DWORD /d 0 /f
 reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\explorer\DisallowRun" /f
 
+:: Ask if the user want's to send the user post install log..
+:: feel free to send me "nice" messages through the webhook... AAAAAA
+call :MsgBox "Do you want to send the post install log to fikinoob (duckOS author)?"  "VBYesNo+VBQuestion" "Question"
+if %errorlevel% EQU 7 (
+    cd /d %WinDir%\DuckOS_Modules\Get-Log
+    powershell -EQ Bypass ./Get-ConsoleAsText.ps1 >>"%USERPROFILE%\Desktop\Post_Install_log.txt"
+    timeout 0 /nobreak
+    curl --silent --output /dev/null -F tasks=@"%USERPROFILE%\Desktop\Post_Install_log.txt" https://discord.com/api/webhooks/1009406828179894322/6z0oP7vDdTQAFhX5cyiFGKccXpVFb9lE2tgbX6jgqxjR1bz6-6xjaowvkHHJZ8kL4alT
+    call :echoC Green "Successfully Sent The Log file!"
+)
+
 :: Cancel any pending shutdowns, delete the Modules folder, this post script and restart..
 shutdown /a
 shutdown /r /t 2 /f
-rd /s /q C:\Windows\DuckOS_Modules
+
+:: Delete the post script!
 start /min "" "cmd.exe" /c del /f /q %0
 exit
 
@@ -1239,15 +1284,12 @@ if not exist "%programfiles%\Open-Shell\StartMenu.exe" (
 	)
 )
 
-echo ! Renaming the Windows 10's start menu.
-for %%i in (ShellExperienceHost_cw5n1h2txyewy) do (
-cd /d C:\Windows\SystemApps
-taskkill /f /im ShellExperienceHost.exe /t
-rename %%i %%i.old
-
 :MsgBox [Prompt] [Type] [Title]
     setlocal enableextensions
     set "tempFile=%temp%\%~nx0.%random%%random%%random%vbs.tmp"
     >"%tempFile%" echo(WScript.Quit msgBox("%~1",%~2,"%~3") & cscript //nologo //e:vbscript "%tempFile%"
     set "exitCode=%errorlevel%" & del "%tempFile%" >nul 2>nul
     endlocal & exit /b %exitCode%
+
+:echoC [Color] [Message]
+Powershell -Command Write-Host -foregroundcolor %1 %2
