@@ -21,9 +21,13 @@
 
 A open-sourced Windows operating system, which is a modification of the original windows 10, designed to reduce performance and latency.
 
+### Notes & Disclaimers
+⚠️ ***This iso IS STILL IN DEVELOPEMENT /\ BETA! Meaning bugs will occur, but duckOS is stable enough!***
+📝 This ISO is a highly modified fork of [Atlas-OS](https://atlasos.net)! Be aware of this and don't say the ISO is stolen!
+
 ### **What do we offer?**
 
-DuckOS is pre-tweaked. While maintaining compatibility, but also good for performance. Here's a good list of what we did to make the image very fast:
+DuckOS is **pre-tweaked**. While maintaining compatibility, but also good for performance. Here's a good list of what we did to make the image very fast:
 
 - Disabled Power Saving
 - Automatically enabled MSI Mode
