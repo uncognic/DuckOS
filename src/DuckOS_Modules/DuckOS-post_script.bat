@@ -21,9 +21,11 @@ echo %c_red%Please wait. This may take a moment.
 :: DuckOS' tweaks aren't 100% made by it's author, but the author and some people's tweaks..
 :: Today you cannot make a good operating system by yourself.. you gotta use ATLEAST 1 source.
 :: Here are credits to the people -- whos code is currently in use in this script: (no order)
-:: 1. He3als - gave this idea to make DuckOS a open-sourced project
+:: 1. He3als - gave this idea to make DuckOS a open-sourced project and made the "echo in colors" things
 :: 2. Unixcorn - We use this power plan to achieve good performance
+::::::::::::
 :: 3. Zusier - We use some tweaks he wrote for AtlasOS, which is an another good modified operating system based on windows!
+::::::::::::
 :: 4. Imribiy - NIC settings
 :: 5. CatGamerOP - I used his commands.. that delete registry classes :skull: :skull:
 :: 6. stefkeec - block telemetry ip commands
