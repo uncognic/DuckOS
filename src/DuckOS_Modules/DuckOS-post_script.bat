@@ -6,7 +6,8 @@ set c_red=[31m
 set c_green=[32m
 set c_blue=[34m
 
-set currentuser=%currentuser%
+:: heals why
+set currentuser=C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait
 
 echo %c_green%The post install script is starting...
 
