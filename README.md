@@ -41,9 +41,13 @@ DuckOS is **pre-tweaked**. While maintaining compatibility, but also good for pe
 - ~ 705 Components removed.
 - Removed almost every unneeded windows boot entry, including clearing scheduled tasks...
 
-#### Why shoud we trust you?
-
-[![Why shoud you trust duckOS?](image)](https://cdn.discordapp.com/attachments/999774689138311288/1011900995653095484/IMG_20220824_093312.jpg)
+<h1 align="center">
+  <br>
+    <br>
+    Why shoud we trust you?
+  <br>
+  <a href="https://discord.gg/8pDMf44t6R/"><img src="https://cdn.discordapp.com/attachments/999774689138311288/1011900995653095484/IMG_20220824_093312.jpg" alt="DuckOS" width="900"></a>
+</h1>
 
 ## DuckOS vs Windows 10 Original (*stock*)
 
