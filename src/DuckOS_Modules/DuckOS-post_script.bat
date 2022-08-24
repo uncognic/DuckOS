@@ -207,7 +207,7 @@ echo %c_green%Done.
 
 :: Set up the toolbox to be in the context menu
 echo %c_green%Setting up the toolbox in the context menu..
-reg add "HKEY_CLASSES_ROOT\Directory\Background\shell\DuckOS Toolbox\command" /v "" /d "C:\Windows\DuckOS_Toolbox\DuckOS_Toolbox.exe" /t REG_SZ /f
+reg add "HKEY_CLASSES_ROOT\Directory\Background\shell\DuckOS Toolbox\command" /v "" /d "C:\Windows\DuckOS_Modules\DuckOS_Toolbox\DuckOS_Toolbox.exe" /t REG_SZ /f
 echo %c_green%Done.
 
 :: Import the powerplan
