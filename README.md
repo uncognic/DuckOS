@@ -19,7 +19,7 @@
 
 ## What is DuckOS?
 
-A open-sourced Windows operating system, which is a modification of the original windows 10, designed to reduce performance and latency.
+A open-sourced Windows operating system, which is a modification of the original windows 10, designed to improve performance and reduce latency.
 
 ### Notes & Disclaimers
 ⚠️ ***This iso IS STILL IN DEVELOPEMENT /\ BETA! Meaning bugs will occur, but duckOS is stable enough!***
