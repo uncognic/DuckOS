@@ -32,6 +32,7 @@ echo %c_red%Please wait. This may take a moment.
 :: 4. Imribiy - NIC settings
 :: 5. CatGamerOP - I used his commands.. that delete registry classes :skull: :skull:
 :: 6. stefkeec - block telemetry ip commands
+:: 7. vojt. - provided toolbox icons
 :: Various different sources and google..
 
 :: Send a message!
