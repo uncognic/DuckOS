@@ -82,7 +82,7 @@ Those features are:
 - [Remote Desktop](https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=Windows+Remote+Desktop)
 - [NetBIOS](https://en.wikipedia.org/wiki/NetBIOS)
 
-*NOTE: Clicking on the blue text will re-direct you to a link with a explanation for each and every feature.*
+*NOTE: Clicking on the blue text will re-direct you to a link with an explanation for each and every feature.*
 
 But we aren't perfect, and here's some things you shoud considered before installing DuckOS on your computer:
 - More likely to crash (not always the case)
