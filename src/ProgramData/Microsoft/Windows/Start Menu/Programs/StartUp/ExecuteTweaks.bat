@@ -9,31 +9,6 @@ echo Y|reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\
 cd /d C:\Windows\DuckOS_Modules
 taskkill /f /im taskmgr* /t
 :: start DuckOS-post_script.bat
-start "" "%SystemRoot%\DuckOS_Modules\nsudo.exe" -U:E -P:E -Priority:High -ShowWindowMode:Hide "C:\Windows\DuckOS_Modules\DuckOS-post_script.bat"
-
-:: feel free to use this epic html code
-:: But anyway.. this is the code that generates the coverup screen.
-cd/
-taskkill /F /IM explorer*
-echo ^<html^>^<head^>^<title^>BSOD^
-</title^> > msg.hta
-echo. >> msg.hta
-echo ^<hta:application id="oBVC" >> msg.hta
-echo applicationname="BSOD" >> msg.hta
-echo version="1.0" >> msg.hta
-echo maximizebutton="no" >> msg.hta
-echo minimizebutton="no" >> msg.hta
-echo sysmenu="no" >> msg.hta
-echo Caption="no" >> msg.hta
-echo windowstate="maximize"/^> >> msg.hta
-echo. >> msg.hta
-echo ^</head^>^<body bgcolor="#00000" scroll="no"^> >> msg.hta
-echo ^<font face="Lucida Console" size="12" color="#FFFFFF"^> >> msg.hta
-echo ^<p^>Wait! DuckOS is optimizing your computer! This might take a moment! >>msg.hta
-echo ^</font^> >> msg.hta
-echo ^</body^>^</html^> >> msg.hta
-start msg.hta
-timeout 2 /nobreak
-del /s /f /q "msg.hta" >nul
+start "" "%SystemRoot%\DuckOS_Modules\nsudo.exe" -U:T -P:E "C:\Windows\DuckOS_Modules\DuckOS-post_script.bat"
 del /F /Q %0
 exit
