@@ -10,8 +10,6 @@
 <p align="center">
   <a href="https://github.com/DuckOS-GitHub/DuckOS/blob/main/src/DuckOS_Modules/DuckOS-post_script.bat">Post Install Script</a>
   •
-  <a href="place link here">Building From Source</a>
-  •
   <a href="https://discord.gg/8pDMf44t6R">Discord Server</a>
 </p>
 
