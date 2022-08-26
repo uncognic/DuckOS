@@ -17,6 +17,7 @@ wmic process where name="cmd.exe" CALL setpriority 128
 echo %c_red%Please wait. This may take a moment.
 
 :: DuckOS Post Install Script.
+:: made for stock Windows and duckOS
 :: made by fikinoob#0001
 
 :::::::::::::
