@@ -61,7 +61,7 @@ DuckOS is really good at many things, here's a list that why you **should use** 
 
 ### **Debloated**
 
-DuckOS is heavily debloated, pre-installed applications and other components are removed. Although this can break some compatibility, it significantly reduces ISO and install size, making the iso 1.30GB average. Functionalities such as Windows Defender, and such are stripped completely. This modification is focused on pure gaming, but most work and business.
+DuckOS is heavily debloated, pre-installed applications and other components are removed. Although this can break some compatibility, it significantly reduces ISO and install size. Programs such as Windows Defender, and such are stripped completely. This modification is focused on pure gaming, but most work and business.
 
 ### Security
 
@@ -81,6 +81,8 @@ Those features are:
 - [NetBIOS](https://en.wikipedia.org/wiki/NetBIOS)
 
 *NOTE: Clicking on the blue text will re-direct you to a link with an explanation for each and every feature.*
+
+##### Cons [What's not so good about duckOS?]
 
 But we aren't perfect, and here's some things you shoud considered before installing DuckOS on your computer:
 - More likely to crash (not always the case)
