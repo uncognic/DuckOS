@@ -20,7 +20,7 @@
 A open-sourced Windows operating system, which is a modification of the original windows 10, designed to improve performance and reduce latency.
 
 ### Notes & Disclaimers
-⚠️ ***This iso IS STILL IN DEVELOPEMENT /\ BETA! Meaning bugs will occur, but duckOS is stable enough!***
+⚠️ ***This iso IS STILL IN DEVELOPEMENT / ALPHA! Meaning bugs will occur, but duckOS is stable enough!***
 📝 This ISO is a highly modified fork of [Atlas-OS](https://atlasos.net)! Be aware of this and don't say the ISO is stolen!
 
 ### **What do we offer?**
@@ -82,7 +82,7 @@ Those features are:
 
 *NOTE: Clicking on the blue text will re-direct you to a link with an explanation for each and every feature.*
 
-#### Cons [What's not so good about duckOS?]
+### Cons [What's not so good about duckOS?]
 
 But we aren't perfect, and here's some things you shoud considered before installing DuckOS on your computer:
 - More likely to crash (not always the case)
