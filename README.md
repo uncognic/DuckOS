@@ -65,7 +65,7 @@ DuckOS is heavily debloated, pre-installed applications and other components are
 
 ### Security
 
-Since there are a lot of features disabled like for performance, we also matter about security..
+Since there are a lot of features disabled for performance, we also care about security.
 
 **What do we do?**
 
