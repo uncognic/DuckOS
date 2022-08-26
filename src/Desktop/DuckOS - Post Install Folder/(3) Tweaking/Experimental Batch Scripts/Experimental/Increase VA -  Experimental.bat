@@ -1,11 +1,9 @@
 @echo off
-title Increase User VA - Experimental
-color b
+title Increase User VA - Experimental - DuckOS
+color c
 echo.
-echo ------------------
-echo - 1. Increase VA -
-echo - 2. Default VA  -
-echo ------------------
+echo 1. Increase VA
+echo 2. Default VA
 echo.
 set /p menu=:
 if %menu% EQU 1 goto enable
