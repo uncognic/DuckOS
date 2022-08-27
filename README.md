@@ -20,7 +20,7 @@
 A open-sourced Windows operating system, which is a modification of the original windows 10, designed to improve performance and reduce latency.
 
 ### Notes & Disclaimers
-⚠️ ***This iso IS STILL IN DEVELOPEMENT / ALPHA! Meaning bugs will occur, but duckOS is stable enough!***
+⚠️ ***This ISO IS STILL IN DEVELOPEMENT / ALPHA! Meaning bugs will occur, but duckOS is stable enough!***
 📝 This ISO is a highly modified fork of [Atlas-OS](https://atlasos.net)! Be aware of this and don't say the ISO is stolen!
 
 ### **What do we offer?**
@@ -42,7 +42,7 @@ DuckOS is **pre-tweaked**. While maintaining compatibility, but also good for pe
 <h1 align="center">
   <br>
     <br>
-    Why shoud we trust you?
+    Why should we trust you?
   <br>
   <a href="https://discord.gg/8pDMf44t6R/"><img src="https://cdn.discordapp.com/attachments/999774689138311288/1011900995653095484/IMG_20220824_093312.jpg" alt="DuckOS" width="900"></a>
 </h1>
