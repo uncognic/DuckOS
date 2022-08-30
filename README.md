@@ -85,7 +85,6 @@ Those features are:
 ### Cons [What's not so good about duckOS?]
 
 But we aren't perfect, and here's some things you shoud considered before installing DuckOS on your computer:
-- More likely to crash (not always the case)
 - Lots of features disabled/broken/limited due to lots of components removed
 - More likely to give you weird, but fixable errors.
 - You have to manually install drivers.. 
