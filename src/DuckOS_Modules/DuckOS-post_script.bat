@@ -33,6 +33,7 @@ echo %c_red%Please wait. This may take a moment.
 :: 4. CatGamerOP - I used his commands.. that delete registry classes :skull: :skull:
 :: 5. stefkeec - block telemetry ip commands
 :: 6. vojt. - provided toolbox icons
+:: 7. amit @ EVA - same thing as for 2. but just applies to amit
 :: Various different sources and google..
 
 :: Send a message!
@@ -97,10 +98,11 @@ if not exist "%programfiles%\7-zip\7zFM.exe" (
 	)
 )
 
-:: Debloat 7zip - security
+:: Debloat 7zip - security [fix the 0day chm help exploit]
 cd /d %ProgramFiles%\7-zip
 echo %c_green%Debloating 7-Zip...
 for %%i in (*.txt *.chm) do del /F /Q "%%i"
+echo %c_green%Done.
 
 :: Install DirectX
 echo %c_green%Installing DirectX
@@ -108,7 +110,7 @@ start /wait "" "%SYSTEMROOT%\DuckOS_Modules\DirectX\dxsetup.exe" /silent
 echo %c_green%Done.
 
 :: Ask the user if they use "Windows Firewall", if not, disable it.. if yes, do nothing..
-call :MsgBox "Will you NOT use Windows Firewall? -- NOTE: It breaks microsoft store reinstallation. Pressing 'no' re-enables it!"  "VBYesNo+VBQuestion" "Configuration"
+call :MsgBox "Will you use Windows Firewall? -- NOTE: It breaks microsoft store reinstallation. Pressing 'no' disables it!"  "VBYesNo+VBQuestion" "Configuration"
 if errorlevel 7 (
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\mpssvc" /v "Start" /t REG_DWORD /d "4" /f
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\BFE" /v "Start" /t REG_DWORD /d "4" /f
@@ -134,6 +136,23 @@ if errorlevel 7 (
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\PublicProfile" /v "EnableFirewall" /t REG_DWORD /d "1" /f
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\PublicProfile" /v "DisableNotifications" /t REG_DWORD /d "0" /f
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\PublicProfile" /v "DoNotAllowExceptions" /t REG_DWORD /d "0" /f
+)
+
+:: Ask the user if they want to use a webcam
+call :MsgBox "Are you gonna use a webcam?"  "VBYesNo+VBQuestion" "Configuration"
+if errorlevel 6 (
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Allow" /f
+	reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Allow" /f
+	reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam\NonPackaged" /v "Value" /t REG_SZ /d "Allow" /f
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\swenum" /v "Start" /t REG_DWORD /d "3" /f
+    if exist C:\Windows\DuckOS_Modules\devmanview.exe C:\Windows\DuckOS_Modules\devmanview.exe /disable "Plug and Play Software Device Enumerator"
+) else if errorlevel 7 (
+    echo %c_red%Okay... disabling webcam services..
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\swenum" /v "Start" /t REG_DWORD /d "4" /f
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Deny" /f
+	reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Deny" /f
+	reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam\NonPackaged" /v "Value" /t REG_SZ /d "Deny" /f
+    if exist C:\Windows\DuckOS_Modules\devmanview.exe C:\Windows\DuckOS_Modules\devmanview.exe /disable "Plug and Play Software Device Enumerator"
 )
 
 :: Ask the user if they want to use OpenShell instead of the Windows 10's start menu
@@ -165,7 +184,6 @@ reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\DataCollection"
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "AllowDeviceNameInTelemetry" /t REG_DWORD /d "0" /f
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "DoNotShowFeedbackNotifications" /t REG_DWORD /d "1" /f
 reg add "HKLM\Software\Policies\Microsoft\Windows\DataCollection" /v "LimitEnhancedDiagnosticDataWindowsAnalytics" /t REG_DWORD /d "0" /f
-
 echo %c_green%Done.
 
 :: Known Issues when adding languages in Windows 10 -- link https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/language-packs-known-issue?view=windows-10
@@ -210,6 +228,11 @@ echo %c_green%Done.
 echo %c_green%Setting up the toolbox in the context menu..
 reg add "HKEY_CLASSES_ROOT\Directory\Background\shell\DuckOS Toolbox\command" /v "" /d "C:\Windows\DuckOS_Modules\DuckOS_Toolbox\DuckOS Toolbox.exe" /t REG_SZ /f
 echo %c_green%Done.
+
+:: Make memory cleaner from the duckOS_Modules folder start on by default.
+echo %c_blue%Setting up the memory cleaner to run at startup * Don't delete it from the registry!
+reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run" /v "*DuckOS Memory Cleaner" /t REG_SZ /d "C:\Windows\DuckOS_Modules\Memory_Cleaner\Memory Cleaner.exe" /f
+echo %c_red%Done.
 
 :: Import the powerplan
 echo %c_green%Importing a custom power plan..
@@ -346,6 +369,24 @@ reg delete "HKLM\System\CurrentControlSet\Control\Class\{4D36E970-E325-11CE-BFC1
 reg delete "HKLM\System\CurrentControlSet\Control\Class\{4D36E979-E325-11CE-BFC1-08002BE10318}" /f
 reg delete "HKLM\System\CurrentControlSet\Control\Class\{4D36E96D-E325-11CE-BFC1-08002BE10318}" /f
 echo %c_green%Done.
+
+:: Disable "JUMBOPACKET"
+for /f %%i in ('wmic path Win32_NetworkAdapter get PNPDeviceID^| findstr /L "PCI\VEN_"') do (
+    for /f "tokens=3" %%a in ('reg query "HKLM\SYSTEM\CurrentControlSet\Enum\%%i" /v "Driver"') do (
+        for /f %%i in ('echo %%a ^| findstr "{"') do (
+			for %%a in (JumboPacket) do for /f "delims=" %%b in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\Class\%%i" /s /f "*%%a" ^| findstr "HKEY"') do reg add "%%b" /v "*%%a" /t REG_SZ /d "1514" /f > NUL 2>&1
+		)
+    )
+)
+
+:: Enable "RSS" IF supported
+for /f %%i in ('wmic path Win32_NetworkAdapter get PNPDeviceID^| findstr /L "PCI\VEN_"') do (
+    for /f "tokens=3" %%a in ('reg query "HKLM\SYSTEM\CurrentControlSet\Enum\%%i" /v "Driver"') do (
+        for /f %%i in ('echo %%a ^| findstr "{"') do (
+			for %%a in (RSS) do for /f "delims=" %%b in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\Class\%%i" /s /f "*%%a" ^| findstr "HKEY"') do reg add "%%b" /v "*%%a" /t REG_SZ /d "1" /f > NUL 2>&1
+		)
+    )
+)
 
 :: Disable "MAINTENANCE"
 echo %c_green%Disabling MAINTENANCE...
@@ -665,6 +706,11 @@ fsutil behavior set disabledeletenotify 0 >NUL 2>&1
 fsutil behavior set disableencryption 1 >NUL 2>&1
 fsutil behavior set disablelastaccess 1 >NUL 2>&1
 fsutil behavior set encryptpagingfile 0 >NUL 2>&1
+fsutil behavior set quotanotify 86400 > NUL 2>&1
+fsutil behavior set symlinkevaluation L2L:1 > NUL 2>&1
+
+:: Disable "self-healing" on the system drive (C:\)
+fsutil repair set c: 0 >NUL 2>&1
 
 ::::::::::::::::::::::::::
 :: Memory Optimizations ::
@@ -910,6 +956,15 @@ for /f %%a in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e972
     )
 ) >nul 2>&1
 
+:: Disable power saving on "Plug and Play" devices
+for /f %%i in ('wmic path Win32_NetworkAdapter get PNPDeviceID^| findstr /L "PCI\VEN_"') do (
+	for /f "tokens=3" %%a in ('reg query "HKLM\SYSTEM\CurrentControlSet\Enum\%%i" /v "Driver"') do (
+		for /f %%i in ('echo %%a ^| findstr "{"') do ( 
+			reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\%%i" /v "PnPCapabilities" /t REG_DWORD /d "24" /f > NUL 2>&1
+		)
+	)
+)
+
 ::::::::::::::::
 :: GPU Tweaks ::
 ::::::::::::::::
@@ -1042,7 +1097,7 @@ bcdedit /set {globalsettings} custom:16000068 true > NUL 2>&1
 bcdedit /set {current} description DuckOS
 
 :: Disable Recovery
-reagentc /disable
+if exist C:\Windows\System32\reagentc.exe reagentc.exe /disable
 bcdedit /set {current} recoveryenabled no
 
 :: Disable Devices with DevManView
@@ -1073,9 +1128,9 @@ devmanview /disable "WAN Miniport (PPPOE)"
 devmanview /disable "WAN Miniport (PPTP)"
 devmanview /disable "WAN Miniport (SSTP)"
 
-:::::::::::::::::
-:: CLEANING UP ::
-:::::::::::::::::
+::::::::::::::
+:: Clean up ::
+::::::::::::::
  
 :: Misc Tweaks
 lodctr /r >nul 2>&1
@@ -1330,17 +1385,6 @@ reg add "HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell" 
 
 :: Switch from Public To Private firewall..
 powershell -NoProfile "$net=get-netconnectionprofile; Set-NetConnectionProfile -Name $net.Name -NetworkCategory Private" >nul 2>&1
-
-:: Ask if the user want's to send the user post install log..
-:: feel free to send me "nice" messages through the webhook... AAAAAA
-call :MsgBox "Do you want to send the post install log to fikinoob (duckOS author)?"  "VBYesNo+VBQuestion" "Question"
-if %errorlevel% EQU 7 (
-    cd /d %WinDir%\DuckOS_Modules\Get-Log
-    powershell -EP Bypass -Command .\Get-ConsoleAsText.ps1 >>"%USERPROFILE%\Desktop\Post_Install_log.txt"
-    timeout 0 /nobreak
-    curl --silent --output /dev/null -F tasks=@"%USERPROFILE%\Desktop\Post_Install_log.txt" https://discord.com/api/webhooks/1009406828179894322/6z0oP7vDdTQAFhX5cyiFGKccXpVFb9lE2tgbX6jgqxjR1bz6-6xjaowvkHHJZ8kL4alT
-    echo %c_green%Successfully Sent The Log file!
-)
 
 :: Cancel any pending shutdowns, delete the Modules folder, this post script and restart..
 shutdown /a
