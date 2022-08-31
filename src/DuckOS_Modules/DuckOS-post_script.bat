@@ -155,13 +155,6 @@ if errorlevel 6 (
     if exist C:\Windows\DuckOS_Modules\devmanview.exe C:\Windows\DuckOS_Modules\devmanview.exe /disable "Plug and Play Software Device Enumerator"
 )
 
-:: Ask the user if they want to use OpenShell instead of the Windows 10's start menu
-call :MsgBox "Would you like to install OpenShell -- includes renaming the Window 10's start menu, breaking icon's functionality on the taskbar.."  "VBYesNo+VBQuestion" "Configuration"
-if errorlevel 7 (
-	:: i got bored of debuging this so im just making it go to a label
-	call InstallOpenShell 2>nul
-)
-
 :: Remove Telemetry IPs - rest is done through NTLite
 echo %c_red%Disabling Telemetry IPs..
 netsh advfirewall firewall add rule name="Block Windows Telemetry" dir=in action=block remoteip=134.170.30.202,137.116.81.24,157.56.106.189,184.86.53.99,2.22.61.43,2.22.61.66,204.79.197.200,23.218.212.69,65.39.117.23,65.55.108.23,64.4.54.254 enable=yes > nul
@@ -1383,16 +1376,6 @@ shutdown /r /t 2 /f
 :: Delete the post script!
 start /min "" "cmd.exe" /c del /f /q %0
 exit
-
-:InstallOpenShell
-if not exist %programfiles%\Open-Shell\StartMenu.exe (
-	echo ! OpenShell not found, trying to reinstall..
-	if exist %SystemRoot%\Setup\Files\OpenShellSetup_4_4_170.exe (
-		echo ! OpenShell installer detected in %Systemroot%\Setup\Files\OpenShellSetup_4_4_170.exe .. reinstalling..
-		start /wait "" "%SystemRoot%\Setup\Files\OpenShellSetup_4_4_170.exe" /qn ADDLOCAL=StartMenu
-		echo ! OpenShell installation done.
-	)
-)
 
 :MsgBox [Prompt] [Type] [Title]
     setlocal enableextensions
