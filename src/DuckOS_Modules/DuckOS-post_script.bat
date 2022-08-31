@@ -162,16 +162,6 @@ if errorlevel 7 (
 	call InstallOpenShell 2>nul
 )
 
-:: Debloat OpenShell -- if it exists
-echo %c_green%Debloating Openshell...
-if exist %ProgramFiles%\Open-Shell (
-	cd /d %ProgramFiles%\Open-Shell
-	for %%i in (OpenShell.chm *.lnk OpenShellReadme.rtf) do del /F /Q "%%i"
-	cd /d %ProgramFiles%\Open-Shell\Skins
-	for %%i in (*.skin *.skin7) do del /F /Q "%%i"
-)
-echo %c_green%Done.
-
 :: Remove Telemetry IPs - rest is done through NTLite
 echo %c_red%Disabling Telemetry IPs..
 netsh advfirewall firewall add rule name="Block Windows Telemetry" dir=in action=block remoteip=134.170.30.202,137.116.81.24,157.56.106.189,184.86.53.99,2.22.61.43,2.22.61.66,204.79.197.200,23.218.212.69,65.39.117.23,65.55.108.23,64.4.54.254 enable=yes > nul
