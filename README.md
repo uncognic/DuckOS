@@ -55,8 +55,8 @@ DuckOS is really good at many things, here's a list that why you **should use** 
 - CPU at 0% usage idle, but this really depends on the processor.
 - Less services
 - Less unneeded drivers
-- More FPS, less lags in general
-- Faster wifi due to tweaks
+- More FPS, less lagging in general
+- Faster wifi because of tweaks
 - and more!
 
 ### **Debloated**
