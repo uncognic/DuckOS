@@ -216,6 +216,9 @@ echo %c_blue%Setting up the memory cleaner to run at startup * Don't delete it f
 reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run" /v "*DuckOS Memory Cleaner" /t REG_SZ /d "C:\Windows\DuckOS_Modules\Memory_Cleaner\Memory Cleaner.exe" /f
 echo %c_red%Done.
 
+:: Make the computer restart 1 time after the current restart, because THAT fixed OS issues
+reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce" /v "*Silent System Restart" /t REG_SZ /d "C:\Windows\System32\shutdown.exe -r -t 0" /f
+
 :: Import the powerplan
 echo %c_green%Importing a custom power plan..
 powercfg -import "C:\Windows\DuckOS_Modules\Duck.pow" 11111111-1111-1111-1111-111111111111
