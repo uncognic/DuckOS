@@ -81,24 +81,15 @@ echo %c_green%Done.
 :: Set UTC to prevent issues with dual booting (specifically with Linux)
 reg add "HKLM\System\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /d 1 /t REG_DWORD /f > nul
 
-:::::::::::::::::::::::::
-:: Automatic Repairing :: -- manual version in the post install folder located on the desktop
-:::::::::::::::::::::::::
-
-:: What does it do? This bassiclly makes sure your apps install, if they don't exist, they will try to be installed..
-:: The code below is user friendly, we don't have to simplify it even more..
-
-:: 7zip
-if not exist "%programfiles%\7-zip\7zFM.exe" (
-	echo ! 7zip not found, trying to reinstall..
-	if exist %SystemRoot%\Setup\Files\7z2201-x64.msi (
-		echo ! 7zip installer detected in %Systemroot%\Setup\Files\7z2201-x64.msi.. reinstalling..
-		start /wait "" "%SystemRoot%\Setup\Files\7z2201-x64.msi" /passive
-		echo ! 7zip installation done.
-	)
+:: Install 7zip
+if exist C:\Windows\DuckOS_Modules\Utils\7z2201-x64.msi (
+    echo %c_red%Installing 7zip..
+    cd C:\Windows\DuckOS_Modules\Utils
+    start /wait "" "7z2201-x64.msi" /passive
+    echo %c_green%Done.
 )
 
-:: Debloat 7zip - security [fix the 0day chm help exploit]
+:: Debloat 7zip - security [fix the 0-day chm help exploit]
 cd /d %ProgramFiles%\7-zip
 echo %c_green%Debloating 7-Zip...
 for %%i in (*.txt *.chm) do del /F /Q "%%i"
