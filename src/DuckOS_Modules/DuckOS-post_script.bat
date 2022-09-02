@@ -100,6 +100,14 @@ echo %c_green%Installing DirectX
 start /wait "" "%SYSTEMROOT%\DuckOS_Modules\DirectX\dxsetup.exe" /silent
 echo %c_green%Done.
 
+:: Install VCRedists
+if exist C:\Windows\DuckOS_Modules\vcredist.exe (
+    echo %c_red%Installing VCRedists..
+    cd C:\Windows\DuckOS_Modules
+    start /wait "" "vcredist.exe" /ai
+    echo %c_green%Done.
+)
+
 :: Ask the user if they use "Windows Firewall", if not, disable it.. if yes, do nothing..
 call :MsgBox "Will you use Windows Firewall? -- NOTE: It breaks microsoft store reinstallation. Pressing 'no' disables it!"  "VBYesNo+VBQuestion" "Configuration"
 if errorlevel 7 (
