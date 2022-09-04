@@ -566,6 +566,10 @@ reg add "HKLM\Software\Policies\Microsoft\Internet Explorer\FlipAhead" /v "Enabl
 reg add "HKLM\Software\Policies\Microsoft\Internet Explorer\Suggested Sites" /v "Enabled" /t REG_DWORD /d "0" /f
 reg add "HKLM\Software\Policies\Microsoft\Internet Explorer\TabbedBrowsing" /v "NewTabPageShow" /t REG_DWORD /d "1" /f
 
+:: Disable Remote Desktop
+echo ! Disabling Remote Desktop..
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurRentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d "1" /f
+
 :: Hide audio devices that ARENT connected.
 echo %c_green%Hiding audio devices that aren't connected...
 reg add "HKCU\SOFTWARE\Microsoft\Multimedia\Audio\DeviceCpl" /v "ShowHiddenDevices" /t REG_DWORD /d "0" /f >nul 2>&1
