@@ -212,7 +212,7 @@ reg add "HKEY_CLASSES_ROOT\Directory\Background\shell\DuckOS Toolbox\command" /v
 echo %c_green%Done.
 
 :: Make the computer restart 1 time after the current restart, because THAT fixed OS issues
-reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce" /v "*Silent System Restart" /t REG_SZ /d "C:\Windows\System32\shutdown.exe -r -t 0" /f
+reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce" /v "*Silent System Restart" /t REG_SZ /d "C:\Windows\System32\shutdown.exe -r -t 0 -f" /f
 
 :: Import the powerplan
 echo %c_green%Importing a custom power plan..
