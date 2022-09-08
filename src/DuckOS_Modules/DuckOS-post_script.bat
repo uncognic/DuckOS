@@ -211,11 +211,6 @@ echo %c_green%Setting up the toolbox in the context menu..
 reg add "HKEY_CLASSES_ROOT\Directory\Background\shell\DuckOS Toolbox\command" /v "" /d "C:\Windows\DuckOS_Modules\DuckOS_Toolbox\DuckOS Toolbox.exe" /t REG_SZ /f
 echo %c_green%Done.
 
-:: Make memory cleaner from the duckOS_Modules folder start on by default.
-echo %c_blue%Setting up the memory cleaner to run at startup * Don't delete it from the registry!
-reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run" /v "*DuckOS Memory Cleaner" /t REG_SZ /d "C:\Windows\DuckOS_Modules\Memory_Cleaner\Memory Cleaner.exe" /f
-echo %c_red%Done.
-
 :: Make the computer restart 1 time after the current restart, because THAT fixed OS issues
 reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce" /v "*Silent System Restart" /t REG_SZ /d "C:\Windows\System32\shutdown.exe -r -t 0" /f
 
