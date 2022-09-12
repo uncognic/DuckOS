@@ -1,16 +1,15 @@
 <h1 align="center">
   <br>
-  <a href="https://discord.gg/8pDMf44t6R/"><img src="https://github.com/DuckOS-GitHub/DuckOS/raw/main/branding/banner.jpg" alt="DuckOS" width="900"></a>
+  <img src="https://github.com/DuckOS-GitHub/DuckOS/raw/main/branding/banner.jpg" alt="DuckOS" width="900">
   <br>
   DuckOS
   <br>
 </h1>
-<h4 align="center">A open-sourced Windows operating system, which is a modification of the original windows 10, designed to reduce performance and latency.</h4>
+<h4 align="center">An open-sourced Windows operating system, which is a modification of the original Windows 10, designed to reduce latency and increase performance.</h4>
 
 <p align="center">
-  <a href="https://github.com/DuckOS-GitHub/DuckOS/blob/main/src/DuckOS_Modules/DuckOS-post_script.bat">Post Install Script</a>
-  •
-  <a href="https://discord.gg/8pDMf44t6R">Discord Server</a>
+  <a href="https://github.com/DuckOS-GitHub/DuckOS/blob/main/src/DuckOS_Modules/DuckOS-post_script.bat"><img src="https://img.shields.io/badge/post%20install%20script-download-green" alt="Post Install Script"></a>
+  <a href="https://discord.gg/8pDMf44t6R/"><img src="https://img.shields.io/discord/998645880368410694.svg?label=discord" alt="DuckOS Discord"></a>
 </p>
 
 # DuckOS
@@ -20,7 +19,7 @@
 A open-sourced Windows operating system, which is a modification of the original windows 10, designed to improve performance and reduce latency.
 
 ### Notes & Disclaimers
-⚠️ ***This ISO IS STILL IN DEVELOPEMENT / ALPHA! Meaning bugs will occur, but duckOS is stable enough!***
+⚠️ ***This ISO IS STILL IN DEVELOPEMENT / ALPHA! Meaning bugs will occur, but DuckOS is stable enough!***
 📝 This ISO is a highly modified fork of a different custom OS! Be aware of this and don't say the ISO is stolen!
 
 ### **What do we offer?**
@@ -37,7 +36,7 @@ DuckOS is **pre-tweaked**. While maintaining compatibility, but also good for pe
 - Boot Configuration Optimization
 - Optimized Process Scheduling
 - ~ 705 Components removed.
-- Removed almost every unneeded windows boot entry, including clearing scheduled tasks...
+- Removed almost every unneeded Windows boot entry, including clearing scheduled tasks...
 
 <h1 align="center">
   <br>
@@ -82,9 +81,9 @@ Those features are:
 
 *NOTE: Clicking on the blue text will re-direct you to a link with an explanation for each and every feature.*
 
-### Cons [What's not so good about duckOS?]
+### Cons [What's not so good about DuckOS?]
 
 But we aren't perfect, and here's some things you shoud considered before installing DuckOS on your computer:
-- Lots of features disabled/broken/limited due to lots of components removed
+- Lots of features disabled/broken/limited due to lots of components removed.
 - More likely to give you weird, but fixable errors.
-- You have to manually install drivers.. 
+- You have to manually install drivers...
