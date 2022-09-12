@@ -21,6 +21,7 @@ A open-sourced Windows operating system, which is a modification of the original
 ### Notes & Disclaimers
 ⚠️ ***This ISO IS STILL IN DEVELOPEMENT / ALPHA! Meaning bugs will occur, but DuckOS is stable enough!***
 📝 This ISO is a highly modified fork of a different custom OS! Be aware of this and don't say the ISO is stolen!
+🐧 If the windows image for some reason isn't good for you, check out our Linux version :)
 
 ### **What do we offer?**
 
