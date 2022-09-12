@@ -12,10 +12,6 @@
   <a href="https://discord.gg/8pDMf44t6R/"><img src="https://img.shields.io/discord/998645880368410694.svg?label=discord" alt="DuckOS Discord"></a>
 </p>
 
-<p align="center">
-<iframe src="https://discord.com/widget?id=998645880368410694&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
-</p>
-
 # DuckOS
 
 ## What is DuckOS?
