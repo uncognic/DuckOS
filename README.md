@@ -19,13 +19,13 @@
 A open-sourced Windows operating system, which is a modification of the original windows 10, designed to improve performance and reduce latency.
 
 ### Notes & Disclaimers
-⚠️ ***This ISO IS STILL IN DEVELOPEMENT / ALPHA! Meaning bugs will occur, but DuckOS is stable enough!***
-📝 This ISO is a highly modified fork of a different custom OS! Be aware of this and don't say the ISO is stolen!
-🐧 If the windows image for some reason isn't good for you, check out our Linux version :)
+⚠️ ***This ISO IS STILL IN DEVELOPEMENT / ALPHA! Meaning bugs will occur, but DuckOS is stable enough!***<br>
+📝 This ISO is a highly modified fork of a different custom OS! Be aware of this and **don't say the ISO is stolen!**<br>
+🐧 If the Windows image for some reason isn't good for you, check out our Linux version :)<br>
 
 ### **What do we offer?**
 
-DuckOS is **pre-tweaked**. While maintaining compatibility, but also good for performance. Here's a good list of what we did to make the image very fast:
+DuckOS is **pre-tweaked**. While maintaining compatibility, it's also good for performance. Here's a good list of what we did to make the image very fast:
 
 - Disabled Power Saving
 - Automatically enabled MSI Mode
