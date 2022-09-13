@@ -42,7 +42,7 @@ DuckOS is **pre-tweaked**. While maintaining compatibility, it's also good for p
 <h1 align="center">
   <br>
     <br>
-    Why should we trust you?
+    Why should you trust us?
   <br>
   <a href="https://discord.gg/8pDMf44t6R/"><img src="https://cdn.discordapp.com/attachments/999774689138311288/1011900995653095484/IMG_20220824_093312.jpg" alt="DuckOS" width="900"></a>
 </h1>
