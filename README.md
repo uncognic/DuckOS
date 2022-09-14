@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <img src="https://github.com/DuckOS-GitHub/DuckOS/raw/main/branding/banner.jpg" alt="DuckOS" width="900">
+  <img src="https://github.com/DuckOS-GitHub/DuckOS/blob/main/banner.jpg?raw=true" alt="DuckOS" width="900">
   <br>
   DuckOS
   <br>
