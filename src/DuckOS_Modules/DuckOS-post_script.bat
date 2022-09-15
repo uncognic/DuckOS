@@ -7,7 +7,7 @@
 :::::::::::::::::::::::::::::::::::::
 :: Made by fikinoob#6487 for DuckOS
 :: Contributed by AnhNguyen#7472
-::::::::::::::::::::::::::::::::::::
+:::::::::::::::::::::::::::::::::::::
 
 :: Set up echo in colors
 chcp 65001 >nul 2>&1
@@ -261,6 +261,7 @@ title Do not close this window - [13/66] Configuring restart
 reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce" /v "*Silent System Restart" /t REG_SZ /d "C:\Windows\System32\shutdown.exe -r -t 0 -f" /f
 
 :: Import the powerplan BASED on your processor
+:: Explanation: AMD has worse speeds, more cores, IDLE isn't ideal, Intel has faster speeds, but less cores, IDLE is ideal.
 title Do not close this window - [14/66] Power Plan
 echo %c_green%Importing a custom power plan based on your processor..
 
@@ -272,7 +273,7 @@ set INTEL=%errorlevel%
 wmic cpu get name|find /i "AMD"
 set AMD=%errorlevel%
 
-:: Checking
+:: Checking the processor...
 if %INTEL% equ 0 (
     echo $ Intel processor detected, making sure powerplan = idle OFF
     echo $ MIGHT CAUSE THE CPU % TO BE INACCURATE!
