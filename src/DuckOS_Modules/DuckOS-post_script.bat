@@ -1,5 +1,14 @@
 @echo off 
 
+:::::::::::::::::::::::::::::::::
+:: DuckOS Post Install Script. ::
+:::::::::::::::::::::::::::::::::
+
+:::::::::::::::::::::::::::::::::::::
+:: Made by fikinoob#6487 for DuckOS
+:: Contributed by AnhNguyen#7472
+::::::::::::::::::::::::::::::::::::
+
 :: Set up echo in colors
 chcp 65001 >nul 2>&1
 set c_red=[31m
@@ -11,17 +20,11 @@ set c_cyan=[36m
 
 :: Set a variable.. that we will use later... that points into a executable.
 set currentuser=C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait
-
-echo %c_cyan%The post install script is starting...
+powershell -WindowStyle Maximized Write-Host The post install script is starting...
 
 :: Make the script faster by putting a higher priority.
 wmic process where name="cmd.exe" CALL setpriority 128
-
 echo %c_purple%Please wait. This may take a moment.
-
-:: DuckOS Post Install Script.
-:: made for DuckOS
-:: made by fikinoob#6487
 
 :::::::::::::
 :: Credits :: 
@@ -106,13 +109,7 @@ SETLOCAL EnableDelayedExpansion
 echo %c_cyan%Setting environment variables...
 for /f "tokens=2 delims==" %%a in ('wmic os get TotalVisibleMemorySize /format:value ^| findstr "TotalVisibleMemorySize"') do set "TotalVisibleMemorySize=%%a"
 set /a RAM=%TotalVisibleMemorySize%+1024000
-for /f "delims=:{}" %%i in ('wmic path Win32_systemenclosure get ChassisTypes^| findstr [0-9]') do set "CHASSIS=%%i"
-set /a LAPTOP=0
-if %CHASSIS% GTR 7 ( 
-if %CHASSIS% LSS 17 ( set /a LAPTOP=1 )
-if %CHASSIS% GTR 28 ( set /a LAPTOP=1 ) 
-)
-echo %c_green%Done!
+echo %c_green%Done.
 
 :: Import services.reg and any other registry file in there.
 title Do not close this window - [4/66] Importing registry
@@ -144,11 +141,12 @@ echo %c_green%Done.
 
 :: Set UTC to prevent issues with dual booting (specifically with Linux)
 title Do not close this window - [7/66] Setting UTC
-reg add "HKLM\System\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /d 1 /t REG_DWORD /f > nul
+reg add "HKLM\System\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /d 1 /t REG_DWORD /f >nul
 
 ::::::::::::::
-:: Programs ::
+:: Software ::
 ::::::::::::::
+
 :: Install 7-zip
 title Do not close this window - [8/66] Programs Installation
 :7z
@@ -156,7 +154,7 @@ if exist C:\Windows\DuckOS_Modules\Utils\7z2201-x64.msi (
     echo %c_cyan%Installing 7-zip..
     cd C:\Windows\DuckOS_Modules\Utils
     start /wait "" "7z2201-x64.msi" /passive
-    echo %c_green%Done.
+    echo Done.
 ) else (
     echo %c_red%Couldn't find 7-Zip installation file! Skipping it...
 )
@@ -184,12 +182,23 @@ if exist C:\Windows\DuckOS_Modules\vcredist.exe (
     echo %c_green%Done.
 ) else (
     echo %c_red%Couldn't file VCRedists installation file! Skipping it... 
+)
 
-:: Remove Telemetry IPs - rest is done through NTLite
+::::::::::::::::::::::::::
+:: Remove Telemetry IPs ::
+::::::::::::::::::::::::::
+
 title Do not close this window - [9/66] Telemetry & Privacy
 echo %c_red%Disabling Telemetry IPs..
+
+:: Inbound
 netsh advfirewall firewall add rule name="Block Windows Telemetry" dir=in action=block remoteip=134.170.30.202,137.116.81.24,157.56.106.189,184.86.53.99,2.22.61.43,2.22.61.66,204.79.197.200,23.218.212.69,65.39.117.23,65.55.108.23,64.4.54.254 enable=yes > nul
-netsh advfirewall firewall add rule name="Block NVIDIA Telemetry" dir=in action=block remoteip=8.36.80.197,8.36.80.224,8.36.80.252,8.36.113.118,8.36.113.141,8.36.80.230,8.36.80.231,8.36.113.126,8.36.80.195,8.36.80.217,8.36.80.237,8.36.80.246,8.36.113.116,8.36.113.139,8.36.80.244,216.228.121.209 enable=yes > nul
+netsh advfirewall firewall add rule name="Block NVIDIA Telemetry" dir=out action=block remoteip=8.36.80.197,8.36.80.224,8.36.80.252,8.36.113.118,8.36.113.141,8.36.80.230,8.36.80.231,8.36.113.126,8.36.80.195,8.36.80.217,8.36.80.237,8.36.80.246,8.36.113.116,8.36.113.139,8.36.80.244,216.228.121.209 enable=yes > nul
+
+:: Outbound
+netsh advfirewall firewall add rule name="Block Windows Telemetry" dir=out action=block remoteip=134.170.30.202,137.116.81.24,157.56.106.189,184.86.53.99,2.22.61.43,2.22.61.66,204.79.197.200,23.218.212.69,65.39.117.23,65.55.108.23,64.4.54.254 enable=yes > nul
+netsh advfirewall firewall add rule name="Block NVIDIA Telemetry" dir=out action=block remoteip=8.36.80.197,8.36.80.224,8.36.80.252,8.36.113.118,8.36.113.141,8.36.80.230,8.36.80.231,8.36.113.126,8.36.80.195,8.36.80.217,8.36.80.237,8.36.80.246,8.36.113.116,8.36.113.139,8.36.80.244,216.228.121.209 enable=yes > nul
+echo %c_red%Done.
 
 :: Disable Data Collection (telemetry)
 :: Gives you privacy :)
@@ -269,20 +278,23 @@ title Do not close this window - [16/66] Disabling unneeded scheduled tasks
 echo %c_cyan%Disabling unneeded scheduled tasks...
 for %%a in ("\Microsoft\Windows\PushToInstall\LoginCheck" "\Microsoft\Windows\Ras\MobilityManager" "\Microsoft\Windows\UpdateOrchestrator\Reportpolicies" "\Microsoft\Windows\CloudExperienceHost\CreateObjectTask" "\Microsoft\Windows\ApplicationExperience\StartupAppTask" "\Microsoft\Windows\WindowsUpdate\ScheduledStart" "\Microsoft\Windows\Shell\FamilySafetyMonitor" "\Microsoft\Windows\Shell\FamilySafetyMonitor" "\Microsoft\Windows\WindowsErrorReporting\QueueReporting" "\Microsoft\Windows\MemoryDiagnostic\RunFullMemoryDiagnostic" "\Microsoft\Windows\Diagnosis\Scheduled" "\Microsoft\Windows\DiskFootprint\StorageSense" "\Microsoft\Windows\MobileBroadbandAccounts\MNOMetadataParser" "\Microsoft\Windows\PushToInstall\LoginCheck" "\Microsoft\Windows\PowerEfficiencyDiagnostics\AnalyzeSystem" "\Microsoft\Windows\DiskCleanup\SilentCleanup" "\Microsoft\Windows\Multimedia\Microsoft\Windows\Multimedia" "\Microsoft\Windows\TimeZone\SynchronizeTimeZone" "\Microsoft\Windows\Diagnosis\Scheduled" "\Microsoft\Windows\UpdateOrchestrator\ScheduleScanStaticTask" "\MicrosoftEdgeUpdateBrowserReplacementTask" "\Microsoft\Windows\WindowsUpdate\ScheduledStart" "\Microsoft\Windows\UPnP\UPnPHostConfig" "\Microsoft\Windows\DiskFootprint\Diagnostics" "\Microsoft\Windows\WindowsFilteringPlatform\BfeOnLoltartTypeChange" "\Microsoft\Windows\International\SynchronizeLanguageSettings" "\Microsoft\Windows\UpdateOrchestrator\ScheduleWork" "\Microsoft\Windows\SoftwareProtectionPlatform\SvcRestartTaskLogon" "\Microsoft\Windows\ApplicationExperience\PcaPatchDbTask" "\Microsoft\Windows\TimeZone\SynchronizeTimeZone" "\Microsoft\Windows\Shell\IndexerAutomaticMaintenance" "\Microsoft\Windows\WindowsFilteringPlatform\BfeOnServiceStartTypeChange" "\Microsoft\Windows\WaaSMedic\PerformRemediation" "\Microsoft\Windows\RemoteAssistance\RemoteAssistanceTask" "\Microsoft\Windows\RemoteAssistance\RemoteAssistanceTask" "\Microsoft\Windows\Autochk\Proxy" "\Microsoft\Windows\SoftwareProtectionPlatform\SvcRestartTaskNetwork" "\Microsoft\Windows\SoftwareProtectionPlatform\SvcRestartTaskLogon" "\Microsoft\Windows\InstallService\SmartRetry" "\Microsoft\Windows\Printing\EduPrintProv" "\Microsoft\Windows\Shell\IndexerAutomaticMaintenance" "\Microsoft\Windows\MemoryDiagnostic\ProcessMemoryDiagnosticEvents" "\Microsoft\Windows\UpdateOrchestrator\UpdateModelTask" "\Microsoft\Windows\UpdateOrchestrator\Reportpolicies" "\Microsoft\Windows\UpdateOrchestrator\UpdateModelTask" "\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector" "\Microsoft\Windows\Multimedia\Microsoft\Windows\Multimedia" "\Microsoft\Windows\Wininet\CacheTask" "\Microsoft\Windows\Ras\MobilityManager" "\Microsoft\Windows\DiskCleanup\SilentCleanup" "\Microsoft\Windows\UpdateOrchestrator\USO_UxBroker" "\Microsoft\Windows\StateRepository\MaintenanceTasks" "\Microsoft\Windows\DeviceSetup\MetadataRefresh" "\Microsoft\Windows\WaaSMedic\PerformRemediation" "\Microsoft\Windows\RetailDemo\CleanupOfflineContent" "\Microsoft\Windows\UpdateOrchestrator\ScheduleScan" "\Microsoft\Windows\MemoryDiagnostic\ProcessMemoryDiagnosticEvents" "\Microsoft\Windows\Autochk\Proxy" "\Microsoft\Windows\BrokerInfrastructure\BgTaskregistrationMaintenanceTask" "\Microsoft\Windows\TimeSynchronization\SynchronizeTime" "\Microsoft\Windows\Wininet\CacheTask" "\Microsoft\Windows\ApplicationExperience\PcaPatchDbTask" "\Microsoft\Windows\UpdateOrchestrator\ScheduleWork" "\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector" "\Microsoft\Windows\ApplicationExperience\MicrosoftCompatibilityAppraiser" "\Microsoft\Windows\UpdateOrchestrator\USO_UxBroker" "\Microsoft\Windows\TimeSynchronization\ForceSynchronizeTime" "\Microsoft\Windows\InstallService\ScanForUpdatesAsUser" "\Microsoft\Windows\TimeSynchronization\ForceSynchronizeTime" "\Microsoft\Windows\ApplicationExperience\StartupAppTask" "\Microsoft\Windows\International\SynchronizeLanguageSettings" "\Microsoft\Windows\ApplicationExperience\MicrosoftCompatibilityAppraiser" "\Microsoft\Windows\UpdateOrchestrator\ScheduleScan" "\Microsoft\Windows\UPnP\UPnPHostConfig" "\Microsoft\Windows\MemoryDiagnostic\RunFullMemoryDiagnostic" "\Microsoft\Windows\CloudExperienceHost\CreateObjectTask" "\Microsoft\Windows\registry\regIdleBackup" "\Microsoft\Windows\TimeSynchronization\SynchronizeTime" "\Microsoft\Windows\Printing\EduPrintProv" "\Microsoft\Windows\MobileBroadbandAccounts\MNOMetadataParser" "\Microsoft\Windows\WindowsErrorReporting\QueueReporting" "\Microsoft\Windows\RetailDemo\CleanupOfflineContent" "\Microsoft\Windows\DiskFootprint\Diagnostics" "\Microsoft\Windows\InstallService\ScanForUpdates" "\Microsoft\Windows\Defrag\ScheduledDefrag" "\Microsoft\Windows\SoftwareProtectionPlatform\SvcRestartTaskNetwork" "\Microsoft\Windows\DeviceSetup\MetadataRefresh" "\Microsoft\Windows\StateRepository\MaintenanceTasks" "\Microsoft\Windows\BrokerInfrastructure\BgTaskRegistrationMaintenanceTask" "\Microsoft\Windows\UpdateOrchestrator\ScheduleScanStaticTask" "\Microsoft\Windows\PowerEfficiencyDiagnostics\AnalyzeSystem") do (
     schtasks /Change /Disable /TN %%a
+)
 echo %c_green%Done.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :: Delete lot's of registry classes, credits goes to: FoxOS ::
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-Cleaning up registry classes
+title Cleaning up registry classes
 echo %c_cyan%Cleaning up registry classes, credit: FoxOS -- CatGamerOP
 for %%a in ({990A2BD7-E738-46C7-B26F-1CF8FB9F1391} {4116F60B-25B3-4662-B732-99A6111EDC0B} {D94EE5D8-D189-4994-83D2-F68D7D41B0E6} {E0CBF06C-CD8B-4647-BB8A-263B43F0F974} {C06FF265-AE09-48F0-812C-16753D7CBA83} {D48179BE-EC20-11D1-B6B8-00C04FA372A7} {997B5D8D-C442-4F2E-BAF3-9C8E671E9E21} {6BDD1FC1-810F-11D0-BEC7-08002BE2092F} {4D36E97B-E325-11CE-BFC1-08002BE10318} {A0A588A4-C46F-4B37-B7EA-C82FE89870C6} {7EBEFBC0-3200-11D2-B4C2-00A0C9697D07} {4D36E965-E325-11CE-BFC1-08002BE10318} {53D29EF7-377C-4D14-864B-EB3A85769359} {4658EE7E-F050-11D1-B6BD-00C04FA372A7} {6BDD1FC5-810F-11D0-BEC7-08002BE2092F} {DB4F6DDD-9C0E-45E4-9597-78DBBAD0F412} {4D36E978-E325-11CE-BFC1-08002BE10318} {4D36E977-E325-11CE-BFC1-08002BE10318} {6D807884-7D21-11CF-801C-08002BE10318} {CE5939AE-EBDE-11D0-B181-0000F8753EC4} {4D36E969-E325-11CE-BFC1-08002BE10318} {4D36E970-E325-11CE-BFC1-08002BE10318} {4D36E979-E325-11CE-BFC1-08002BE10318} {4D36E96D-E325-11CE-BFC1-08002BE10318}) do (
-reg delete "HKLM\System\CurrentControlSet\Control\Class\%%a" /f
+    reg delete "HKLM\System\CurrentControlSet\Control\Class\%%a" /f
+)
+
 echo %c_green%Done.
 
 :: Disable "JUMBOPACKET"
 title Do not close this window - [17/66] Disabling JUMBOPACKET
-echo %c_red%Disabling JUMBOPACKET...
+echo %c_red%Disabling JUMBOPACKETing...
 for /f %%i in ('wmic path Win32_NetworkAdapter get PNPDeviceID^| findstr /L "PCI\VEN_"') do (
     for /f "tokens=3" %%a in ('reg query "HKLM\SYSTEM\CurrentControlSet\Enum\%%i" /v "Driver"') do (
         for /f %%i in ('echo %%a ^| findstr "{"') do (
@@ -714,13 +726,13 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager" /v "ProtectionMo
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters" /v "EnableBoottrace" /t reg_DWORD /d "0" /f >NUL 2>&1
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "FeatureSettingsOverride" /t REG_DWORD /d "3" /f
 
-:: SvcSplitThreshold
+:: Set SvcSplitThreshold In KB
 reg add "HKLM\System\CurrentControlSet\Control" /v "SvcHostSplitThresholdInKB" /t reg_DWORD /d "%ram%" /f >NUL 2>&1
 
-:: Large System Cache
+:: Set Large System Cache
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "LargeSystemCache" /t reg_DWORD /d "1" /f >NUL 2>&1
 
-:: Startup
+:: Disable startup delay for RunOnce and Run keys.. and more.
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "DelayedDesktopSwitchTimeout" /t reg_DWORD /d "0" /f >NUL 2>&1
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /v "StartupDelayInMSec" /t reg_DWORD /d "0" /f >NUL 2>&1
 echo %c_green%Done.
@@ -731,7 +743,7 @@ echo %c_green%Done.
 
 title Do not close this window - [61/66] Optimizing system
 echo %c_cyan%Optimizing system...
-:: Disable DmaRemapping
+:: Disable DmaRemapping - disabling cause it can be exploited
 for /f %%i in ('reg query "HKLM\SYSTEM\CurrentControlSet\Services" /s /f DmaRemappingCompatible ^| find /i "Services\" ') do (
 	reg add "%%i" /v "DmaRemappingCompatible" /t reg_DWORD /d "0" /f >NUL 2>&1
 )
@@ -1354,7 +1366,7 @@ reg add "HKLM\Software\Classes\.reg\ShellNew" /v "NullFile" /t REG_SZ /d "" /f
 :: "Merge as TrustedInstaller" for registry files
 reg add "HKEY_CLASSES_ROOT\regfile\Shell\RunAs" /ve /t REG_SZ /d "Merge As TrustedInstaller" /f
 reg add "HKEY_CLASSES_ROOT\regfile\Shell\RunAs" /v "HasLUAShield" /t REG_SZ /d "1" /f
-reg add "HKEY_CLASSES_ROOT\regfile\Shell\RunAs\Command" /ve /t REG_SZ /d "nsudo -U:T -P:E reg import "%%1"" /f
+reg add "HKEY_CLASSES_ROOT\regfile\Shell\RunAs\Command" /ve /t REG_SZ /d "C:\Windows\DuckOS_modules\nsudo.exe -U:T -P:E reg import "%%1"" /f
 
 :: Disable Bluetooth
 echo %c_red%Disabling Bluetooth...
@@ -1387,10 +1399,9 @@ reg add "HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell" 
 
 :: Switch from Public To Private firewall..
 powershell -NoProfile "$net=get-netconnectionprofile; Set-NetConnectionProfile -Name $net.Name -NetworkCategory Private" >nul 2>&1
+echo %c_green%Done, finalizing...
 
-echo %c_green%Done, finalizing!
-title Do not close this window - [66/66] Cleaning up!
-:: Cancel any pending shutdowns, delete the Modules folder, this post script and restart..
+:: Cancel any pending shutdowns, and restart in 2 seconds.. [with force..]
 shutdown /a
 shutdown /r /t 2 /f
 
