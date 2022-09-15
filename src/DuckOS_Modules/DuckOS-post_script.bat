@@ -618,7 +618,8 @@ reg add "HKLM\Software\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsRunInBa
 %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v "BackgroundAppGlobalToggle" /t REG_DWORD /d "0" /f
 echo %c_green%Done.
 
-:: Set Win32PrioritySeparation 26 hex/38 dec
+:: Set Win32PrioritySeparation 26 hex/38 dec.
+:: Explanation: "foreground processes more priority and make your CPU faster." source: https://richannel.org/win32-priority-separation/
 title Do not close this window - [50/66] Setting Win32PrioritySeparation
 reg add "HKLM\System\CurrentControlSet\Control\PriorityControl" /v "Win32PrioritySeparation" /t REG_DWORD /d "38" /f
 
