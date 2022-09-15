@@ -1,7 +1,5 @@
 @echo off 
 
-pause
-
 :: Set up echo in colors
 chcp 65001 >nul 2>&1
 set c_red=[31m
