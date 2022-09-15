@@ -9,7 +9,7 @@ set c_blue=[34m
 set c_purple=[35m
 set c_cyan=[36m
 
-:: heals why
+:: Set a variable.. that we will use later... that points into a executable.
 set currentuser=C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait
 
 echo %c_cyan%The post install script is starting...
