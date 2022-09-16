@@ -1,4 +1,4 @@
-@echo off 
+@echo off && cls
 
 :::::::::::::::::::::::::::::::::
 :: DuckOS Post Install Script. ::
@@ -49,7 +49,7 @@ title Do not close this window
 start mshta.exe vbscript:Execute("msgbox ""Welcome to DuckOS, a modification to Windows for enhanced privacy and performance! Thank you for downloading and using DuckOS, we are preparing DuckOS and will be available to use shortly..."",64+4096,""DuckOS Post Install Tweaks"":close")
 start mshta.exe vbscript:Execute("msgbox ""You will be prompted with a few questions, then you can leave your computer running and let us do the rest."",64+4096,""DuckOS Post Install Tweaks"":close")
 
-::Change the directory.
+:: Change the directory.
 cd C:\Windows\DuckOS_Modules
 
 :: Ask the user if they use "Windows Firewall", if not, disable it.. if yes, do nothing...
@@ -198,7 +198,7 @@ netsh advfirewall firewall add rule name="Block NVIDIA Telemetry" dir=out action
 :: Outbound
 netsh advfirewall firewall add rule name="Block Windows Telemetry" dir=out action=block remoteip=134.170.30.202,137.116.81.24,157.56.106.189,184.86.53.99,2.22.61.43,2.22.61.66,204.79.197.200,23.218.212.69,65.39.117.23,65.55.108.23,64.4.54.254 enable=yes > nul
 netsh advfirewall firewall add rule name="Block NVIDIA Telemetry" dir=out action=block remoteip=8.36.80.197,8.36.80.224,8.36.80.252,8.36.113.118,8.36.113.141,8.36.80.230,8.36.80.231,8.36.113.126,8.36.80.195,8.36.80.217,8.36.80.237,8.36.80.246,8.36.113.116,8.36.113.139,8.36.80.244,216.228.121.209 enable=yes > nul
-echo %c_red%Done.
+echo %c_red%Done. 
 
 :: Disable Data Collection (telemetry)
 :: Gives you privacy :)
@@ -405,6 +405,9 @@ title Do not close this window - [27/66] Mitigating a security vulnerability...
 echo %c_cyan%Mitigating a security vulnerability...
 icacls %SystemRoot%\system32\config\* /inheritance:e
 echo %c_green%Done.
+
+:: Disable TsX to mitigate ZombieLoad
+reg add "HKLM\System\CurrentControlSet\Control\Session Manager\kernel" /v "DisableTsx" /t REG_DWORD /d 1 /f
 
 :: Remove SOME dependencies
 title Do not close this window - [28/66] Removing some dependencies...
@@ -700,7 +703,6 @@ echo %c_green%Done.
 
 title Do not close this window - [59/66] Optimizing Storage
 echo %c_cyan%Optimizing storage...
-:: Storage System
 fsutil behavior set memoryusage 2 >NUL 2>&1
 fsutil behavior set mftzone 2 >NUL 2>&1
 fsutil behavior set allowextchar 0 >NUL 2>&1
