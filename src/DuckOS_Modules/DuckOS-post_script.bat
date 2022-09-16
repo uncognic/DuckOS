@@ -112,9 +112,9 @@ for /f "tokens=2 delims==" %%a in ('wmic os get TotalVisibleMemorySize /format:v
 set /a RAM=%TotalVisibleMemorySize%+1024000
 echo %c_green%Done.
 
-:: Import services.reg and any other registry file in there.
+:: Import gray accent color.reg
 title Do not close this window - [4/66] Importing registry
-for %%i in (C:\Windows\DuckOS_Modules\*.reg) do reg import %%i
+if exist C:\Windows\DuckOS_Modules\gray_accent_color.reg ( %currentuser% regedit /s C:\Windows\DuckOS_Modules\gray_accent_color.reg )
 
 :: Block every single websites telemetry with the help of a modified hosts file.
 title Do not close this window - [5/66] Blocking telemetry
@@ -200,6 +200,17 @@ netsh advfirewall firewall add rule name="Block NVIDIA Telemetry" dir=out action
 netsh advfirewall firewall add rule name="Block Windows Telemetry" dir=out action=block remoteip=134.170.30.202,137.116.81.24,157.56.106.189,184.86.53.99,2.22.61.43,2.22.61.66,204.79.197.200,23.218.212.69,65.39.117.23,65.55.108.23,64.4.54.254 enable=yes > nul
 netsh advfirewall firewall add rule name="Block NVIDIA Telemetry" dir=out action=block remoteip=8.36.80.197,8.36.80.224,8.36.80.252,8.36.113.118,8.36.113.141,8.36.80.230,8.36.80.231,8.36.113.126,8.36.80.195,8.36.80.217,8.36.80.237,8.36.80.246,8.36.113.116,8.36.113.139,8.36.80.244,216.228.121.209 enable=yes > nul
 echo %c_red%Done. 
+
+:::::::::::::::::::::::::::::::::::::::::::::
+:: Fully disable the telemetry with OOSU10 ::
+:::::::::::::::::::::::::::::::::::::::::::::
+
+echo Fully disabling the telemetry...
+if exist C:\Windows\DuckOS_Modules\OOSU10.exe (
+	echo OO ShutUp10 found... disabling telemetry..
+	C:\Windows\DuckOS_Modules\OOSU10.exe C:\Windows\DuckOS_Modules\duckOS_preset.cfg /quiet /nosrp
+)
+echo %c_red%Done.
 
 :: Disable Data Collection (telemetry)
 :: Gives you privacy :)
