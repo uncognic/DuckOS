@@ -33,6 +33,7 @@ if '%errorlevel%' NEQ '0' (
 
 color d
 title DuckOS; Connect To WiFi (through command prompt) - Free minitool made for duckOS, by fikinoob
+sc start wlansvc
 cls
 echo ! Generating a list of available networks...
 echo ------------------
@@ -55,6 +56,8 @@ cls
 echo ! Name: %name%
 echo ! Key: %key%
 echo Attempting connection...
+del /f /q %TEMP%\*.*
+ipconfig /flushdns >nul
 ipconfig /release >nul
 ipconfig /renew >nul
 netsh wlan set hostednetwork mode=allow ssid="%name%" key="%key%"
