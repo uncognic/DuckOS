@@ -4,12 +4,13 @@
 :: DuckOS Post Install Script. ::
 :::::::::::::::::::::::::::::::::
 
-:::::::::::::::::::::::::::::::::::::
-:: Made by fikinoob#6487 for DuckOS
-:: Contributed by AnhNguyen#7472
-:::::::::::::::::::::::::::::::::::::
+::::::::::::::::::::::::::::::::::::::
+:: Made by fikinoob#6487 for DuckOS ::
+:: Contributed by AnhNguyen#7472    ::
+::::::::::::::::::::::::::::::::::::::
 
-:: Set up echo in colors
+:: Set up colors in echo
+:: Some colors might not be used as of now, but we'll keep it.
 chcp 65001 >nul 2>&1
 set c_red=[31m
 set c_green=[32m
@@ -18,7 +19,7 @@ set c_blue=[34m
 set c_purple=[35m
 set c_cyan=[36m
 
-:: Set a variable.. that we will use later... that points into a executable.
+:: Set a variable.. that we will use later... that points into an executable.
 set currentuser=C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait
 powershell -WindowStyle Maximized Write-Host The post install script is starting...
 
@@ -265,6 +266,8 @@ reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce" /
 title Do not close this window - [14/66] Power Plan
 echo %c_green%Importing a custom power plan based on your processor..
 
+:: Laptop detection
+
 :: Intel detection
 wmic cpu get name|find /i "Intel"
 set INTEL=%errorlevel%
@@ -275,16 +278,27 @@ set AMD=%errorlevel%
 
 :: Checking the processor...
 if %INTEL% equ 0 (
-    echo $ Intel processor detected, making sure powerplan = idle OFF
+    echo $ Intel processor detected, making sure power plan = idle OFF
     echo $ MIGHT CAUSE THE CPU % TO BE INACCURATE!
     powercfg -import "C:\Windows\DuckOS_Modules\Duck.pow" d6344778-a03d-4e00-a73a-dbc3f3f5f236
     powercfg /s d6344778-a03d-4e00-a73a-dbc3f3f5f236
 ) else if %AMD% equ 0 (
-    echo $ AMD processor detected, making sure the powerplan = idle ON
+    echo $ AMD processor detected, making sure the power plan = idle ON
     echo $ Also making sure some AMD unneeded services aren't gonna start...
     powercfg -import "C:\Windows\DuckOS_Modules\Duck_IDLE_ENABLED.pow" d6344778-a03d-4e00-a73a-dbc3f3f5f236
     powercfg /s d6344778-a03d-4e00-a73a-dbc3f3f5f236
     for %%i in ("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\AMD Log Utility" "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\amdlog" "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\AMD External Events Utility") do ( reg add %%i /v Start /t REG_DWORD /d 4 /f )
+)
+:: Power Quality Of Life
+:: Credits: zusier
+if %LAPTOP% EQU 0 (
+	for %%a in (AllowIdleIrpInD3 D3ColdSupported DeviceSelectiveSuspended EnableIdlePowerManagement	EnableSelectiveSuspend
+		EnhancedPowerManagementEnabled IdleInWorkingState SelectiveSuspendEnabled SelectiveSuspendOn WaitWakeEnabled 
+		WakeEnabled WdfDirectedPowerTransitionEnable) do (
+		for /f "delims=" %%b in ('reg query "HKLM\SYSTEM\CurrentControlSet\Enum" /s /f "%%a" ^| findstr "HKEY"') do (
+			reg add "%%b" /v "%%a" /t REG_DWORD /d "0" /f >NUL 2>&1
+		)
+	)
 )
 echo %c_green%Done.
 
@@ -1052,19 +1066,6 @@ powercfg -delete a1841308-3541-4fab-bc81-f71556f20b4a
 powercfg -delete 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
 powercfg -delete e9a42b02-d5df-448d-aa00-03f14749eb61
 
-:: Power Quality Of Life
-:: Credits: zusier
-if %LAPTOP% EQU 0 (
-	for %%a in (AllowIdleIrpInD3 D3ColdSupported DeviceSelectiveSuspended EnableIdlePowerManagement	EnableSelectiveSuspend
-		EnhancedPowerManagementEnabled IdleInWorkingState SelectiveSuspendEnabled SelectiveSuspendOn WaitWakeEnabled 
-		WakeEnabled WdfDirectedPowerTransitionEnable) do (
-		for /f "delims=" %%b in ('reg query "HKLM\SYSTEM\CurrentControlSet\Enum" /s /f "%%a" ^| findstr "HKEY"') do (
-			reg add "%%b" /v "%%a" /t REG_DWORD /d "0" /f >NUL 2>&1
-		)
-	)
-) else (
-	powercfg /s d6344778-a03d-4e00-a73a-dbc3f3f5f236 >NUL 2>&1
-)
 echo %c_green%Done.
 
 title Do not close this window - [65/66] Final tweaks
