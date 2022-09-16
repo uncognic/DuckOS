@@ -266,7 +266,9 @@ reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce" /
 title Do not close this window - [14/66] Power Plan
 echo %c_green%Importing a custom power plan based on your processor..
 
-:: Laptop detection
+:::::::::::::::::::::::::
+:: Processor detection ::
+:::::::::::::::::::::::::
 
 :: Intel detection
 wmic cpu get name|find /i "Intel"
@@ -288,17 +290,6 @@ if %INTEL% equ 0 (
     powercfg -import "C:\Windows\DuckOS_Modules\Duck_IDLE_ENABLED.pow" d6344778-a03d-4e00-a73a-dbc3f3f5f236
     powercfg /s d6344778-a03d-4e00-a73a-dbc3f3f5f236
     for %%i in ("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\AMD Log Utility" "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\amdlog" "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\AMD External Events Utility") do ( reg add %%i /v Start /t REG_DWORD /d 4 /f )
-)
-:: Power Quality Of Life
-:: Credits: zusier
-if %LAPTOP% EQU 0 (
-	for %%a in (AllowIdleIrpInD3 D3ColdSupported DeviceSelectiveSuspended EnableIdlePowerManagement	EnableSelectiveSuspend
-		EnhancedPowerManagementEnabled IdleInWorkingState SelectiveSuspendEnabled SelectiveSuspendOn WaitWakeEnabled 
-		WakeEnabled WdfDirectedPowerTransitionEnable) do (
-		for /f "delims=" %%b in ('reg query "HKLM\SYSTEM\CurrentControlSet\Enum" /s /f "%%a" ^| findstr "HKEY"') do (
-			reg add "%%b" /v "%%a" /t REG_DWORD /d "0" /f >NUL 2>&1
-		)
-	)
 )
 echo %c_green%Done.
 
