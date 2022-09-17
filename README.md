@@ -12,6 +12,12 @@
   <a href="https://discord.gg/8pDMf44t6R/"><img src="https://img.shields.io/discord/998645880368410694.svg?label=discord" alt="DuckOS Discord"></a>
 </p>
 
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![GNU AGPLv3 License][license-shield]][license-url]
+
 # DuckOS
 
 ## What is DuckOS?
