@@ -12,6 +12,14 @@
   <a href="https://discord.gg/8pDMf44t6R/"><img src="https://img.shields.io/discord/998645880368410694.svg?label=discord" alt="DuckOS Discord"></a>
 </p>
 
+<p align="center">
+  <a href="https://github.com/DuckOS-GitHub/DuckOS/graphs/contributors"><img src="https://img.shields.io/github/contributors/DuckOS-GitHub/DuckOS.svg" alt="Contributors"></a>
+  <a href="https://github.com/DuckOS-GitHub/DuckOS/network/members"><img src="https://img.shields.io/github/forks/DuckOS-GitHub/DuckOS?style=flat" alt="Forks"></a>
+  <a><img src="https://img.shields.io/github/stars/DuckOS-GitHub/DuckOS" alt="Stars"></a>
+  <a href="https://github.com/DuckOS-GitHub/DuckOS/issues"><img src="https://img.shields.io/github/issues/DuckOS-GitHub/DuckOS" alt="Issues"></a>
+  <a href="https://github.com/DuckOS-GitHub/DuckOS/blob/main/LICENSE"><img src="https://img.shields.io/github/license/DuckOS-GitHub/DuckOS" alt="License"></a>
+</p>
+
 # DuckOS
 
 ## What is DuckOS?
