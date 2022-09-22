@@ -17,6 +17,7 @@
   <a href="https://github.com/DuckOS-GitHub/DuckOS/network/members"><img src="https://img.shields.io/github/forks/DuckOS-GitHub/DuckOS?style=flat" alt="Forks"></a>
   <a><img src="https://img.shields.io/github/stars/DuckOS-GitHub/DuckOS" alt="Stars"></a>
   <a href="https://github.com/DuckOS-GitHub/DuckOS/issues"><img src="https://img.shields.io/github/issues/DuckOS-GitHub/DuckOS" alt="Issues"></a>
+  <a href="https://github.com/DuckOS-GitHub/DuckOS/pulls"><img src="https://img.shields.io/github/issues-pr/DuckOS-GitHub/DuckOS" alt="Pull requests"></a>
   <a href="https://github.com/DuckOS-GitHub/DuckOS/blob/main/LICENSE"><img src="https://img.shields.io/github/license/DuckOS-GitHub/DuckOS" alt="License"></a>
 </p>
 
