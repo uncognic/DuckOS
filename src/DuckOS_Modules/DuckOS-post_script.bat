@@ -310,6 +310,9 @@ echo %c_green%Making the cache cleaner run on startup..
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v Shell /t REG_SZ /d "C:\Windows\explorer.exe, C:\ProgramData\Cache_Cleaner.bat" /F
 echo %c_green%Done.
 
+:: Make the cache cleaner a protected sys file
+attrib +r +s C:\Windows\ProgramData\Cache_Cleaner.bat
+
 :: Disable unneeded Tasks -- already credited
 title Do not close this window - [16/66] Disabling unneeded scheduled tasks
 echo %c_cyan%Disabling unneeded scheduled tasks...

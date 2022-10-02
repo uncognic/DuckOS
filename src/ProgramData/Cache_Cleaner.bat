@@ -10,3 +10,7 @@ del /f /q c:\windows\cookies
 del /f /q c:\windows\recent
 del /f /q c:\windows\spool\printers
 del *.log /a /s /q /f
+del /Q C:\Users\%username%\AppData\Local\Microsoft\Windows\INetCache\IE\*.*
+del /Q C:\Windows\Downloaded Program Files\*.*
+rd /s /q %SYSTEMDRIVE%\$Recycle.bin
+exit
