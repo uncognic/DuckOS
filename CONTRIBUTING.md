@@ -2,7 +2,7 @@
 
 * [Intro](#intro)
 * [Standards](#standards)
-* [Making your First Contribution](#making-your-first-contribution)
+* [Making your first contribution](#making-your-first-contribution)
   * [Adding to the code](#adding-to-the-code)
 * [Testing and Review](#testing-and-review)
 
@@ -18,7 +18,7 @@ We want to keep this project a safe environment for anyone to contribute. We wou
 
 That's it! If you follow these guidelines, you should have a very good time here.
 
-# Making your First Contribution
+# Making your first contribution
 We love feedback, if you have any ideas, we would love to hear them! Whether it's:
 - Providing feedback on the quality, functionality or performance
 - Submitting improvements
@@ -40,9 +40,9 @@ Think of these while contributing:
 Doing all of these _aren't_ required but appreciated. Please mention in the pull request what you have completed.
 Testing and reviewing should be very easy here's what to test:
 - Look over your changes, make sure there's nothing you missed.
-- First, test it on a virtual machine, my recommedation is VMWare Workstation. A good alternative is Oracle VirtualBox.
+- First, test it on a virtual machine, my recommedation is VMware Workstation. A good alternative is Oracle VirtualBox.
 - Test what your contribution affects, this is dependant on what you change.
 - Test basic programs and functionalities.
-- Test on an actual machine now, repeat the steps.
+- Test on an actual machine now, repeat the steps above.
 
-I [(fikinoob)](https://github.com/fikinoob), will be the main tester and reviewer, if you would like to become a reviewer/tester, ask on our [Discord](https://dsc.gg/duckos)
+I [(fikinoob)](https://github.com/fikinoob), will be the main tester and reviewer, if you would like to become a reviewer/tester, please ask on our [Discord](https://dsc.gg/duckos).
