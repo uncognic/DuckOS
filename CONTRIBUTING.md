@@ -1,4 +1,4 @@
-# Contents
+# Table of Contents
 
 * [Intro](#intro)
 * [Standards](#standards)
