@@ -40,6 +40,8 @@ body:
       - CPU [Intel or AMD, include specifics]
       - System Drive Type [e.g. SSD, HDD]
       - Version [e.g. 20H2]
+    validations:
+      required: true
 - type: textarea
   attributes:
     label: Additional Context
