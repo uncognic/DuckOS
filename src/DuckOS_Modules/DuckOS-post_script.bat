@@ -109,7 +109,7 @@ echo %c_purple%Please wait. This may take a moment.
 
 :: DuckOS' tweaks aren't 100% made by it's author, but the author and some people's tweaks..
 :: Today you cannot make a good operating system by yourself.. you gotta use AT LEAST 1 source.
-:: Here are credits to the people -- whos code is currently in use in this script: (no order)
+:: Here are credits to the people -- whose code is currently in use in this script: (no order)
 :: 1. He3als - gave this idea to make DuckOS a open-sourced project
 :: 2. Zusier - We use some tweaks he wrote for AtlasOS, which is an another good modified operating system based on windows!
 :: 3. Imribiy - NIC settings
@@ -1634,7 +1634,7 @@ if not exist %nsudo% (
         set /p nsudo=Please enter NSudo path:
     ) else (
         if errorlevel 1 (
-            prompt The script won't run with it's full potentional. Continue to the tweaks?
+            prompt The script won't run with it's full potential. Continue to the tweaks?
                 if errorlevel 2 (
                     goto :tweaks
                 ) else (
