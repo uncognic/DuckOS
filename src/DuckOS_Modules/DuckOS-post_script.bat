@@ -9,19 +9,95 @@
 :: Contributed by AnhNguyen#7472    ::
 ::::::::::::::::::::::::::::::::::::::
 
+:: Set up initial title
+title Do not close this window - [0/20] Preparing
 :: Set up colors in echo
 :: Some colors might not be used as of now, but we'll keep it.
 chcp 65001 >nul 2>&1
+set c_black=[30m
 set c_red=[31m
 set c_green=[32m
 set c_gold=[33m
 set c_blue=[34m
 set c_purple=[35m
 set c_cyan=[36m
+set c_white=[37m
 
 :: Set a variable.. that we will use later... that points into an executable.
-set currentuser=C:\Windows\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait
+set currentuser=%windir%\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait
 powershell -WindowStyle Maximized Write-Host The post install script is starting...
+
+::::::::::::::::::::::::::::
+:: Command line arguments ::
+::::::::::::::::::::::::::::
+
+:: Default values
+set doRestart=no
+set doUpdate=no
+set isDuck=no
+set onlyTweak=no
+
+:: Check if there are no arguments...
+if /i "%*"=="" ( goto :noArgs )
+
+:: Go to the correct function if one of the command line arguments is a valid one.
+for %%i in (%*) do (
+    if /i "%%i" equ "-doRestart" set doRestart=yes
+    if /i "%%i" equ "-doUpdate" set doUpdate=yes
+    if /i "%%i" equ "-onlyTweak" goto :tweaks
+    if /i "%%i" equ "-isDuck" set isDuck=yes
+)
+
+:: Update the script
+if /i %doUpdate%=yes (
+    echo %c_red%Updating the script..
+    curl --progress-bar --verbose https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/DuckOS_Modules/DuckOS-post_script.bat -o "%~f0"
+    call "%~f0" %* -doUpdate
+)
+
+:: Here we go
+:init
+setlocal DisableDelayedExpansion
+set "batchPath=%~0"
+for %%k in (%0) do set batchName=%%~nk
+set "vbsGetPrivileges=%temp%\OEgetPriv_%batchName%.vbs"
+setlocal EnableDelayedExpansion
+
+:checkPrivileges
+NET FILE 1>NUL 2>NUL
+if '%errorlevel%' == '0' (
+    goto gotPrivileges
+) else (
+    setlocal DisableDelayedExpansion
+    choice /n /m "Permission denied. Try again? [Y/N]"
+    if errorlevel 2 (
+        echo Permission denied. To properly apply the tweaks, make sure to run it as admin!
+        echo Press any key to close this window... & pause >nul
+    ) else (
+        if errorlevel 1 (
+            echo Alright.
+            goto getPrivileges
+            title You may now close this window - Permission denied
+        )
+    )
+)
+
+:getPrivileges
+setlocal EnableDelayedExpansion
+if '%1'=='ELEV' (echo ELEV & shift /1 & goto gotPrivileges)
+echo Set UAC = CreateObject^("Shell.Application"^) > "%vbsGetPrivileges%"
+echo args = "ELEV " >> "%vbsGetPrivileges%"
+echo For Each strArg in WScript.Arguments >> "%vbsGetPrivileges%"
+echo args = args ^& strArg ^& " "  >> "%vbsGetPrivileges%"
+echo Next >> "%vbsGetPrivileges%"
+echo UAC.ShellExecute "!batchPath!", args, "", "runas", 1 >> "%vbsGetPrivileges%"
+"%SystemRoot%\System32\WScript.exe" "%vbsGetPrivileges%" %*
+exit /B
+
+:gotPrivileges
+setlocal & pushd .
+cd /d %~dp0
+if '%1'=='ELEV' (del "%vbsGetPrivileges%" 1>nul 2>nul  &  shift /1)
 
 :: Make the script faster by putting a higher priority.
 wmic process where name="cmd.exe" CALL setpriority 128
@@ -32,8 +108,8 @@ echo %c_purple%Please wait. This may take a moment.
 :::::::::::::
 
 :: DuckOS' tweaks aren't 100% made by it's author, but the author and some people's tweaks..
-:: Today you cannot make a good operating system by yourself.. you gotta use ATLEAST 1 source.
-:: Here are credits to the people -- whos code is currently in use in this script: (no order)
+:: Today you cannot make a good operating system by yourself.. you gotta use AT LEAST 1 source.
+:: Here are credits to the people -- whose code is currently in use in this script: (no order)
 :: 1. He3als - gave this idea to make DuckOS a open-sourced project
 :: 2. Zusier - We use some tweaks he wrote for AtlasOS, which is an another good modified operating system based on windows!
 :: 3. Imribiy - NIC settings
@@ -43,15 +119,33 @@ echo %c_purple%Please wait. This may take a moment.
 :: 7. amit @ EVA - same thing as for 2. but just applies to amit
 :: Various different sources and google..
 
+:tweaks
+
+:: Check if the user is running the script as TrustedInstaller...
+whoami|findstr "NT AUTHORITY\SYSTEM"
+if %errorlevel% equ 0 ( call :TrustedInstaller )
+
+:: Check if the script was already ran...
+reg query "HKEY_CURRENT_USER\Software\DuckOS\Post Script"|find "RunningState    REG_DWORD    1"
+if %errorlevel% equ 0 ( call :scriptS )
+reg query "HKEY_CURRENT_USER\Software\DuckOS\Post Script"|find "RunningState    REG_DWORD    2"
+if %errorlevel% equ 0 ( call :scriptF )
+
+:: Flag the script as running...
+reg add "HKEY_CURRENT_USER\Software\DuckOS\Post Script" /v "RunningState" /d "1" /t REG_DWORD /f
+
 :: Set the initial title
-title Do not close this window
+title Do not close this window, tweaking your computer!
 
 :: Send a message!
-start mshta.exe vbscript:Execute("msgbox ""Welcome to DuckOS, a modification to Windows for enhanced privacy and performance! Thank you for downloading and using DuckOS, we are preparing DuckOS and will be available to use shortly..."",64+4096,""DuckOS Post Install Tweaks"":close")
-start mshta.exe vbscript:Execute("msgbox ""You will be prompted with a few questions, then you can leave your computer running and let us do the rest."",64+4096,""DuckOS Post Install Tweaks"":close")
-
+if %isDuck% equ 1 (
+    call :MsgBox "Welcome to DuckOS, a modification to Windows for enhanced privacy and performance! Thank you for downloading and using DuckOS, we are preparing DuckOS and will be available to use shortly..." 64+4096 "DuckOS Post Install Tweaks"
+    call :MsgBox "You will be prompted with a few questions, then you can leave your computer running and let us do the rest." 64+4096 "DuckOS Post Install Tweaks"
+) else (
+    call :MsgBox "You will be prompted with a few questions, then you can leave your computer running and let us do the rest." 64+4096 "DuckOS Tweaks"
+)
 :: Change the directory.
-cd C:\Windows\DuckOS_Modules
+cd %windir%\DuckOS_Modules
 
 :: Ask the user if they use "Windows Firewall", if not, disable it.. if yes, do nothing...
 title Do not close this window - [1/66] Windows Firewall
@@ -94,14 +188,14 @@ if errorlevel 6 (
 	reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Allow" /f
 	reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam\NonPackaged" /v "Value" /t REG_SZ /d "Allow" /f
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\swenum" /v "Start" /t REG_DWORD /d "3" /f
-    if exist C:\Windows\DuckOS_Modules\devmanview.exe C:\Windows\DuckOS_Modules\devmanview.exe /disable "Plug and Play Software Device Enumerator"
+    if exist %windir%\DuckOS_Modules\devmanview.exe %windir%\DuckOS_Modules\devmanview.exe /disable "Plug and Play Software Device Enumerator"
 ) else if errorlevel 7 (
     echo %c_green%Okay... Disabling webcam services...
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\swenum" /v "Start" /t REG_DWORD /d "4" /f
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Deny" /f
 	reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Deny" /f
 	reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam\NonPackaged" /v "Value" /t REG_SZ /d "Deny" /f
-    if exist C:\Windows\DuckOS_Modules\devmanview.exe C:\Windows\DuckOS_Modules\devmanview.exe /disable "Plug and Play Software Device Enumerator"
+    if exist %windir%\DuckOS_Modules\devmanview.exe %windir%\DuckOS_Modules\devmanview.exe /disable "Plug and Play Software Device Enumerator"
 )
 
 :: Set enviroment variables for future use, example: toolbox
@@ -114,8 +208,11 @@ echo %c_green%Done.
 
 :: Import gray accent color.reg
 title Do not close this window - [4/66] Importing registry
-if exist C:\Windows\DuckOS_Modules\gray_accent_color.reg ( %currentuser% regedit /s C:\Windows\DuckOS_Modules\gray_accent_color.reg )
-
+if %isDuck% equ 1 (
+    if exist %windir%\DuckOS_Modules\gray_accent_color.reg ( %currentuser% regedit /s %windir%\DuckOS_Modules\gray_accent_color.reg )
+) else (
+    echo %c_red%We've detected that you're not using DuckOS, skipping.
+)
 :: Block every single websites telemetry with the help of a modified hosts file.
 title Do not close this window - [5/66] Blocking telemetry
 echo %c_blue%Blocking every single websites telemetry with the help of a modified hosts file.
@@ -134,15 +231,22 @@ if exist %SystemRoot%\System32\drivers\etc\hosts.temp (
 :: Enable dark mode, disable transparency
 :: WE DON'T LIKE LIGHT MODE!
 title Do not close this window - [6/66] Windows appearence
-echo %c_green%Enabling dark mode, disabling transparency..
-%currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "SystemUsesLightTheme" /t REG_DWORD /d "0" /f
-%currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "AppsUseLightTheme" /t REG_DWORD /d "0" /f
-%currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "EnableTransparency" /t REG_DWORD /d "0" /f
-echo %c_green%Done.
+if %isDuck equ 1 (
+    echo %c_green%Enabling dark mode, disabling transparency...
+    %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "SystemUsesLightTheme" /t REG_DWORD /d "0" /f
+    %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "AppsUseLightTheme" /t REG_DWORD /d "0" /f
+    %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "EnableTransparency" /t REG_DWORD /d "0" /f
+    echo %c_green%Done.
+) else (
+    echo %c_red%Appearance tweaks might not fit with you, so we're skipping it.
+)
 
 :: Set UTC to prevent issues with dual booting (specifically with Linux)
 title Do not close this window - [7/66] Setting UTC
+echo %c_cyan%Setting UTC to prevent issues with dual booting (specifically with Linux)...
 reg add "HKLM\System\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /d 1 /t REG_DWORD /f >nul
+
+if %isDuck% equ 1 ( goto skipPrograms )
 
 ::::::::::::::
 :: Software ::
@@ -150,10 +254,9 @@ reg add "HKLM\System\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeI
 
 :: Install 7-zip
 title Do not close this window - [8/66] Programs Installation
-:7z
-if exist C:\Windows\DuckOS_Modules\Utils\7z2201-x64.msi (
+if exist %windir%\DuckOS_Modules\Utils\7z2201-x64.msi (
     echo %c_cyan%Installing 7-zip..
-    cd C:\Windows\DuckOS_Modules\Utils
+    cd %windir%\DuckOS_Modules\Utils
     start /wait "" "7z2201-x64.msi" /passive
     echo Done.
 ) else (
@@ -176,14 +279,16 @@ if exist %SYSTEMROOT%\DuckOS_Modules\DirectX\dxsetup.exe (
 )
 
 :: Install VCRedists
-if exist C:\Windows\DuckOS_Modules\vcredist.exe (
+if exist %windir%\DuckOS_Modules\vcredist.exe (
     echo %c_cyan%Installing VCRedists..
-    cd C:\Windows\DuckOS_Modules
+    cd %windir%\DuckOS_Modules
     start /wait "" "vcredist.exe" /ai
     echo %c_green%Done.
 ) else (
     echo %c_red%Couldn't file VCRedists installation file! Skipping it... 
 )
+
+:skipPrograms
 
 ::::::::::::::::::::::::::
 :: Remove Telemetry IPs ::
@@ -205,12 +310,12 @@ echo %c_red%Done.
 :: Fully disable the telemetry with OOSU10 ::
 :::::::::::::::::::::::::::::::::::::::::::::
 
-echo Fully disabling the telemetry...
-if exist C:\Windows\DuckOS_Modules\OOSU10.exe (
-	echo OO ShutUp10 found... disabling telemetry..
-	C:\Windows\DuckOS_Modules\OOSU10.exe C:\Windows\DuckOS_Modules\duckOS_preset.cfg /quiet /nosrp
+echo Fully disabling the telemetry if O&O ShutUp 10 exists...
+if exist %windir%\DuckOS_Modules\OOSU10.exe (
+	echo O&O ShutUp10 found... disabling telemetry..
+	%windir%\DuckOS_Modules\OOSU10.exe %windir%\DuckOS_Modules\duckOS_preset.cfg /quiet /nosrp
 )
-echo %c_red%Done.
+echo %c_green%Done.
 
 :: Disable Data Collection (telemetry)
 :: Gives you privacy :)
@@ -262,15 +367,17 @@ reg delete "HKLM\Software\Clients\StartMenuInternet\Microsoft Edge" /f >nul 2>nu
 reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Device Metadata" /f >nul 2>nul
 echo %c_green%Done.
 
+if %isDuck% equ 1 ( goto skipStuff )
+
 :: Set up the toolbox to be in the context menu
 title Do not close this window - [12/66] Context Menu
 echo %c_cyan%Setting up the toolbox in the context menu..
-reg add "HKEY_CLASSES_ROOT\Directory\Background\shell\DuckOS Toolbox\command" /v "" /d "C:\Windows\DuckOS_Modules\DuckOS_Toolbox\DuckOS Toolbox.exe" /t REG_SZ /f
+reg add "HKEY_CLASSES_ROOT\Directory\Background\shell\DuckOS Toolbox\command" /v "" /d "%windir%\DuckOS_Modules\DuckOS_Toolbox\DuckOS Toolbox.exe" /t REG_SZ /f
 echo %c_green%Done.
 
 :: Make the computer restart 1 time after the current restart, because THAT fixed OS issues
 title Do not close this window - [13/66] Configuring restart
-reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce" /v "*Silent System Restart" /t REG_SZ /d "C:\Windows\System32\shutdown.exe -r -t 0 -f" /f
+reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce" /v "*Silent System Restart" /t REG_SZ /d "%windir%\System32\shutdown.exe -r -t 0 -f" /f
 
 :: Import the powerplan BASED on your processor
 :: Explanation: AMD has worse speeds, more cores, IDLE isn't ideal, Intel has faster speeds, but less cores, IDLE is ideal.
@@ -293,12 +400,12 @@ set AMD=%errorlevel%
 if %INTEL% equ 0 (
     echo $ Intel processor detected, making sure power plan = idle OFF
     echo $ MIGHT CAUSE THE CPU % TO BE INACCURATE!
-    powercfg -import "C:\Windows\DuckOS_Modules\Duck.pow" d6344778-a03d-4e00-a73a-dbc3f3f5f236
+    powercfg -import "%windir%\DuckOS_Modules\Duck.pow" d6344778-a03d-4e00-a73a-dbc3f3f5f236
     powercfg /s d6344778-a03d-4e00-a73a-dbc3f3f5f236
 ) else if %AMD% equ 0 (
     echo $ AMD processor detected, making sure the power plan = idle ON
     echo $ Also making sure some AMD unneeded services aren't gonna start...
-    powercfg -import "C:\Windows\DuckOS_Modules\Duck_IDLE_ENABLED.pow" d6344778-a03d-4e00-a73a-dbc3f3f5f236
+    powercfg -import "%windir%\DuckOS_Modules\Duck_IDLE_ENABLED.pow" d6344778-a03d-4e00-a73a-dbc3f3f5f236
     powercfg /s d6344778-a03d-4e00-a73a-dbc3f3f5f236
     for %%i in ("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\AMD Log Utility" "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\amdlog" "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\AMD External Events Utility") do ( reg add %%i /v Start /t REG_DWORD /d 4 /f )
 )
@@ -307,11 +414,13 @@ echo %c_green%Done.
 :: MAKE THE CACHE CLEANER START ON STARTUP by modifying the shell value...
 title Do not close this window - [15/66] Cache Cleaner
 echo %c_green%Making the cache cleaner run on startup..
-reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v Shell /t REG_SZ /d "C:\Windows\explorer.exe, C:\ProgramData\Cache_Cleaner.bat" /F
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v Shell /t REG_SZ /d "%windir%\explorer.exe, C:\ProgramData\Cache_Cleaner.bat" /F
 echo %c_green%Done.
 
 :: Make the cache cleaner a protected sys file
-attrib +r +s C:\Windows\ProgramData\Cache_Cleaner.bat
+attrib +r +s %windir%\ProgramData\Cache_Cleaner.bat
+
+:skipStuffs
 
 :: Disable unneeded Tasks -- already credited
 title Do not close this window - [16/66] Disabling unneeded scheduled tasks
@@ -570,7 +679,7 @@ echo %c_green%Done.
 
 :: Internet Explorer settings... who really uses it.. but still it's good to download librewolf lmfao
 title Do not close this window - [43/66] Configuring Internet Explorer
-echo %c_cyan%Configuring Internet Explorer -- for the 1 time used to download firefox kekw
+echo %c_cyan%Configuring Internet Explorer...
 reg add "HKLM\Software\Microsoft\Internet Explorer\Main" /v "NoUpdateCheck" /t REG_DWORD /d "1" /f
 reg add "HKLM\Software\Microsoft\Internet Explorer\Main" /v "Enable Browser Extensions" /t REG_SZ /d "no" /f
 reg add "HKLM\Software\Microsoft\Internet Explorer\Main" /v "Isolation" /t REG_SZ /d "PMEM" /f
@@ -591,7 +700,7 @@ reg add "HKLM\Software\Policies\Microsoft\Internet Explorer\Feeds" /v "Backgroun
 reg add "HKLM\Software\Policies\Microsoft\Internet Explorer\FlipAhead" /v "Enabled" /t REG_DWORD /d "0" /f
 reg add "HKLM\Software\Policies\Microsoft\Internet Explorer\Suggested Sites" /v "Enabled" /t REG_DWORD /d "0" /f
 reg add "HKLM\Software\Policies\Microsoft\Internet Explorer\TabbedBrowsing" /v "NewTabPageShow" /t REG_DWORD /d "1" /f
-echo %c_green%done, remember to download Firefox!
+echo %c_green%Done.
 
 :: Disable Remote Desktop
 title Do not close this window - [44/66] Disabling Remote Desktop
@@ -647,11 +756,12 @@ title Do not close this window - [50/66] Setting Win32PrioritySeparation
 reg add "HKLM\System\CurrentControlSet\Control\PriorityControl" /v "Win32PrioritySeparation" /t REG_DWORD /d "38" /f
 
 :: Disable Notification/Action Center
+:: We will use balloons instead.
 title Do not close this window - [51/66] Disabling Action Center
 echo %c_green%Disabling notifications & Action Center...
 %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\PushNotifications" /v "ToastEnabled" /t REG_DWORD /d "0" /f
 %currentuser% reg add "HKCU\Software\Policies\Microsoft\Windows\CurrentVersion\PushNotifications" /v "NoTileApplicationNotification" /t REG_DWORD /d "1" /f
-echo %c_green%Done.
+%currentuser% reg add HKCU\SOFTWARE\Policies\Microsoft\Windows\Explorer /v EnableLegacyBalloonNotifications /t REG_DWORD /d 1 /f
 
 :: Misc stuff
 title Do not close this window - [52/66] Miscellaneous
@@ -729,6 +839,7 @@ fsutil behavior set Bugcheckoncorrupt 0 >NUL 2>&1
 fsutil behavior set disable8dot3 1 >NUL 2>&1
 fsutil behavior set disablecompression 1 >NUL 2>&1
 fsutil behavior set disabledeletenotify 0 >NUL 2>&1
+fsutil behavior set disabledeletenotify refs 0 >NUL 2>&1
 fsutil behavior set disableencryption 1 >NUL 2>&1
 fsutil behavior set disablelastaccess 1 >NUL 2>&1
 fsutil behavior set encryptpagingfile 0 >NUL 2>&1
@@ -773,10 +884,19 @@ echo %c_green%Done.
 
 title Do not close this window - [61/66] Optimizing system
 echo %c_cyan%Optimizing system...
+
 :: Disable DmaRemapping - disabling cause it can be exploited
 for /f %%i in ('reg query "HKLM\SYSTEM\CurrentControlSet\Services" /s /f DmaRemappingCompatible ^| find /i "Services\" ') do (
 	reg add "%%i" /v "DmaRemappingCompatible" /t reg_DWORD /d "0" /f >NUL 2>&1
 )
+
+:: Thread Priority tweaks
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\DXGKrnl\Parameters" /v "ThreadPriority" /t REG_DWORD /d "31" /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm\Parameters" /v "ThreadPriority" /t REG_DWORD /d "31" /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\amdkmdap\Parameters" /v "ThreadPriority" /t REG_DWORD /d "31" /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\USBXHCI\Parameters" /v "ThreadPriority" /t REG_DWORD /d "31" /f
+reg add "HKLM\SYSTEM\CurrentControlSet\services\mouhid\Parameters" /v "ThreadPriority" /t REG_DWORD /d "31" /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\kbdhid\Parameters" /v "ThreadPriority" /t REG_DWORD /d "31" /f
 
 :: Disable Chain Validation
 reg add "HKLM\System\CurrentControlSet\Control\Session Manager\kernel" /v "DisableExceptionChainValidation" /t reg_DWORD /d "1" /f >NUL 2>&1
@@ -795,6 +915,10 @@ for %%i in (lsass.exe sppsvc.exe SearchIndexer.exe fontdrvhost.exe sihost.exe ct
   reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\%%i\PerfOptions" /v "CpuPriorityClass" /t REG_DWORD /d "5" /f
 )
 
+:: PowerShell Tweaks
+del /f /q %windir%\Temp\disable.ps1
+for %%i in (DEP, EmulateAtlThunks, SEHOP, ForceRelocateImages, RequireInfo, BottomUp, HighEntropy, StrictHandle, DisableWin32kSystemCalls, AuditSystemCall, DisableExtensionPoints, BlockDynamicCode, AllowThreadsToOptOut, AuditDynamicCode, CFG, SuppressExports, StrictCFG, MicrosoftSignedOnly, AllowStoreSignedBinaries, AuditMicrosoftSigned, AuditStoreSigned, EnforceModuleDependencySigning, DisableNonSystemFonts, AuditFont, BlockRemoteImageLoads, BlockLowLabelImageLoads, PreferSystem32, AuditRemoteImageLoads, AuditLowLabelImageLoads, AuditPreferSystem32, EnableExportAddressFilter, AuditEnableExportAddressFilter, EnableExportAddressFilterPlus, AuditEnableExportAddressFilterPlus, EnableImportAddressFilter, AuditEnableImportAddressFilter, EnableRopStackPivot, AuditEnableRopStackPivot, EnableRopCallerCheck, AuditEnableRopCallerCheck, EnableRopSimExec, AuditEnableRopSimExec, SEHOP, AuditSEHOP, SEHOPTelemetry, TerminateOnError, DisallowChildProcessCreation, AuditChildProcess) do echo Set-ProcessMitigation -System -Disable %%i>>%WINDIR%\Temp\disable.ps1
+powershell -ep bypass -mta %windir%\Temp\disable.ps1
 
 :: Set background apps priority below normal
 for %%i in (OriginWebHelperService.exe ShareX.exe EpicWebHelper.exe SocialClubHelper.exe steamwebhelper.exe Discord.exe) do (
@@ -853,7 +977,7 @@ reg add "HKLM\Software\Microsoft\Windows\Windows Error Reporting" /v "LoggingDis
 reg add "HKLM\Software\Microsoft\Windows\Windows Error Reporting\Consent" /v "DefaultOverrideBehavior" /t REG_DWORD /d "1" /f
 reg add "HKLM\Software\Microsoft\Windows\Windows Error Reporting\Consent" /v "DefaultConsent" /t REG_DWORD /d "0" /f
 
-:: Delete Defaultuser0 used during OOBE
+:: Delete defaultuser0 used during OOBE
 net user defaultuser0 /delete >NUL 2>&1 
 
 :: Disable "Administrator" used using OEM
@@ -1130,45 +1254,55 @@ bcdedit /set bootux disabled > NUL 2>&1
 bcdedit /set bootmenupolicy Legacy > NUL 2>&1
 bcdedit /set hypervisorlaunchtype off > NUL 2>&1
 bcdedit /set tpmbootentropy ForceDisable > NUL 2>&1
-bcdedit /set quietboot yes > NUL 2>&1
 bcdedit /set {globalsettings} custom:16000067 true > NUL 2>&1
 bcdedit /set {globalsettings} custom:16000069 true > NUL 2>&1
 bcdedit /set {globalsettings} custom:16000068 true > NUL 2>&1
 
 :: Set the DuckOS' name to DuckOS.. so it can be easily identified when dualbooting.
-bcdedit /set {current} description DuckOS
+if %isDuck% equ 1 (
+    bcdedit /set {current} description DuckOS
+)
 
 :: Disable Recovery
-if exist C:\Windows\System32\reagentc.exe reagentc.exe /disable
-bcdedit /set {current} recoveryenabled no
+if %isDuck% equ 1 (
+    if exist %windir%\System32\reagentc.exe reagentc.exe /disable
+    bcdedit /set {current} recoveryenabled no
+) else (
+    echo %c_red%Disabling recovery might be unsafe for your system, skipping.
+)
 
 :: Disable Devices with DevManView
-cd /d C:\Windows\DuckOS_Modules
-devmanview /disable "Composite Bus Enumerator"
-devmanview /disable "System Speaker" MemoryDiagnostic
-devmanview /disable "System Timer"
-devmanview /disable "UMBus Root Bus Enumerator"
-devmanview /disable "Microsoft System Management BIOS Driver"
-devmanview /disable "High Precision Event Timer"
-devmanview /disable "PCI Encryption/Decryption Controller"
-devmanview /disable "AMD PSP"
-devmanview /disable "Intel SMBus"
-devmanview /disable "Intel Management Engine"
-devmanview /disable "PCI Memory Controller"
-devmanview /disable "PCI standard RAM Controller"
-devmanview /disable "Microsoft Kernel Debug Network Adapter"
-devmanview /disable "SM Bus Controller"
-devmanview /disable "NDIS Virtual Network Adapter Enumerator"
-devmanview /disable "Numeric Data Processor"
-devmanview /disable "Microsoft RRAS Root Enumerator"
-devmanview /disable "WAN Miniport (IKEv2)"
-devmanview /disable "WAN Miniport (IP)"
-devmanview /disable "WAN Miniport (IPv6)"
-devmanview /disable "WAN Miniport (L2TP)"
-devmanview /disable "WAN Miniport (Network Monitor)"
-devmanview /disable "WAN Miniport (PPPOE)"
-devmanview /disable "WAN Miniport (PPTP)"
-devmanview /disable "WAN Miniport (SSTP)"
+if %isDuck% equ 1 (
+    cd /d %windir%\DuckOS_Modules
+    if exist %windir%\DuckOS_Modules\devmanview.exe (
+        devmanview /disable "Composite Bus Enumerator"
+        devmanview /disable "System Speaker" MemoryDiagnostic
+        devmanview /disable "System Timer"
+        devmanview /disable "UMBus Root Bus Enumerator"
+        devmanview /disable "Microsoft System Management BIOS Driver"
+        devmanview /disable "High Precision Event Timer"
+        devmanview /disable "PCI Encryption/Decryption Controller"
+        devmanview /disable "AMD PSP"
+        devmanview /disable "Intel SMBus"
+        devmanview /disable "Intel Management Engine"
+        devmanview /disable "PCI Memory Controller"
+        devmanview /disable "PCI standard RAM Controller"
+        devmanview /disable "Microsoft Kernel Debug Network Adapter"
+        devmanview /disable "SM Bus Controller"
+        devmanview /disable "NDIS Virtual Network Adapter Enumerator"
+        devmanview /disable "Numeric Data Processor"
+        devmanview /disable "Microsoft RRAS Root Enumerator"
+        devmanview /disable "WAN Miniport (IKEv2)"
+        devmanview /disable "WAN Miniport (IP)"
+        devmanview /disable "WAN Miniport (IPv6)"
+        devmanview /disable "WAN Miniport (L2TP)"
+        devmanview /disable "WAN Miniport (Network Monitor)"
+        devmanview /disable "WAN Miniport (PPPOE)"
+        devmanview /disable "WAN Miniport (PPTP)"
+        devmanview /disable "WAN Miniport (SSTP)"
+    )
+)
+if not exist %windir%\DuckOS_Modules\devmanview.exe ( echo $ DevManView is missing, cannot disable unnecessary devices in Device Management.. )
 
 ::::::::::::::
 :: Clean up ::
@@ -1251,7 +1385,7 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "HibernateEnabled" /t r
 :: GPO for Startmenu (tiles)
 reg add "HKLM\Software\Policies\Microsoft\Windows\Explorer" /v "LockedStartLayout" /t REG_DWORD /d "1" /f
 reg add "HKLM\Software\Policies\Microsoft\Windows\Explorer" /v "DisableNotificationCenter" /t REG_DWORD /d "1" /f
-%currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Group Policy Objects\{2F5183E9-4A32-40DD-9639-F9FAF80C79F4}Machine\Software\Policies\Microsoft\Windows\Explorer" /v "StartLayoutFile" /t REG_EXPAND_SZ /d "C:\Windows\layout.xml" /f
+%currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Group Policy Objects\{2F5183E9-4A32-40DD-9639-F9FAF80C79F4}Machine\Software\Policies\Microsoft\Windows\Explorer" /v "StartLayoutFile" /t REG_EXPAND_SZ /d "%windir%\layout.xml" /f
 
 :: disable windows updates
 reg add "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate\AU" /v "IncludeRecommendedUpdates" /t REG_DWORD /d "0" /f
@@ -1346,6 +1480,9 @@ reg delete "HKEY_CLASSES_ROOT\Drive\shellex\PropertySheetHandlers\{55B3A0BD-4D28
 :: Disable Windows Media Player DRM Online Access
 reg add "HKLM\Software\Policies\Microsoft\WMDRM" /v "DisableOnline" /t REG_DWORD /d "1" /f
 
+:: Clear page file at shutdown
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "ClearPageFileAtShutdown" /d "1" /t REG_DWORD /f
+
 :: Show all tasks on the "Control Panel", credits: Tenforums
 reg add "HKLM\Software\Classes\CLSID\{D15ED2E1-C75B-443c-BD7C-FC03B2F08C17}" /ve /t REG_SZ /d "All Tasks" /f
 reg add "HKLM\Software\Classes\CLSID\{D15ED2E1-C75B-443c-BD7C-FC03B2F08C17}" /v "InfoTip" /t REG_SZ /d "View list of all Control Panel tasks" /f
@@ -1384,18 +1521,19 @@ reg add "HKLM\Software\Policies\Microsoft\Windows\DWM" /v "DisallowAnimations" /
 %currentuser% reg add "HKCU\SOFTWARE\Microsoft\Windows\DWM" /v "Composition" /t REG_DWORD /d "0" /f
 
 :: Add batch (command prompt) files to the right-click "new file" menu
-reg add "HKLM\Software\Classes\.bat\ShellNew" /v "ItemName" /t REG_EXPAND_SZ /d "@C:\Windows\System32\acppage.dll,-6002" /f
+reg add "HKLM\Software\Classes\.bat\ShellNew" /v "ItemName" /t REG_EXPAND_SZ /d "@%windir%\System32\acppage.dll,-6002" /f
 reg add "HKLM\Software\Classes\.bat\ShellNew" /v "NullFile" /t REG_SZ /d "" /f
 
 :: Add registry files to the right-click "new file" menu
-reg add "HKLM\Software\Classes\.reg\ShellNew" /v "ItemName" /t REG_EXPAND_SZ /d "@C:\Windows\regedit.exe,-309" /f
+reg add "HKLM\Software\Classes\.reg\ShellNew" /v "ItemName" /t REG_EXPAND_SZ /d "@%windir%\regedit.exe,-309" /f
 reg add "HKLM\Software\Classes\.reg\ShellNew" /v "NullFile" /t REG_SZ /d "" /f
 
 :: "Merge as TrustedInstaller" for registry files
-reg add "HKEY_CLASSES_ROOT\regfile\Shell\RunAs" /ve /t REG_SZ /d "Merge As TrustedInstaller" /f
-reg add "HKEY_CLASSES_ROOT\regfile\Shell\RunAs" /v "HasLUAShield" /t REG_SZ /d "1" /f
-reg add "HKEY_CLASSES_ROOT\regfile\Shell\RunAs\Command" /ve /t REG_SZ /d "C:\Windows\DuckOS_modules\nsudo.exe -U:T -P:E reg import "%%1"" /f
-
+if %isDuck% equ 1 (
+    reg add "HKEY_CLASSES_ROOT\regfile\Shell\RunAs" /ve /t REG_SZ /d "Merge as TrustedInstaller" /f
+    reg add "HKEY_CLASSES_ROOT\regfile\Shell\RunAs" /v "HasLUAShield" /t REG_SZ /d "1" /f
+    reg add "HKEY_CLASSES_ROOT\regfile\Shell\RunAs\Command" /ve /t REG_SZ /d "%windir%\DuckOS_modules\nsudo.exe -U:T -P:E reg import "%%1"" /f
+)
 :: Disable Bluetooth
 echo %c_red%Disabling Bluetooth...
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\BluetoothUserService" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
@@ -1429,9 +1567,16 @@ reg add "HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell" 
 powershell -NoProfile "$net=get-netconnectionprofile; Set-NetConnectionProfile -Name $net.Name -NetworkCategory Private" >nul 2>&1
 echo %c_green%Done, finalizing...
 
-:: Cancel any pending shutdowns, and restart in 2 seconds.. [with force..]
+:: Flag the script as finished
+reg add "HKEY_CURRENT_USER\Software\DuckOS\Post Script" /v RunningState /d 2 /t REG_DWORD /f
+
+:: Cancel any pending shutdowns, and restart in 2 seconds.. [with force option]
+:: If the argument -doRestart is selected, then we will restart..
 shutdown /a
-shutdown /r /t 2 /f
+
+if /i "%doRestart%" equ "yes" ( shutdown /r /t 5 /f ) else (
+	start mshta.exe vbscript:Execute("msgbox ""You selected to not restart. Please restart as soon as possible to apply changes!"",64+4096,""DuckOS Tweaks"":close")
+)
 
 :: Delete the post script!
 start /min "" "cmd.exe" /c del /f /q %0
@@ -1443,3 +1588,65 @@ exit
     >"%tempFile%" echo(WScript.Quit msgBox("%~1",%~2,"%~3") & cscript //nologo //e:vbscript "%tempFile%"
     set "exitCode=%errorlevel%" & del "%tempFile%" >nul 2>nul
     endlocal & exit /b %exitCode%
+
+
+:noArgs
+color 0a
+title Hold up!
+cls
+echo $ No CMDLine args were passed. The script doesn't know what to do.
+echo.
+echo $ 1 - Tweak the computer
+echo $ 2 - Turn on automatic restarting after the tweaks are done.
+echo $ 3 - Don't update the script
+:askAgain
+set /p choice=Your choice:
+for %%i in (1 2 3 one two three) do (
+    if /i not %choice% equ %%i do ( echo $ Invalid choice. && goto :askAgain)
+)
+if %choice% equ 1 ( goto :tweaks )
+if %choice% equ one ( goto :tweaks )
+if %choice% equ 2 ( set doRestart=yes )
+if %choice% equ two ( set doRestart=yes )
+if %choice% equ 3 ( set doUpdate=no )
+if %choice% equ three ( set doUpdate=no )
+goto :noArgs
+
+:scriptS
+cls
+echo $ The script was interrupted. You should consider runnning it again.
+pause
+goto :tweaks
+
+:scriptF
+cls
+echo $ The script tweaks have been sucessfully applied.
+echo.
+echo $ Press any key to exit...
+pause >nul
+exit /b
+
+:TrustedInstaller
+echo $ Relaunching as TrustedInstaller...
+if %isDuck% equ 1 ( set nsudo=%windir%\DuckOS_Modules\nsudo.exe )
+if /i exist %nsudo% ( %nsudo% -P:E -U:T "%~f0" -onlyTweak && exit )
+if not exist %nsudo% (
+    cls
+    color cf
+    prompt /n /m "$ NSudo doesn't exist in the directory you specified! Try again?"
+    if errorlevel 2 (
+        set /p nsudo=Please enter NSudo path:
+    ) else (
+        if errorlevel 1 (
+            prompt The script won't run with it's full potential. Continue to the tweaks?
+	) else (
+            if errorlevel 2 (
+                goto :tweaks
+            ) else (
+                if errorlevel 1 (
+                    exit 3
+                )
+            )
+        )
+    )  
+)
