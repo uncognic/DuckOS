@@ -1625,6 +1625,7 @@ exit /b
 
 :TrustedInstaller
 echo $ Relaunching as TrustedInstaller...
+if %isDuck% equ 1 ( set nsudo=%windir%\DuckOS_Modules\nsudo.exe )
 if /i exist %nsudo% ( %nsudo% -P:E -U:T "%~f0" -onlyTweak && exit )
 if not exist %nsudo% (
     cls
@@ -1635,13 +1636,14 @@ if not exist %nsudo% (
     ) else (
         if errorlevel 1 (
             prompt The script won't run with it's full potential. Continue to the tweaks?
-                if errorlevel 2 (
-                    goto :tweaks
-                ) else (
-                    if errorlevel 1 (
-                        exit 3
-                    )
+	) else (
+            if errorlevel 2 (
+                goto :tweaks
+            ) else (
+                if errorlevel 1 (
+                    exit 3
                 )
+            )
         )
     )  
 )
