@@ -32,72 +32,28 @@ powershell -WindowStyle Maximized Write-Host The post install script is starting
 ::::::::::::::::::::::::::::
 
 :: Default values
-set doRestart=no
-set doUpdate=no
-set isDuck=no
-set onlyTweak=no
+set doRestart=0
+set doUpdate=0
+set isDuck=0
+set onlyTweak=0
 
 :: Check if there are no arguments...
 if /i "%*"=="" ( goto :noArgs )
 
 :: Go to the correct function if one of the command line arguments is a valid one.
 for %%i in (%*) do (
-    if /i "%%i" equ "-doRestart" set doRestart=yes
-    if /i "%%i" equ "-doUpdate" set doUpdate=yes
+    if /i "%%i" equ "-doRestart" set doRestart=1
+    if /i "%%i" equ "-doUpdate" set doUpdate=1
+    if /i "%%i" equ "-isDuck" set isDuck=1
     if /i "%%i" equ "-onlyTweak" goto :tweaks
-    if /i "%%i" equ "-isDuck" set isDuck=yes
 )
 
 :: Update the script
-if /i %doUpdate%=yes (
+if /i %doUpdate% equ 1 (
     echo %c_red%Updating the script..
     curl --progress-bar --verbose https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/DuckOS_Modules/DuckOS-post_script.bat -o "%~f0"
     call "%~f0" %* -doUpdate
 )
-
-:: Here we go
-:init
-setlocal DisableDelayedExpansion
-set "batchPath=%~0"
-for %%k in (%0) do set batchName=%%~nk
-set "vbsGetPrivileges=%temp%\OEgetPriv_%batchName%.vbs"
-setlocal EnableDelayedExpansion
-
-:checkPrivileges
-NET FILE 1>NUL 2>NUL
-if '%errorlevel%' == '0' (
-    goto gotPrivileges
-) else (
-    setlocal DisableDelayedExpansion
-    choice /n /m "Permission denied. Try again? [Y/N]"
-    if errorlevel 2 (
-        echo Permission denied. To properly apply the tweaks, make sure to run it as admin!
-        echo Press any key to close this window... & pause >nul
-    ) else (
-        if errorlevel 1 (
-            echo Alright.
-            goto getPrivileges
-            title You may now close this window - Permission denied
-        )
-    )
-)
-
-:getPrivileges
-setlocal EnableDelayedExpansion
-if '%1'=='ELEV' (echo ELEV & shift /1 & goto gotPrivileges)
-echo Set UAC = CreateObject^("Shell.Application"^) > "%vbsGetPrivileges%"
-echo args = "ELEV " >> "%vbsGetPrivileges%"
-echo For Each strArg in WScript.Arguments >> "%vbsGetPrivileges%"
-echo args = args ^& strArg ^& " "  >> "%vbsGetPrivileges%"
-echo Next >> "%vbsGetPrivileges%"
-echo UAC.ShellExecute "!batchPath!", args, "", "runas", 1 >> "%vbsGetPrivileges%"
-"%SystemRoot%\System32\WScript.exe" "%vbsGetPrivileges%" %*
-exit /B
-
-:gotPrivileges
-setlocal & pushd .
-cd /d %~dp0
-if '%1'=='ELEV' (del "%vbsGetPrivileges%" 1>nul 2>nul  &  shift /1)
 
 :: Make the script faster by putting a higher priority.
 wmic process where name="cmd.exe" CALL setpriority 128
@@ -121,9 +77,30 @@ echo %c_purple%Please wait. This may take a moment.
 
 :tweaks
 
+DISM >NUL || ( @pushd %~dp0 & fltmc | find "." && (powershell start '%~f0' ' %* -tweakONLY' -verb runas 2>nul && exit /b) )
+
+:: Check if the user didn't accept the uac prompt...
+dism >nul 2>&1 || (
+	mode 500, 800
+	title DuckOS Post Script: Permission Denied
+	color cf
+	cls
+	echo.
+	echo  DuckOS Post Script: Permission Denied:
+	echo.
+	echo  Can't use %USERNAME%'s Administrator rights.
+    echo  To properly apply the tweaks, make sure to run it as admin!
+    echo.
+	powershell -NoProfile -Command "start-Process %~0 -Verb runas | Out-Null" >NUL && exit
+	echo Press any key to exit...
+	pause >nul
+	exit 3
+)
+
+
 :: Check if the user is running the script as TrustedInstaller...
-whoami|findstr "NT AUTHORITY\SYSTEM"
-if %errorlevel% equ 0 ( call :TrustedInstaller )
+whoami|findstr /i "NT AUTHORITY\SYSTEM" >nul
+if %errorlevel% equ 1 ( call :TrustedInstaller )
 
 :: Check if the script was already ran...
 reg query "HKEY_CURRENT_USER\Software\DuckOS\Post Script"|find "RunningState    REG_DWORD    1"
@@ -144,6 +121,7 @@ if %isDuck% equ 1 (
 ) else (
     call :MsgBox "You will be prompted with a few questions, then you can leave your computer running and let us do the rest." 64+4096 "DuckOS Tweaks"
 )
+
 :: Change the directory.
 cd %windir%\DuckOS_Modules
 
@@ -151,7 +129,7 @@ cd %windir%\DuckOS_Modules
 title Do not close this window - [1/66] Windows Firewall
 call :MsgBox "Will you use Windows Firewall? -- NOTE: It will break Microsoft Store reinstallation. Pressing 'no' disables it!"  "VBYesNo+VBQuestion" "Configuration"
 if errorlevel 7 (
-        echo %c_green%Alright, destroying firewall...
+    echo %c_green%Alright, destroying firewall...
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\mpssvc" /v "Start" /t REG_DWORD /d "4" /f
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\BFE" /v "Start" /t REG_DWORD /d "4" /f
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile" /v "EnableFirewall" /t REG_DWORD /d "0" /f
@@ -211,7 +189,9 @@ title Do not close this window - [4/66] Importing registry
 if %isDuck% equ 1 (
     if exist %windir%\DuckOS_Modules\gray_accent_color.reg ( %currentuser% regedit /s %windir%\DuckOS_Modules\gray_accent_color.reg )
 ) else (
+    echo %c_green%******************************************************
     echo %c_red%We've detected that you're not using DuckOS, skipping.
+    echo %c_green%******************************************************
 )
 :: Block every single websites telemetry with the help of a modified hosts file.
 title Do not close this window - [5/66] Blocking telemetry
@@ -645,19 +625,15 @@ reg add "HKLM\Software\Policies\Microsoft\Windows\WDI\{9c5a40da-b965-4fc3-8781-8
 :: Content Delivery Manager
 title Do not close this window - [39/66] Configuring Delivery Manager
 echo %c_cyan%Configuring Content Delivery Manager...
-%currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "RotatingLockScreenOverlayEnabled" /t REG_DWORD /d "0" /f
-%currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-310093Enabled" /t REG_DWORD /d "0" /f
-%currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-353698Enabled" /t REG_DWORD /d "0" /f
-%currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-314563Enabled" /t REG_DWORD /d "0" /f
-%currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338389Enabled" /t REG_DWORD /d "0" /f
-%currentuser% reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338387Enabled" /t REG_DWORD /d "0" /f
-%currentuser% reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338388Enabled" /t REG_DWORD /d "0" /f
-%currentuser% reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338393Enabled" /t REG_DWORD /d "0" /f
-%currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "RotatingLockScreenEnabled" /t REG_DWORD /d "0" /f
-%currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SoftLandingEnabled" /t REG_DWORD /d "0" /f
-%currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SystemPaneSuggestionsEnabled" /t REG_DWORD /d "0" /f
-%currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SilentInstalledAppsEnabled" /t REG_DWORD /d "0" /f
-%currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "ContentDeliveryAllowed" /t REG_DWORD /d "0" /f
+
+for %%a in (310093 353698 314563 338389 338387 338388 338393) do (
+    %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-%%aEnabled" /t REG_DWORD /d "0"
+)
+
+for %%a in (RotatingLockScreenOverlayEnabled RotatingLockScreenEnabled SoftLandingEnabled SystemPaneSuggestionsEnabled SilentInstalledAppsEnabled ContentDeliveryAllowed) do (
+    %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "%%a" /t REG_DWORD /d "0" /f
+)
+
 echo %c_green%Done.
 
 :: Disable Sleep Study
@@ -1205,9 +1181,11 @@ for /f "tokens=*" %%i in ('wmic PATH Win32_PnPEntity GET DeviceID ^| findstr "US
 )
 
 :: Import and set the powerplan
-powercfg -delete a1841308-3541-4fab-bc81-f71556f20b4a
-powercfg -delete 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
-powercfg -delete e9a42b02-d5df-448d-aa00-03f14749eb61
+if %isDuck% equ 1 (
+    powercfg -delete a1841308-3541-4fab-bc81-f71556f20b4a
+    powercfg -delete 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
+    powercfg -delete e9a42b02-d5df-448d-aa00-03f14749eb61
+)
 
 echo %c_green%Done.
 
@@ -1537,6 +1515,7 @@ if %isDuck% equ 1 (
     reg add "HKEY_CLASSES_ROOT\regfile\Shell\RunAs" /v "HasLUAShield" /t REG_SZ /d "1" /f
     reg add "HKEY_CLASSES_ROOT\regfile\Shell\RunAs\Command" /ve /t REG_SZ /d "%windir%\DuckOS_modules\nsudo.exe -U:T -P:E reg import "%%1"" /f
 )
+
 :: Disable Bluetooth
 echo %c_red%Disabling Bluetooth...
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\BluetoothUserService" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
@@ -1608,11 +1587,8 @@ for %%i in (1 2 3 one two three) do (
     if /i not %choice% equ %%i do ( echo $ Invalid choice. && goto :askAgain)
 )
 if %choice% equ 1 ( goto :tweaks )
-if %choice% equ one ( goto :tweaks )
 if %choice% equ 2 ( set doRestart=yes )
-if %choice% equ two ( set doRestart=yes )
 if %choice% equ 3 ( set doUpdate=no )
-if %choice% equ three ( set doUpdate=no )
 goto :noArgs
 
 :scriptS
@@ -1631,25 +1607,16 @@ exit /b
 
 :TrustedInstaller
 echo $ Relaunching as TrustedInstaller...
-if %isDuck% equ 1 ( set nsudo=%windir%\DuckOS_Modules\nsudo.exe )
-if /i exist %nsudo% ( %nsudo% -P:E -U:T "%~f0" -onlyTweak && exit )
+set nsudo=%windir%\DuckOS_Modules\nsudo.exe
+
+if /i exist %nsudo% ( %nsudo% -P:E -U:T "%~f0" -onlyTweak %* && exit )
+
 if not exist %nsudo% (
     cls
     color cf
-    prompt /n /m "$ NSudo doesn't exist in the directory you specified! Try again?"
-    if errorlevel 2 (
-        set /p nsudo=Please enter NSudo path:
-    ) else (
-        if errorlevel 1 (
-            prompt The script won't run with it's full potential. Continue to the tweaks?
-	) else (
-            if errorlevel 2 (
-                goto :tweaks
-            ) else (
-                if errorlevel 1 (
-                    exit 3
-                )
-            )
-        )
-    )  
+    echo $ NSudo doesn't exist in the default directory you specified! The script can't run with it's full potential.
+    :ask_NSUDO
+    set /p nsudo=Please enter the NSudo path:
+    if /i not exist %nsudo% goto :ask_NSUDO
+    if /i exist %nsudo% ( %nsudo% -P:E -U:T "%~f0" -onlyTweak %* && exit )
 )
