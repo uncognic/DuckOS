@@ -199,14 +199,15 @@ if exist %SystemRoot%\System32\drivers\etc\hosts.temp (
 :: Windows Appearance ::
 ::::::::::::::::::::::::
 
-:: Enable dark mode, disable transparency
+:: Enable dark mode, disable transparency and disable Task View
 :: WE DON'T LIKE LIGHT MODE!
 title Do not close this window - [6/66] Windows appearence
 if %isDuck equ 1 (
-    echo %c_green%Enabling dark mode, disabling transparency...
+    echo %c_green%Enabling dark mode, disabling transparency and disabling Task View...
     %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "SystemUsesLightTheme" /t REG_DWORD /d "0" /f
     %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "AppsUseLightTheme" /t REG_DWORD /d "0" /f
     %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "EnableTransparency" /t REG_DWORD /d "0" /f
+    %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowTaskViewButton" /t REG_DWORD /d "0" /f
     echo %c_green%Done.
 ) else (
     echo %c_red%Appearance tweaks might not fit with you, so we're skipping it.
