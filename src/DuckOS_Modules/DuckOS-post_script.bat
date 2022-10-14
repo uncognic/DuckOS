@@ -281,9 +281,9 @@ echo %c_red%Done.
 :: Fully disable the telemetry with OOSU10 ::
 :::::::::::::::::::::::::::::::::::::::::::::
 
-echo Fully disabling the telemetry if O&O ShutUp 10 exists...
+echo Fully disabling the telemetry if O^&O ShutUp 10 exists...
 if exist %windir%\DuckOS_Modules\OOSU10.exe (
-	echo O&O ShutUp10 found... disabling telemetry..
+	echo O^&O ShutUp10 found... disabling telemetry..
 	%windir%\DuckOS_Modules\OOSU10.exe %windir%\DuckOS_Modules\duckOS_preset.cfg /quiet /nosrp
 )
 echo %c_green%Done.
@@ -339,6 +339,7 @@ reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Device Metadata" /f >
 echo %c_green%Done.
 
 if %isDuck% equ 1 ( goto skipStuff )
+if %isDuck% equ 1 ( goto skipDuckOnly )
 
 :: Set up the toolbox to be in the context menu
 title Do not close this window - [12/66] Context Menu
@@ -391,7 +392,7 @@ echo %c_green%Done.
 :: Make the cache cleaner a protected sys file
 attrib +r +s %windir%\ProgramData\Cache_Cleaner.bat
 
-:skipStuffs
+:skipDuckOnly
 
 :: Disable unneeded Tasks -- already credited
 title Do not close this window - [16/66] Disabling unneeded scheduled tasks
@@ -618,7 +619,7 @@ title Do not close this window - [39/66] Configuring Delivery Manager
 echo %c_cyan%Configuring Content Delivery Manager...
 
 for %%a in (310093 353698 314563 338389 338387 338388 338393) do (
-    %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-%%aEnabled" /t REG_DWORD /d "0"
+    %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-%%aEnabled" /t REG_DWORD /d "0" /f
 )
 
 for %%a in (RotatingLockScreenOverlayEnabled RotatingLockScreenEnabled SoftLandingEnabled SystemPaneSuggestionsEnabled SilentInstalledAppsEnabled ContentDeliveryAllowed) do (
@@ -1545,7 +1546,9 @@ echo %c_green%Done, finalizing...
 shutdown /a
 
 if /i "%doRestart%" equ "yes" ( shutdown /r /t 5 /f ) else (
-	start mshta.exe vbscript:Execute("msgbox ""You selected to not restart. Please restart as soon as possible to apply changes!"",64+4096,""DuckOS Tweaks"":close")
+	echo $ You selected to not restart. Please restart as soon as possible to apply changes!
+    echo $ Quitting soon in 3 seconds..
+    timeout 3 /nobreak
 )
 
 :: Delete the post script!
