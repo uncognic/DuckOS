@@ -1547,8 +1547,8 @@ shutdown /a
 
 if /i "%doRestart%" equ "yes" ( shutdown /r /t 5 /f ) else (
 	echo $ You selected to not restart. Please restart as soon as possible to apply changes!
-    echo $ Quitting soon in 3 seconds..
-    timeout 3 /nobreak
+    echo $ Quitting soon in 8 seconds..
+    timeout 8 /nobreak
 )
 
 :: Delete the post script!
