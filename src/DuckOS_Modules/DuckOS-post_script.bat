@@ -1547,9 +1547,11 @@ echo %c_green%Done, finalizing...
 shutdown /a
 
 if /i "%doRestart%" equ "1" ( shutdown /r /t 5 /f ) else (
-	echo $ You selected to not restart. Please restart as soon as possible to apply changes!
-    echo $ Quitting soon in 8 seconds..
-    timeout 8 /nobreak
+    if /i "%isDuck%" equ "1" ( shutdown /r /t 10 /f /c "Your system is almost ready!") else (
+        echo $ You selected to not restart. Please restart as soon as possible to apply changes!
+        echo $ Quitting soon in 8 seconds..
+        timeout 8 /nobreak
+    )
 )
 
 :: Delete the post script!
