@@ -100,16 +100,7 @@ dism >nul 2>&1 || (
 
 :: Check if the user is running the script as TrustedInstaller...
 whoami|findstr /i "NT AUTHORITY\SYSTEM" >nul
-if %errorlevel% equ 1 ( call :TrustedInstaller )
-
-:: Check if the script was already ran...
-reg query "HKEY_CURRENT_USER\Software\DuckOS\Post Script"|find "RunningState    REG_DWORD    1"
-if %errorlevel% equ 0 ( call :scriptS )
-reg query "HKEY_CURRENT_USER\Software\DuckOS\Post Script"|find "RunningState    REG_DWORD    2"
-if %errorlevel% equ 0 ( call :scriptF )
-
-:: Flag the script as running...
-reg add "HKEY_CURRENT_USER\Software\DuckOS\Post Script" /v "RunningState" /d "1" /t REG_DWORD /f
+if %errorlevel% equ 1 ( goto :TrustedInstaller )
 
 :: Set the initial title
 title Do not close this window, tweaking your computer!
@@ -1548,9 +1539,6 @@ reg add "HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell" 
 :: Switch from Public To Private firewall..
 powershell -NoProfile "$net=get-netconnectionprofile; Set-NetConnectionProfile -Name $net.Name -NetworkCategory Private" >nul 2>&1
 echo %c_green%Done, finalizing...
-
-:: Flag the script as finished
-reg add "HKEY_CURRENT_USER\Software\DuckOS\Post Script" /v RunningState /d 2 /t REG_DWORD /f
 
 :: Cancel any pending shutdowns, and restart in 2 seconds.. [with force option]
 :: If the argument -doRestart is selected, then we will restart..
