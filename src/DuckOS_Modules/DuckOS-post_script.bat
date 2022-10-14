@@ -338,7 +338,7 @@ reg delete "HKLM\Software\Clients\StartMenuInternet\Microsoft Edge" /f >nul 2>nu
 reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Device Metadata" /f >nul 2>nul
 echo %c_green%Done.
 
-if %isDuck% equ 1 ( goto skipStuff )
+:: Skip some parts that should be exclusive only to DuckOS
 if %isDuck% equ 1 ( goto skipDuckOnly )
 
 :: Set up the toolbox to be in the context menu
