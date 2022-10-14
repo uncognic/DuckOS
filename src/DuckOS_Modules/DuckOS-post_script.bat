@@ -1545,7 +1545,7 @@ echo %c_green%Done, finalizing...
 :: If the argument -doRestart is selected, then we will restart..
 shutdown /a
 
-if /i "%doRestart%" equ "yes" ( shutdown /r /t 5 /f ) else (
+if /i "%doRestart%" equ "1" ( shutdown /r /t 5 /f ) else (
 	echo $ You selected to not restart. Please restart as soon as possible to apply changes!
     echo $ Quitting soon in 8 seconds..
     timeout 8 /nobreak
