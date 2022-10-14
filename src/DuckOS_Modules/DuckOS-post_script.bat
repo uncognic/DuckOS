@@ -178,7 +178,7 @@ echo %c_green%Done.
 :: Import gray accent color.reg
 title Do not close this window - [4/66] Importing registry
 if %isDuck% equ 1 (
-    if exist %windir%\DuckOS_Modules\gray_accent_color.reg ( %currentuser% regedit /s %windir%\DuckOS_Modules\gray_accent_color.reg )
+    if exist %windir%\DuckOS_Modules\gray_accent_color.reg ( %currentuser% "%WINDIR%\regedit.exe" /s %windir%\DuckOS_Modules\gray_accent_color.reg )
 ) else (
     echo %c_green%******************************************************
     echo %c_red%We've detected that you're not using DuckOS, skipping.
