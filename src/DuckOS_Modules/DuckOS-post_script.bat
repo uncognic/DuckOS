@@ -10,7 +10,11 @@
 ::::::::::::::::::::::::::::::::::::::
 
 :: Set up initial title
-title Do not close this window - [0/20] Preparing
+title Do not close this window - [0/20] Preparing..
+
+:: Set the post script version
+set version=0.45
+
 :: Set up colors in echo
 :: Some colors might not be used as of now, but we'll keep it.
 chcp 65001 >nul 2>&1
@@ -23,6 +27,21 @@ set c_purple=[35m
 set c_cyan=[36m
 set c_white=[37m
 
+:::::::::::::::::::::::::::::::::
+:: Get the post script version ::
+:::::::::::::::::::::::::::::::::
+
+:: Detect if there's any wifi.
+ping -n 1 google.com | findstr Sent >NUL && set NETWORK_AVAILABLE=yes
+ping -n 1 google.com | findstr Sent >NUL || set NETWORK_AVAILABLE=no
+
+:: Compare it to the one on the internet.
+if "%NETWORK_AVAILABLE%" equ "yes" (
+    if exist "%TEMP%\Post-Script_ver.txt" del /f /q "%TEMP%\Post-Script_ver.txt" >NUL
+    curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/version.txt -o "%TEMP%\Post-Script_ver.txt"
+    for /f "tokens=* USEBACKQ" %%f IN (`type %TEMP%\Post-Script_ver.txt`) do ( if "%version%" LSS "%%f" call :UpdateDetected %%f )
+)
+
 :: Set a variable.. that we will use later... that points into an executable.
 set currentuser=%windir%\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait
 powershell -WindowStyle Maximized Write-Host The post install script is starting...
@@ -33,7 +52,6 @@ powershell -WindowStyle Maximized Write-Host The post install script is starting
 
 :: Default values
 set noRestart=0
-set noUpdate=0
 set isDuck=0
 set onlyTweak=0
 
@@ -43,19 +61,10 @@ if /i "%*"=="" ( goto :noArgs )
 :: Go to the correct function if one of the command line arguments is a valid one.
 for %%i in (%*) do (
     if /i "%%i" equ "-noRestart" set noRestart=1
-    if /i "%%i" equ "-noUpdate" set noUpdate=1
     if /i "%%i" equ "-isDuck" set isDuck=1
     if /i "%%i" equ "-onlyTweak" goto :tweaks
     if /i "%%i" equ "/noRestart" set noRestart=1
-    if /i "%%i" equ "/noUpdate" set noUpdate=1
     if /i "%%i" equ "/onlyTweak" goto :tweaks
-)
-
-:: Update the script
-if /i %noUpdate% equ 0 (
-    echo %c_red%Updating the script..
-    curl --progress-bar --verbose https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/DuckOS_Modules/DuckOS-post_script.bat -o "%~f0"
-    call "%~f0" %* -noUpdate
 )
 
 :: Make the script faster by putting a higher priority.
@@ -1575,30 +1584,16 @@ echo $ No CMDLine args were passed. The script doesn't know what to do.
 echo.
 echo $ 1 - Tweak the computer
 echo $ 2 - Turn off automatic restarting after the tweaks are done.
-echo $ 3 - Don't update the script
+echo $ 3 - Exit
 :askAgain
 set /p choice=Your choice:
-for %%i in (1 2 3 one two three) do (
+for %%i in (1 2 3) do (
     if /i not %choice% equ %%i do ( echo $ Invalid choice. && goto :askAgain)
 )
 if %choice% equ 1 ( goto :tweaks )
 if %choice% equ 2 ( set noRestart=1 )
-if %choice% equ 3 ( set noUpdate=1 )
+if %choice% equ 3 ( exit )
 goto :noArgs
-
-:scriptS
-cls
-echo $ The script was interrupted. You should consider runnning it again.
-pause
-goto :tweaks
-
-:scriptF
-cls
-echo $ The script tweaks have been sucessfully applied.
-echo.
-echo $ Press any key to exit...
-pause >nul
-exit /b
 
 :TrustedInstaller
 echo $ Relaunching as TrustedInstaller...
@@ -1614,4 +1609,54 @@ if not exist %nsudo% (
     set /p nsudo=Please enter the NSudo path:
     if /i not exist %nsudo% goto :ask_NSUDO
     if /i exist %nsudo% ( %nsudo% -P:E -U:T "%~f0" -onlyTweak %* && exit )
+)
+
+:UpdateDetected
+if exist "%TEMP%\type.txt" del /f /q "%TEMP%\type.txt" >NUL
+curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/changelog_type.txt -o "%TEMP%\type.txt"
+
+:: The "type" of the new versions can be:
+::  1. bug_fixes
+::  2. feature_updates
+::  3. os_update
+
+:: Check for bug_fixes
+findstr /i "bug_fixes" %temp%\type.txt
+if %errorlevel% equ 0 ( set changes=Fixed bugs, which makes your experience better. Recommended to apply the tweaks. )
+
+:: Check for feature_updates
+findstr /i "feature_update" %temp%\type.txt
+if %errorlevel% equ 0 ( set changes=Something NEW has been added. Recommended to apply the tweaks, might give performance. )
+
+:: Check for os_updates
+findstr /i "os_update" %temp%\type.txt
+if %errorlevel% equ 0 ( set changes=Something were changed in the operating system. You aren't required to apply the tweaks. )
+
+:: The "Update found" screen.
+title Woah! New update detected.
+cls
+chcp 65001 >nul
+echo %c_cyan%██╗   ██╗██████╗ ██████╗  █████╗ ████████╗███████╗    ███████╗ ██████╗ ██╗   ██╗███╗   ██╗██████╗ 
+echo %c_cyan%██║   ██║██╔══██╗██╔══██╗██╔══██╗╚══██╔══╝██╔════╝    ██╔════╝██╔═══██╗██║   ██║████╗  ██║██╔══██╗
+echo %c_cyan%██║   ██║██████╔╝██║  ██║███████║   ██║   █████╗      █████╗  ██║   ██║██║   ██║██╔██╗ ██║██║  ██║
+echo %c_cyan%██║   ██║██╔═══╝ ██║  ██║██╔══██║   ██║   ██╔══╝      ██╔══╝  ██║   ██║██║   ██║██║╚██╗██║██║  ██║
+echo %c_cyan%╚██████╔╝██║     ██████╔╝██║  ██║   ██║   ███████╗    ██║     ╚██████╔╝╚██████╔╝██║ ╚████║██████╔╝
+echo %c_cyan% ╚═════╝ ╚═╝     ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝    ╚═╝      ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚═════╝ 
+echo.
+echo %c_white%=================================================================================================
+echo.
+echo %c_white%$ Local Version: %c_red%%version%
+echo %c_white%$ Version from the internet: %c_green%%1
+echo.
+echo %c_cyan%$ What's changed: %c_green%%changes%
+echo %c_white%================================================================================================
+echo.
+echo %c_cyan%$ Would you like to %c_red%update? [Y/N]
+choice /n >nul
+if %errorlevel% equ 1 (
+    echo %c_green%Updating the script..
+    curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/DuckOS_Modules/DuckOS-post_script.bat -o "%~f0"
+    call "%~f0" %*
+) else (
+    echo %c_red%Fine.
 )
