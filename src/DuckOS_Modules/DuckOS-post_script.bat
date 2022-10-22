@@ -32,8 +32,8 @@ powershell -WindowStyle Maximized Write-Host The post install script is starting
 ::::::::::::::::::::::::::::
 
 :: Default values
-set doRestart=0
-set doUpdate=0
+set noRestart=0
+set noUpdate=0
 set isDuck=0
 set onlyTweak=0
 
@@ -42,17 +42,20 @@ if /i "%*"=="" ( goto :noArgs )
 
 :: Go to the correct function if one of the command line arguments is a valid one.
 for %%i in (%*) do (
-    if /i "%%i" equ "-doRestart" set doRestart=1
-    if /i "%%i" equ "-doUpdate" set doUpdate=1
+    if /i "%%i" equ "-noRestart" set noRestart=1
+    if /i "%%i" equ "-noUpdate" set noUpdate=1
     if /i "%%i" equ "-isDuck" set isDuck=1
     if /i "%%i" equ "-onlyTweak" goto :tweaks
+    if /i "%%i" equ "/noRestart" set noRestart=1
+    if /i "%%i" equ "/noUpdate" set noUpdate=1
+    if /i "%%i" equ "/onlyTweak" goto :tweaks
 )
 
 :: Update the script
-if /i %doUpdate% equ 1 (
+if /i %noUpdate% equ 0 (
     echo %c_red%Updating the script..
     curl --progress-bar --verbose https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/DuckOS_Modules/DuckOS-post_script.bat -o "%~f0"
-    call "%~f0" %* -doUpdate
+    call "%~f0" %* -noUpdate
 )
 
 :: Make the script faster by putting a higher priority.
@@ -1546,12 +1549,10 @@ echo %c_green%Done, finalizing...
 :: If the argument -doRestart is selected, then we will restart..
 shutdown /a
 
-if /i "%doRestart%" equ "1" ( shutdown /r /t 5 /f ) else (
-    if /i "%isDuck%" equ "1" ( shutdown /r /t 10 /f /c "Your system is almost ready!") else (
-        echo $ You selected to not restart. Please restart as soon as possible to apply changes!
-        echo $ Quitting soon in 8 seconds..
-        timeout 8 /nobreak
-    )
+if /i "%noRestart%" equ "0" ( shutdown /r /t 5 /f ) else (
+    echo $ You selected to not restart. Please restart as soon as possible to apply changes!
+    echo $ Quitting soon in 8 seconds..
+    timeout 8 /nobreak
 )
 
 :: Delete the post script!
@@ -1573,7 +1574,7 @@ cls
 echo $ No CMDLine args were passed. The script doesn't know what to do.
 echo.
 echo $ 1 - Tweak the computer
-echo $ 2 - Turn on automatic restarting after the tweaks are done.
+echo $ 2 - Turn off automatic restarting after the tweaks are done.
 echo $ 3 - Don't update the script
 :askAgain
 set /p choice=Your choice:
@@ -1581,8 +1582,8 @@ for %%i in (1 2 3 one two three) do (
     if /i not %choice% equ %%i do ( echo $ Invalid choice. && goto :askAgain)
 )
 if %choice% equ 1 ( goto :tweaks )
-if %choice% equ 2 ( set doRestart=yes )
-if %choice% equ 3 ( set doUpdate=no )
+if %choice% equ 2 ( set noRestart=1 )
+if %choice% equ 3 ( set noUpdate=1 )
 goto :noArgs
 
 :scriptS
