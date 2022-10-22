@@ -1655,8 +1655,12 @@ echo %c_cyan%$ Would you like to %c_red%update? [Y/N]
 choice /n >nul
 if %errorlevel% equ 1 (
     echo %c_green%Updating the script..
+    if exist %TEMP%\Post-script_ver.txt del /f /q %TEMP%\Post-script_ver.txt
+    if exist %TEMP%\type.txt del /f /q %TEMP%\type.txt
     curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/DuckOS_Modules/DuckOS-post_script.bat -o "%~f0"
     call "%~f0" %*
 ) else (
+    if exist %TEMP%\Post-script_ver.txt del /f /q %TEMP%\Post-script_ver.txt
+    if exist %TEMP%\type.txt del /f /q %TEMP%\type.txt
     echo %c_red%Fine.
 )
