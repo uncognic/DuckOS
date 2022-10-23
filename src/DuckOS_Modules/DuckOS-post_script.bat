@@ -1,13 +1,13 @@
-@echo off && cls
+r@echo off && cls
 
 :::::::::::::::::::::::::::::::::
 :: DuckOS Post Install Script. ::
 :::::::::::::::::::::::::::::::::
 
-::::::::::::::::::::::::::::::::::::::
-:: Made by fikinoob#6487 for DuckOS ::
-:: Contributed by AnhNguyen#7472    ::
-::::::::::::::::::::::::::::::::::::::
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:: Made by fikinoob#6487 for any Windows 10 installation ::
+::             Contributed by AnhNguyen#7472             ::
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 :: Set up initial title
 title Do not close this window - [0/66] Preparing
