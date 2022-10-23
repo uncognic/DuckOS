@@ -10,7 +10,9 @@
 ::::::::::::::::::::::::::::::::::::::
 
 :: Set up initial title
-title Do not close this window - [0/20] Preparing..
+title Do not close this window - [0/66] Preparing
+:: Set up colors in echo
+:: Some colors might not be used as of now, but we'll keep it.
 
 :: Set the post script version
 set version=0.45
@@ -31,45 +33,56 @@ set c_white=[37m
 :: Get the post script version ::
 :::::::::::::::::::::::::::::::::
 
-:: Detect if there's any wifi.
-ping -n 1 google.com | findstr Sent >NUL && set NETWORK_AVAILABLE=yes
-ping -n 1 google.com | findstr Sent >NUL || set NETWORK_AVAILABLE=no
+:: Check if connection to GitHub is possible.
+ping -n 1 github.com | findstr Sent >NUL && set network=1
+ping -n 1 github.com | findstr not >NUL || set network=0
 
 :: Compare it to the one on the internet.
-if "%NETWORK_AVAILABLE%" equ "yes" (
+if "%network%" equ "1" (
     if exist "%TEMP%\Post-Script_ver.txt" del /f /q "%TEMP%\Post-Script_ver.txt" >NUL
     curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/version.txt -o "%TEMP%\Post-Script_ver.txt"
-    for /f "tokens=* USEBACKQ" %%f IN (`type %TEMP%\Post-Script_ver.txt`) do ( if "%version%" LSS "%%f" call :UpdateDetected %%f )
+    for /f "tokens=* USEBACKQ" %%f IN (`type %TEMP%\Post-Script_ver.txt`) do ( if "%version%" LSS "%%f" call :updateDetected %%f )
+) else (
+    if "%network% equ "0" (
+        echo No network connectivity detected, skipping update!
+    )
 )
 
 :: Set a variable.. that we will use later... that points into an executable.
 set currentuser=%windir%\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait
+
 powershell -WindowStyle Maximized Write-Host The post install script is starting...
+
+echo ██████╗ ██╗     ███████╗ █████╗ ███████╗███████╗    ██╗    ██╗ █████╗ ██╗████████╗      
+echo ██╔══██╗██║     ██╔════╝██╔══██╗██╔════╝██╔════╝    ██║    ██║██╔══██╗██║╚══██╔══╝      
+echo ██████╔╝██║     █████╗  ███████║███████╗█████╗      ██║ █╗ ██║███████║██║   ██║         
+echo ██╔═══╝ ██║     ██╔══╝  ██╔══██║╚════██║██╔══╝      ██║███╗██║██╔══██║██║   ██║         
+echo ██║     ███████╗███████╗██║  ██║███████║███████╗    ╚███╔███╔╝██║  ██║██║   ██║██╗██╗██╗
+echo ╚═╝     ╚══════╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝     ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝   ╚═╝╚═╝╚═╝╚═╝
+
 
 ::::::::::::::::::::::::::::
 :: Command line arguments ::
 ::::::::::::::::::::::::::::
 
 :: Default values
-set noRestart=0
-set isDuck=0
-set onlyTweak=0
+set "noRestart=0"
+set "isDuck=0"
+set "onlyTweak=0"
 
 :: Check if there are no arguments...
 if /i "%*"=="" ( goto :noArgs )
 
 :: Go to the correct function if one of the command line arguments is a valid one.
-for %%i in (%*) do (
-    if /i "%%i" equ "-noRestart" set noRestart=1
-    if /i "%%i" equ "-isDuck" set isDuck=1
+for %%i in (%*) (
+    if /i "%%i" equ "-noRestart" set "noRestart=1"
+    if /i "%%i" equ "-isDuck" set "isDuck=1"
     if /i "%%i" equ "-onlyTweak" goto :tweaks
-    if /i "%%i" equ "/noRestart" set noRestart=1
+    if /i "%%i" equ "/noRestart" set "noRestart=1"
     if /i "%%i" equ "/onlyTweak" goto :tweaks
 )
 
-:: Make the script faster by putting a higher priority.
-wmic process where name="cmd.exe" CALL setpriority 128
-echo %c_purple%Please wait. This may take a moment.
+:begin
 
 :::::::::::::
 :: Credits :: 
@@ -89,26 +102,73 @@ echo %c_purple%Please wait. This may take a moment.
 
 :tweaks
 
-DISM >NUL || ( @pushd %~dp0 & fltmc | find "." && (powershell start '%~f0' ' %* -tweakONLY' -verb runas 2>nul && exit /b) )
+:: Here we go
+:init
+setlocal DisableDelayedExpansion
+set "batchPath=%~0"
+for %%k in (%0) do set batchName=%%~nk
+set "vbsGetPrivileges=%temp%\OEgetPriv_%batchName%.vbs"
+setlocal EnableDelayedExpansion
 
-:: Check if the user didn't accept the uac prompt...
-dism >nul 2>&1 || (
-	mode 500, 800
-	title DuckOS Post Script: Permission Denied
-	color cf
-	cls
-	echo.
-	echo  DuckOS Post Script: Permission Denied:
-	echo.
-	echo  Can't use %USERNAME%'s Administrator rights.
-    echo  To properly apply the tweaks, make sure to run it as admin!
+:checkPrivileges
+:: Sure, using DISM for elev check because we're cool
+DISM >NUL
+if '%errorlevel%' == '0' (
+    goto gotPrivileges
+) else (
+    setlocal DisableDelayedExpansion
+    title Permission denied
+    cls
+    color 0c
+    echo ██╗    ██╗ █████╗ ██████╗ ███╗   ██╗██╗███╗   ██╗ ██████╗ 
+    echo ██║    ██║██╔══██╗██╔══██╗████╗  ██║██║████╗  ██║██╔════╝ 
+    echo ██║ █╗ ██║███████║██████╔╝██╔██╗ ██║██║██╔██╗ ██║██║  ███╗
+    echo ██║███╗██║██╔══██║██╔══██╗██║╚██╗██║██║██║╚██╗██║██║   ██║
+    echo ╚███╔███╔╝██║  ██║██║  ██║██║ ╚████║██║██║ ╚████║╚██████╔╝
+    echo  ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
     echo.
-	powershell -NoProfile -Command "start-Process %~0 -Verb runas | Out-Null" >NUL && exit
-	echo Press any key to exit...
-	pause >nul
-	exit 3
+    choice /n /m "Permission denied. Try again? [Y/N]"
+    if errorlevel 2 (
+        cls
+        echo ███╗   ██╗ ██████╗     ██████╗ ███████╗██████╗ ███╗   ███╗██╗███████╗███████╗██╗ ██████╗ ███╗   ██╗
+        echo ████╗  ██║██╔═══██╗    ██╔══██╗██╔════╝██╔══██╗████╗ ████║██║██╔════╝██╔════╝██║██╔═══██╗████╗  ██║
+        echo ██╔██╗ ██║██║   ██║    ██████╔╝█████╗  ██████╔╝██╔████╔██║██║███████╗███████╗██║██║   ██║██╔██╗ ██║
+        echo ██║╚██╗██║██║   ██║    ██╔═══╝ ██╔══╝  ██╔══██╗██║╚██╔╝██║██║╚════██║╚════██║██║██║   ██║██║╚██╗██║
+        echo ██║ ╚████║╚██████╔╝    ██║     ███████╗██║  ██║██║ ╚═╝ ██║██║███████║███████║██║╚██████╔╝██║ ╚████║
+        echo ╚═╝  ╚═══╝ ╚═════╝     ╚═╝     ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚══════╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+        echo.
+        echo Permission denied. To properly apply the tweaks, make sure to run it as admin!
+        echo Press any key to close this window... & pause >nul
+	exit
+    ) else (
+        if errorlevel 1 (
+            title Do not close this window - [0/66] Preparing
+            echo Alright.
+            goto getPrivileges
+        )
+    )
 )
 
+:getPrivileges
+setlocal EnableDelayedExpansion
+if '%1'=='ELEV' (echo ELEV & shift /1 & goto gotPrivileges)
+echo Set UAC = CreateObject^("Shell.Application"^) > "%vbsGetPrivileges%"
+echo args = "ELEV " >> "%vbsGetPrivileges%"
+echo For Each strArg in WScript.Arguments >> "%vbsGetPrivileges%"
+echo args = args ^& strArg ^& " "  >> "%vbsGetPrivileges%"
+echo Next >> "%vbsGetPrivileges%"
+echo UAC.ShellExecute "!batchPath!", args, "", "runas", 1 >> "%vbsGetPrivileges%"
+"%SystemRoot%\System32\WScript.exe" "%vbsGetPrivileges%" %*
+exit /B
+
+:gotPrivileges
+setlocal & pushd .
+cd /d %~dp0
+if '%1'=='ELEV' (del "%vbsGetPrivileges%" 1>nul 2>nul  &  shift /1)
+
+:: Make the script faster by putting a higher priority.
+wmic process where name="cmd.exe" CALL setpriority 128
+echo %c_purple%Please wait. This may take a moment.
 
 :: Check if the user is running the script as TrustedInstaller...
 whoami|findstr /i "NT AUTHORITY\SYSTEM" >nul
@@ -127,6 +187,8 @@ if %isDuck% equ 1 (
 
 :: Change the directory.
 cd %windir%\DuckOS_Modules
+
+cls
 
 :: Ask the user if they use "Windows Firewall", if not, disable it.. if yes, do nothing...
 title Do not close this window - [1/66] Windows Firewall
@@ -899,13 +961,9 @@ for %%i in (lsass.exe sppsvc.exe SearchIndexer.exe fontdrvhost.exe sihost.exe ct
   reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\%%i\PerfOptions" /v "CpuPriorityClass" /t REG_DWORD /d "5" /f
 )
 
-:::::::::::::::::::::::
-:: PowerShell Tweaks ::
-:::::::::::::::::::::::
-
-:: Generate the script
-if exist %windir%\Temp\disable.ps1 del /f /q %windir%\Temp\disable.ps1
-for %%i in (DEP, EmulateAtlThunks, SEHOP, ForceRelocateImages, RequireInfo, BottomUp, HighEntropy, StrictHandle, DisableWin32kSystemCalls, AuditSystemCall, DisableExtensionPoints, BlockDynamicCode, AllowThreadsToOptOut, AuditDynamicCode, CFG, SuppressExports, StrictCFG, MicrosoftSignedOnly, AllowStoreSignedBinaries, AuditMicrosoftSigned, AuditStoreSigned, EnforceModuleDependencySigning, DisableNonSystemFonts, AuditFont, BlockRemoteImageLoads, BlockLowLabelImageLoads, PreferSystem32, AuditRemoteImageLoads, AuditLowLabelImageLoads, AuditPreferSystem32, SEHOP, AuditSEHOP, SEHOPTelemetry, TerminateOnError) do echo Set-ProcessMitigation -System -Disable %%i>>%WINDIR%\Temp\disable.ps1
+:: PowerShell Tweaks
+del /f /q %windir%\Temp\disable.ps1
+for %%i in (DEP, EmulateAtlThunks, SEHOP, ForceRelocateImages, RequireInfo, BottomUp, HighEntropy, StrictHandle, DisableWin32kSystemCalls, AuditSystemCall, DisableExtensionPoints, BlockDynamicCode, AllowThreadsToOptOut, AuditDynamicCode, CFG, SuppressExports, StrictCFG, MicrosoftSignedOnly, AllowStoreSignedBinaries, AuditMicrosoftSigned, AuditStoreSigned, EnforceModuleDependencySigning, DisableNonSystemFonts, AuditFont, BlockRemoteImageLoads, BlockLowLabelImageLoads, PreferSystem32, AuditRemoteImageLoads, AuditLowLabelImageLoads, AuditPreferSystem32, EnableExportAddressFilter, AuditEnableExportAddressFilter, EnableExportAddressFilterPlus, AuditEnableExportAddressFilterPlus, EnableImportAddressFilter, AuditEnableImportAddressFilter, EnableRopStackPivot, AuditEnableRopStackPivot, EnableRopCallerCheck, AuditEnableRopCallerCheck, EnableRopSimExec, AuditEnableRopSimExec, SEHOP, AuditSEHOP, SEHOPTelemetry, TerminateOnError, DisallowChildProcessCreation, AuditChildProcess) do echo Set-ProcessMitigation -System -Disable %%i>>%WINDIR%\Temp\disable.ps1
 powershell -ep bypass -mta %windir%\Temp\disable.ps1
 
 :: Set background apps priority below normal
@@ -1558,8 +1616,8 @@ reg add "HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell" 
 powershell -NoProfile "$net=get-netconnectionprofile; Set-NetConnectionProfile -Name $net.Name -NetworkCategory Private" >nul 2>&1
 echo %c_green%Done, finalizing...
 
-:: Cancel any pending shutdowns, and restart in 2 seconds.. [with force option]
-:: If the argument -doRestart is selected, then we will restart..
+:: Cancel any pending shutdowns, and restart in 5 seconds.. [with force option]
+:: If the argument -noRestart is selected, then we will restart..
 shutdown /a
 
 if /i "%noRestart%" equ "0" ( shutdown /r /t 5 /f ) else (
@@ -1584,20 +1642,40 @@ exit
 color 0a
 title Hold up!
 cls
+echo ██╗  ██╗ ██████╗ ██╗     ██████╗     ██╗   ██╗██████╗ ██╗
+echo ██║  ██║██╔═══██╗██║     ██╔══██╗    ██║   ██║██╔══██╗██║
+echo ███████║██║   ██║██║     ██║  ██║    ██║   ██║██████╔╝██║
+echo ██╔══██║██║   ██║██║     ██║  ██║    ██║   ██║██╔═══╝ ╚═╝
+echo ██║  ██║╚██████╔╝███████╗██████╔╝    ╚██████╔╝██║     ██╗
+echo ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═════╝      ╚═════╝ ╚═╝     ╚═╝
+echo.
 echo $ No CMDLine args were passed. The script doesn't know what to do.
 echo.
-echo $ 1 - Tweak the computer
+echo $ 1 - Tweak the computer only
 echo $ 2 - Turn off automatic restarting after the tweaks are done.
-echo $ 3 - Exit
 :askAgain
-set /p choice=Your choice:
-for %%i in (1 2 3) do (
-    if /i not %choice% equ %%i do ( echo $ Invalid choice. && goto :askAgain)
-)
+set /p choice="Your choice: "
 if %choice% equ 1 ( goto :tweaks )
-if %choice% equ 2 ( set noRestart=1 )
-if %choice% equ 3 ( exit )
-goto :noArgs
+if %choice% equ 2 (
+    set noRestart=1
+    goto begin
+) else (
+echo $ Invalid choice. && goto askAgain
+)
+
+:scriptS
+cls
+echo $ The script was interrupted. You should consider runnning it again.
+pause
+goto tweaks
+
+:scriptF
+cls
+echo $ The script tweaks have been sucessfully applied.
+echo.
+echo $ Press any key to exit...
+pause >nul
+exit /b
 
 :TrustedInstaller
 echo $ Relaunching as TrustedInstaller...
@@ -1615,7 +1693,7 @@ if not exist %nsudo% (
     if /i exist %nsudo% ( %nsudo% -P:E -U:T "%~f0" -onlyTweak %* && exit )
 )
 
-:UpdateDetected
+:updateDetected
 if exist "%TEMP%\type.txt" del /f /q "%TEMP%\type.txt" >NUL
 curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/changelog_type.txt -o "%TEMP%\type.txt"
 
