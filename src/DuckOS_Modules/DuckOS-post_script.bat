@@ -1654,12 +1654,24 @@ echo $ No CMDLine args were passed. The script doesn't know what to do.
 echo.
 echo $ 1 - Tweak the computer only
 echo $ 2 - Turn off automatic restarting after the tweaks are done.
+echo $ 3 - Exit the script without making any changes to your device
 :askAgain
 set /p choice="Your choice: "
-if %choice% equ 1 ( goto :tweaks )
+if %choice% equ 1 ( goto :tweaks ) else (
+    echo $ Invalid choice. && goto askAgain
+)
 if %choice% equ 2 (
     set noRestart=1
+    cls
     goto begin
+) else (
+    echo $ Invalid choice. && goto askAgain
+)
+if %choice% equ 3 (
+    cls
+    echo $ You've chosen to exit the script. You may relaunch the script at any time.
+    echio Press any key to exit. & pause >nul
+    exit
 ) else (
     echo $ Invalid choice. && goto askAgain
 )
