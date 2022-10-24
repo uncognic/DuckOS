@@ -1,13 +1,13 @@
-r@echo off && cls
+@echo off && cls
 
 :::::::::::::::::::::::::::::::::
 :: DuckOS Post Install Script. ::
 :::::::::::::::::::::::::::::::::
 
-:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-:: Made by fikinoob#6487 for any Windows 10 installation ::
-::             Contributed by AnhNguyen#7472             ::
-:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::::::::::::::::::::::::::::::::::::
+:: Made by fikinoob#6487 for DuckOS ::
+:: Contributed by AnhNguyen#7472    ::
+::::::::::::::::::::::::::::::::::::::
 
 :: Set up initial title
 title Do not close this window - [0/66] Preparing
@@ -34,16 +34,16 @@ set c_white=[37m
 :::::::::::::::::::::::::::::::::
 
 :: Check if connection to GitHub is possible.
-ping -n 1 github.com | findstr Sent >NUL && set network=1
-ping -n 1 github.com | findstr not >NUL || set network=0
+ping -n 1 github.com | findstr Sent >NUL && set network=0
+ping -n 1 github.com | findstr Sent >NUL || set network=0
 
 :: Compare it to the one on the internet.
 if "%network%" equ "1" (
     if exist "%TEMP%\Post-Script_ver.txt" del /f /q "%TEMP%\Post-Script_ver.txt" >NUL
     curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/version.txt -o "%TEMP%\Post-Script_ver.txt"
-    for /f "tokens=* USEBACKQ" %%f IN (`type %TEMP%\Post-Script_ver.txt`) do ( if "%version%" LSS "%%f" call :updateDetected %%f )
+    for /f "tokens=* USEBACKQ" %%f IN (`type %TEMP%\Post-Script_ver.txt`) do ( if "%version%" LSS "%%f" call :UpdateDetected %%f )
 ) else (
-    if "%network% equ "0" (
+    if "%network%" equ "0" (
         echo No network connectivity detected, skipping update!
     )
 )
@@ -51,6 +51,7 @@ if "%network%" equ "1" (
 :: Set a variable.. that we will use later... that points into an executable.
 set currentuser=%windir%\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait
 
+cls
 powershell -WindowStyle Maximized Write-Host The post install script is starting...
 
 echo ██████╗ ██╗     ███████╗ █████╗ ███████╗███████╗    ██╗    ██╗ █████╗ ██╗████████╗      
@@ -71,15 +72,15 @@ set "isDuck=0"
 set "onlyTweak=0"
 
 :: Check if there are no arguments...
-if /i "%*"=="" ( goto :noArgs )
+if /i "%*" == "" goto noArgs
 
 :: Go to the correct function if one of the command line arguments is a valid one.
-for %%i in (%*) (
+for %%i in ("%*") do (
     if /i "%%i" equ "-noRestart" set "noRestart=1"
     if /i "%%i" equ "-isDuck" set "isDuck=1"
-    if /i "%%i" equ "-onlyTweak" goto :tweaks
+    if /i "%%i" equ "-onlyTweak" goto tweaks
     if /i "%%i" equ "/noRestart" set "noRestart=1"
-    if /i "%%i" equ "/onlyTweak" goto :tweaks
+    if /i "%%i" equ "/onlyTweak" goto tweaks
 )
 
 :begin
@@ -118,7 +119,7 @@ if '%errorlevel%' == '0' (
 ) else (
     setlocal DisableDelayedExpansion
     title Permission denied
-    cls
+::    cls
     color 0c
     echo ██╗    ██╗ █████╗ ██████╗ ███╗   ██╗██╗███╗   ██╗ ██████╗ 
     echo ██║    ██║██╔══██╗██╔══██╗████╗  ██║██║████╗  ██║██╔════╝ 
@@ -737,7 +738,7 @@ reg add "HKLM\Software\Policies\Microsoft\Internet Explorer\DomainSuggestion" /v
 reg add "HKLM\Software\Policies\Microsoft\Internet Explorer\Security" /v "DisableSecuritySettingsCheck" /t REG_DWORD /d "1" /f
 reg add "HKLM\Software\Policies\Microsoft\Internet Explorer\Security" /v "DisableFixSecuritySettings" /t REG_DWORD /d "1" /f
 reg add "HKLM\Software\Policies\Microsoft\Internet Explorer\Privacy" /v "EnableInPrivateBrowsing" /t REG_DWORD /d "1" /f
-reg add "HKLM\Software\Policies\Microsoft\Internet Explorer\Privacy" /v "ClearBrowsingHistoryOnExit" /t REG_DWORD /d "1" /f
+reg add "HKLM\Software\Policies\Microsoft\Internet Explorer\Privacy" /v "ClearBrowsingHistoryOnexit" /t REG_DWORD /d "1" /f
 reg add "HKLM\Software\Policies\Microsoft\Internet Explorer\Main" /v "EnableAutoUpgrade" /t REG_DWORD /d "0" /f
 reg add "HKLM\Software\Policies\Microsoft\Internet Explorer\Main" /v "DisableFirstRunCustomize" /t REG_DWORD /d "1" /f
 reg add "HKLM\Software\Policies\Microsoft\Internet Explorer\Main" /v "HideNewEdgeButton" /t REG_DWORD /d "1" /f
@@ -960,12 +961,10 @@ reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\Image File Execution 
 for %%i in (lsass.exe sppsvc.exe SearchIndexer.exe fontdrvhost.exe sihost.exe ctfmon.exe) do (
   reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\%%i\PerfOptions" /v "CpuPriorityClass" /t REG_DWORD /d "5" /f
 )
-:::::::::::::::::::::::
-:: PowerShell Tweaks ::
-:::::::::::::::::::::::
 
-if exist %windir%\Temp\disable.ps1 ( del /f /q %windir%\Temp\disable.ps1 )
-for %%i in (DEP, EmulateAtlThunks, SEHOP, ForceRelocateImages, RequireInfo, BottomUp, HighEntropy, StrictHandle, DisableWin32kSystemCalls, AuditSystemCall, DisableExtensionPoints, BlockDynamicCode, AllowThreadsToOptOut, AuditDynamicCode, CFG, SuppressExports, StrictCFG, MicrosoftSignedOnly, AllowStoreSignedBinaries, AuditMicrosoftSigned, AuditStoreSigned, EnforceModuleDependencySigning, DisableNonSystemFonts, AuditFont, BlockRemoteImageLoads, BlockLowLabelImageLoads, PreferSystem32, AuditRemoteImageLoads, AuditLowLabelImageLoads, AuditPreferSystem32, SEHOP, AuditSEHOP, SEHOPTelemetry, TerminateOnError) do echo Set-ProcessMitigation -System -Disable %%i>>%WINDIR%\Temp\disable.ps1
+:: PowerShell Tweaks
+del /f /q %windir%\Temp\disable.ps1
+for %%i in (DEP, EmulateAtlThunks, SEHOP, ForceRelocateImages, RequireInfo, BottomUp, HighEntropy, StrictHandle, DisableWin32kSystemCalls, AuditSystemCall, DisableExtensionPoints, BlockDynamicCode, AllowThreadsToOptOut, AuditDynamicCode, CFG, SuppressExports, StrictCFG, MicrosoftSignedOnly, AllowStoreSignedBinaries, AuditMicrosoftSigned, AuditStoreSigned, EnforceModuleDependencySigning, DisableNonSystemFonts, AuditFont, BlockRemoteImageLoads, BlockLowLabelImageLoads, PreferSystem32, AuditRemoteImageLoads, AuditLowLabelImageLoads, AuditPreferSystem32, EnableExportAddressFilter, AuditEnableExportAddressFilter, EnableExportAddressFilterPlus, AuditEnableExportAddressFilterPlus, EnableImportAddressFilter, AuditEnableImportAddressFilter, EnableRopStackPivot, AuditEnableRopStackPivot, EnableRopCallerCheck, AuditEnableRopCallerCheck, EnableRopSimExec, AuditEnableRopSimExec, SEHOP, AuditSEHOP, SEHOPTelemetry, TerminateOnError, DisallowChildProcessCreation, AuditChildProcess) do echo Set-ProcessMitigation -System -Disable %%i>>%WINDIR%\Temp\disable.ps1
 powershell -ep bypass -mta %windir%\Temp\disable.ps1
 
 :: Set background apps priority below normal
@@ -1380,7 +1379,7 @@ sc config W32Time start=disabled
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoAutorun" /t REG_DWORD /d "1" /f
 
 :: Disable Network Navigation pane in file explorer
-reg add "HKEY_CLASSES_ROOT\CLSID\{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}\ShellFolder" /v "Attributes" /t REG_DWORD /d 2962489444 /f
+reg add "HKEY_CLASSES_ROOT\clsID\{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}\ShellFolder" /v "Attributes" /t REG_DWORD /d 2962489444 /f
 
 :: tokens arg breaks path to just \Device instead of \Device Parameters
 :: Disable Power savings on drives
@@ -1534,11 +1533,11 @@ reg add "HKLM\Software\Policies\Microsoft\WMDRM" /v "DisableOnline" /t REG_DWORD
 reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "ClearPageFileAtShutdown" /d "1" /t REG_DWORD /f
 
 :: Show all tasks on the "Control Panel", credits: Tenforums
-reg add "HKLM\Software\Classes\CLSID\{D15ED2E1-C75B-443c-BD7C-FC03B2F08C17}" /ve /t REG_SZ /d "All Tasks" /f
-reg add "HKLM\Software\Classes\CLSID\{D15ED2E1-C75B-443c-BD7C-FC03B2F08C17}" /v "InfoTip" /t REG_SZ /d "View list of all Control Panel tasks" /f
-reg add "HKLM\Software\Classes\CLSID\{D15ED2E1-C75B-443c-BD7C-FC03B2F08C17}" /v "System.ControlPanel.Category" /t REG_SZ /d "5" /f
-reg add "HKLM\Software\Classes\CLSID\{D15ED2E1-C75B-443c-BD7C-FC03B2F08C17}\DefaultIcon" /ve /t REG_SZ /d "%%WinDir%%\System32\imageres.dll,-27" /f
-reg add "HKLM\Software\Classes\CLSID\{D15ED2E1-C75B-443c-BD7C-FC03B2F08C17}\Shell\Open\Command" /ve /t REG_SZ /d "explorer.exe shell:::{ED7BA470-8E54-465E-825C-99712043E01C}" /f
+reg add "HKLM\Software\Classes\clsID\{D15ED2E1-C75B-443c-BD7C-FC03B2F08C17}" /ve /t REG_SZ /d "All Tasks" /f
+reg add "HKLM\Software\Classes\clsID\{D15ED2E1-C75B-443c-BD7C-FC03B2F08C17}" /v "InfoTip" /t REG_SZ /d "View list of all Control Panel tasks" /f
+reg add "HKLM\Software\Classes\clsID\{D15ED2E1-C75B-443c-BD7C-FC03B2F08C17}" /v "System.ControlPanel.Category" /t REG_SZ /d "5" /f
+reg add "HKLM\Software\Classes\clsID\{D15ED2E1-C75B-443c-BD7C-FC03B2F08C17}\DefaultIcon" /ve /t REG_SZ /d "%%WinDir%%\System32\imageres.dll,-27" /f
+reg add "HKLM\Software\Classes\clsID\{D15ED2E1-C75B-443c-BD7C-FC03B2F08C17}\Shell\Open\Command" /ve /t REG_SZ /d "explorer.exe shell:::{ED7BA470-8E54-465E-825C-99712043E01C}" /f
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer\ControlPanel\NameSpace\{D15ED2E1-C75B-443c-BD7C-FC03B2F08C17}" /ve /t REG_SZ /d "All Tasks" /f
 
 :: Disable Fault Tolerant Heap
@@ -1618,7 +1617,7 @@ reg add "HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell" 
 powershell -NoProfile "$net=get-netconnectionprofile; Set-NetConnectionProfile -Name $net.Name -NetworkCategory Private" >nul 2>&1
 echo %c_green%Done, finalizing...
 
-:: Cancel any pending shutdowns, and restart in 5 seconds.. [with force option]
+:: Cancel any pending shutdowns, and restart in 2 seconds.. [with force option]
 :: If the argument -noRestart is selected, then we will restart..
 shutdown /a
 
@@ -1643,7 +1642,7 @@ exit
 :noArgs
 color 0a
 title Hold up!
-cls
+cls 
 echo ██╗  ██╗ ██████╗ ██╗     ██████╗     ██╗   ██╗██████╗ ██╗
 echo ██║  ██║██╔═══██╗██║     ██╔══██╗    ██║   ██║██╔══██╗██║
 echo ███████║██║   ██║██║     ██║  ██║    ██║   ██║██████╔╝██║
@@ -1662,7 +1661,7 @@ if %choice% equ 2 (
     set noRestart=1
     goto begin
 ) else (
-echo $ Invalid choice. && goto askAgain
+    echo $ Invalid choice. && goto askAgain
 )
 
 :scriptS
