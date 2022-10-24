@@ -1676,20 +1676,6 @@ if %choice% equ 3 (
     echo $ Invalid choice. && goto askAgain
 )
 
-:scriptS
-cls
-echo $ The script was interrupted. You should consider runnning it again.
-pause
-goto tweaks
-
-:scriptF
-cls
-echo $ The script tweaks have been sucessfully applied.
-echo.
-echo $ Press any key to exit...
-pause >nul
-exit /b
-
 :TrustedInstaller
 echo $ Relaunching as TrustedInstaller...
 set nsudo=%windir%\DuckOS_Modules\nsudo.exe
