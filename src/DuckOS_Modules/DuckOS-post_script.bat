@@ -278,7 +278,7 @@ if exist %windir%\DuckOS_Modules\vcredist.exe (
 :: Remove Telemetry IPs ::
 ::::::::::::::::::::::::::
 
-title Do not close this window - [9/66] Telemetry & Privacy
+title Do not close this window - [9/66] Telemetry ^& Privacy
 echo %c_red%Disabling Telemetry IPs..
 
 :: Inbound
