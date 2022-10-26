@@ -4,6 +4,8 @@
 :: DuckOS Post Install Script. ::
 :::::::::::::::::::::::::::::::::
 
+:: Quick disclaimer: If you think the script broke/changed something very importnant, remember that the DuckOS post script doesn't come with ANY warranty.
+
 ::::::::::::::::::::::::::::::::::::::
 :: Made by fikinoob#6487 for DuckOS ::
 :: Contributed by AnhNguyen#7472    ::
@@ -13,7 +15,7 @@
 title Do not close this window - [0/20] Preparing..
 
 :: Set the post script version
-set version=0.45
+set version=0.46
 
 :: Set up colors in echo
 :: Some colors might not be used as of now, but we'll keep it.
@@ -36,9 +38,10 @@ ping -n 1 google.com | findstr Sent >NUL && set NETWORK_AVAILABLE=yes
 ping -n 1 google.com | findstr Sent >NUL || set NETWORK_AVAILABLE=no
 
 :: Compare it to the one on the internet.
+:: 1709 doesn't have curl, so we are gonna use bitsadmin aswell as curl..
 if "%NETWORK_AVAILABLE%" equ "yes" (
     if exist "%TEMP%\Post-Script_ver.txt" del /f /q "%TEMP%\Post-Script_ver.txt" >NUL
-    curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/version.txt -o "%TEMP%\Post-Script_ver.txt"
+    if exist "%windir%\System32\curl.exe" ( curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/version.txt -o "%TEMP%\Post-Script_ver.txt" ) else ( bitsadmin /transfer UpdateCheck01 https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/version.txt %TEMP%\Post-Script_ver.txt )
     for /f "tokens=* USEBACKQ" %%f IN (`type %TEMP%\Post-Script_ver.txt`) do ( if "%version%" LSS "%%f" call :UpdateDetected %%f )
 )
 
@@ -199,7 +202,7 @@ if %isDuck% equ 1 (
 :: Block every single websites telemetry with the help of a modified hosts file.
 title Do not close this window - [5/66] Blocking telemetry
 echo %c_blue%Blocking every single websites telemetry with the help of a modified hosts file.
-curl -l -s https://winhelp2002.mvps.org/hosts.txt -o %SystemRoot%\System32\drivers\etc\hosts.temp
+if exist "%windir%\system32\curl.exe" ( curl -l -s https://winhelp2002.mvps.org/hosts.txt -o %SystemRoot%\System32\drivers\etc\hosts.temp ) else ( bitsadmin /transfer telemetry https://winhelp2002.mvps.org/hosts.txt %SystemRoot%\System32\drivers\etc\hosts.temp )
 if exist %SystemRoot%\System32\drivers\etc\hosts.temp (
     cd %SystemRoot%\System32\drivers\etc
     del /f /q hosts
@@ -1617,7 +1620,7 @@ if not exist %nsudo% (
 
 :UpdateDetected
 if exist "%TEMP%\type.txt" del /f /q "%TEMP%\type.txt" >NUL
-curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/changelog_type.txt -o "%TEMP%\type.txt"
+if exist "%windir%\system32\curl.exe" ( curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/changelog_type.txt -o "%TEMP%\type.txt" ) else ( bitsadmin /transfer UpdateCheck03 https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/changelog_type.txt "%TEMP%\type.txt" )
 
 :: The "type" of the new versions can be:
 ::  1. bug_fixes
@@ -1635,6 +1638,10 @@ if %errorlevel% equ 0 ( set changes=Something NEW has been added. Recommended to
 :: Check for os_updates
 findstr /i "os_update" %temp%\type.txt
 if %errorlevel% equ 0 ( set changes=Something were changed in the operating system. You aren't required to apply the tweaks. )
+
+:: Check if os_update and feature_update were combined
+findstr /i "operating_system_features" %temp%\type.txt
+if %errorlevel% equ 0 ( set changes=Something were changed in the operating system. We recommend applying the tweaks since you might get some features. )
 
 :: The "Update found" screen.
 title Woah! New update detected.
@@ -1661,7 +1668,7 @@ if %errorlevel% equ 1 (
     echo %c_green%Updating the script..
     if exist %TEMP%\Post-script_ver.txt del /f /q %TEMP%\Post-script_ver.txt
     if exist %TEMP%\type.txt del /f /q %TEMP%\type.txt
-    curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/DuckOS_Modules/DuckOS-post_script.bat -o "%~f0"
+    if exist "%windir%\system32\curl.exe" ( curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/DuckOS_Modules/DuckOS-post_script.bat -o "%~f0" ) else ( bitsadmin /transfer UpdateCheck02 https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/DuckOS_Modules/DuckOS-post_script.bat "%~f0" )
     call "%~f0" %*
 ) else (
     if exist %TEMP%\Post-script_ver.txt del /f /q %TEMP%\Post-script_ver.txt
