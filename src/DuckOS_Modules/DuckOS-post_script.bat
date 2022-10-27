@@ -41,9 +41,10 @@ ping -n 1 github.com | findstr Sent >NUL && set network=1
 ping -n 1 github.com | findstr Sent >NUL || set network=0
 
 :: Compare it to the one on the internet.
-if "%network%" equ "1" (
+:: 1709 doesn't have cURL, so we are gonna use bitsadmin aswell as cURL..
+if "%network%" equ "yes" (
     if exist "%TEMP%\Post-Script_ver.txt" del /f /q "%TEMP%\Post-Script_ver.txt" >NUL
-    curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/version.txt -o "%TEMP%\Post-Script_ver.txt"
+    if exist "%windir%\System32\curl.exe" ( curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/version.txt -o "%TEMP%\Post-Script_ver.txt" ) else ( bitsadmin /transfer UpdateCheck01 https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/version.txt %TEMP%\Post-Script_ver.txt )
     for /f "tokens=* USEBACKQ" %%f IN (`type %TEMP%\Post-Script_ver.txt`) do ( if "%version%" LSS "%%f" call :UpdateDetected %%f )
 ) else (
     if "%network%" equ "0" (
