@@ -114,69 +114,25 @@ if %isDuck% equ 0 (
 
 :tweaks
 
-:: Here we go
-:init
-setlocal DisableDelayedExpansion
-set "batchPath=%~0"
-for %%k in (%0) do set batchName=%%~nk
-set "vbsGetPrivileges=%temp%\OEgetPriv_%batchName%.vbs"
-setlocal EnableDelayedExpansion
+DISM >NUL || ( @pushd %~dp0 & fltmc | find "." && (powershell start '%~f0' ' %* -tweakONLY' -verb runas 2>nul && exit /b) )
 
-:checkPrivileges
-:: Sure, using DISM for elev check because we're cool
-DISM >NUL
-if '%errorlevel%' == '0' (
-    goto gotPrivileges
-) else (
-    setlocal DisableDelayedExpansion
-    title Permission denied
-::    cls
-    color 0c
-    echo ██╗    ██╗ █████╗ ██████╗ ███╗   ██╗██╗███╗   ██╗ ██████╗ 
-    echo ██║    ██║██╔══██╗██╔══██╗████╗  ██║██║████╗  ██║██╔════╝ 
-    echo ██║ █╗ ██║███████║██████╔╝██╔██╗ ██║██║██╔██╗ ██║██║  ███╗
-    echo ██║███╗██║██╔══██║██╔══██╗██║╚██╗██║██║██║╚██╗██║██║   ██║
-    echo ╚███╔███╔╝██║  ██║██║  ██║██║ ╚████║██║██║ ╚████║╚██████╔╝
-    echo  ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
+:: Check if the user didn't accept the uac prompt...
+dism >nul 2>&1 || (
+	mode 500, 800
+	title DuckOS Post Script: Permission Denied
+	color cf
+	cls
+	echo.
+	echo  DuckOS Post Script: Permission Denied:
+	echo.
+	echo  Can't use %USERNAME%'s Administrator rights.
+    echo  To properly apply the tweaks, make sure to run it as admin!
     echo.
-    choice /n /m "Permission denied. Try again? [Y/N]"
-    if errorlevel 2 (
-        cls
-        echo ███╗   ██╗ ██████╗     ██████╗ ███████╗██████╗ ███╗   ███╗██╗███████╗███████╗██╗ ██████╗ ███╗   ██╗
-        echo ████╗  ██║██╔═══██╗    ██╔══██╗██╔════╝██╔══██╗████╗ ████║██║██╔════╝██╔════╝██║██╔═══██╗████╗  ██║
-        echo ██╔██╗ ██║██║   ██║    ██████╔╝█████╗  ██████╔╝██╔████╔██║██║███████╗███████╗██║██║   ██║██╔██╗ ██║
-        echo ██║╚██╗██║██║   ██║    ██╔═══╝ ██╔══╝  ██╔══██╗██║╚██╔╝██║██║╚════██║╚════██║██║██║   ██║██║╚██╗██║
-        echo ██║ ╚████║╚██████╔╝    ██║     ███████╗██║  ██║██║ ╚═╝ ██║██║███████║███████║██║╚██████╔╝██║ ╚████║
-        echo ╚═╝  ╚═══╝ ╚═════╝     ╚═╝     ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚══════╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
-        echo.
-        echo Permission denied. To properly apply the tweaks, make sure to run it as admin!
-        echo Press any key to close this window... & pause >nul
-	exit
-    ) else (
-        if errorlevel 1 (
-            title Do not close this window - [0/66] Preparing
-            echo Alright.
-            goto getPrivileges
-        )
-    )
+	powershell -NoProfile -Command "start-Process %~0 -Verb runas | Out-Null" >NUL && exit
+	echo Press any key to exit...
+	pause >nul
+	exit 3
 )
-
-:getPrivileges
-setlocal EnableDelayedExpansion
-if '%1'=='ELEV' (echo ELEV & shift /1 & goto gotPrivileges)
-echo Set UAC = CreateObject^("Shell.Application"^) > "%vbsGetPrivileges%"
-echo args = "ELEV " >> "%vbsGetPrivileges%"
-echo For Each strArg in WScript.Arguments >> "%vbsGetPrivileges%"
-echo args = args ^& strArg ^& " "  >> "%vbsGetPrivileges%"
-echo Next >> "%vbsGetPrivileges%"
-echo UAC.ShellExecute "!batchPath!", args, "", "runas", 1 >> "%vbsGetPrivileges%"
-"%SystemRoot%\System32\WScript.exe" "%vbsGetPrivileges%" %*
-exit /B
-
-:gotPrivileges
-setlocal & pushd .
-cd /d %~dp0
-if '%1'=='ELEV' (del "%vbsGetPrivileges%" 1>nul 2>nul  &  shift /1)
 
 :: Make the script faster by putting a higher priority.
 wmic process where name="cmd.exe" CALL setpriority 128
