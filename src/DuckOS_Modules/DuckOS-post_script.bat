@@ -4,7 +4,7 @@
 :: DuckOS Post Install Script. ::
 :::::::::::::::::::::::::::::::::
 =======
-:: Quick disclaimer: If you think the script broke/changed something very importnant, remember that the DuckOS post script is provided AS IS, and doesn't come with ANY warranty.
+:: Quick disclaimer: If you think the script broke/changed something very important, remember that the DuckOS post script is provided AS IS, and doesn't come with ANY warranty.
 =======
 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
