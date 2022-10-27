@@ -119,15 +119,15 @@ DISM >NUL || ( @pushd %~dp0 & fltmc | find "." && (powershell start '%~f0' ' %* 
 :: Check if the user didn't accept the uac prompt...
 dism >nul 2>&1 || (
 	mode 500, 800
-	title DuckOS Post Script: Permission Denied
+	title DuckOS Tweaker: Permission denied
 	color cf
 	cls
 	echo.
-	echo  DuckOS Post Script: Permission Denied:
+	echo Permission denied.
 	echo.
-	echo  Can't use %USERNAME%'s Administrator rights.
-    echo  To properly apply the tweaks, make sure to run it as admin!
-    echo.
+	echo Can't use %USERNAME%'s Administrator rights.
+        echo  To properly apply the tweaks, make sure to run it as admin!
+        echo.
 	powershell -NoProfile -Command "start-Process %~0 -Verb runas | Out-Null" >NUL && exit
 	echo Press any key to exit...
 	pause >nul
