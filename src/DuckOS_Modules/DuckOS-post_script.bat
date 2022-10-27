@@ -271,6 +271,8 @@ if exist %windir%\DuckOS_Modules\vcredist.exe (
     cd %windir%\DuckOS_Modules
     start /wait "" "vcredist.exe" /ai
     echo %c_green%Done.
+    echo %c_cyan%Re-registering msvcp just in case...
+    for %%i in (ntdll.dll msdxm.ocx dxmasf.dll wmp.dll wmpdxm.dll) do regsvr32 %%i /s
 ) else (
     echo %c_red%Couldn't file VCRedists installation file! Skipping it... 
 )
