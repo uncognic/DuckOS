@@ -128,8 +128,9 @@ if %isDuck% equ 1 (
     call :MsgBox "You will be prompted with a few questions, then you can leave your computer running and let us do the rest." 64+4096 "DuckOS Tweaks"
 )
 
-:: Change the directory.
+:: Change the directory and clear the screen
 cd %windir%\DuckOS_Modules
+cls
 
 :: Ask the user if they use "Windows Firewall", if not, disable it.. if yes, do nothing...
 title Do not close this window - [1/66] Windows Firewall
@@ -360,10 +361,12 @@ echo %c_green%Done.
 if %isDuck% equ 1 ( goto skipDuckOnly )
 
 :: Set up the toolbox to be in the context menu
-title Do not close this window - [12/66] Context Menu
-echo %c_cyan%Setting up the toolbox in the context menu..
-reg add "HKEY_CLASSES_ROOT\Directory\Background\shell\DuckOS Toolbox\command" /v "" /d "%windir%\DuckOS_Modules\DuckOS_Toolbox\DuckOS Toolbox.exe" /t REG_SZ /f
-echo %c_green%Done.
+if %isDuck% equ 1 (
+    title Do not close this window - [12/66] Context Menu
+    echo %c_cyan%Setting up the toolbox in the context menu..
+    reg add "HKEY_CLASSES_ROOT\Directory\Background\shell\DuckOS Toolbox\command" /v "" /d "%windir%\DuckOS_Modules\DuckOS_Toolbox\DuckOS Toolbox.exe" /t REG_SZ /f
+    echo %c_green%Done.
+)
 
 :: Make the computer restart 1 time after the current restart, because THAT fixed OS issues
 title Do not close this window - [13/66] Configuring restart
