@@ -558,6 +558,7 @@ if %errorlevel% equ 0 (
 cd /d %ProgramFiles%\7-zip
 echo %c_cyan%Debloating 7-Zip...
 for %%i in (*.txt *.chm) do del /F /Q "%%i"
+rd /s "%programdata%\Microsoft\Windows\Start Menu\Programs\7-Zip"
 echo %c_green%Done.
 
 :: Install DirectX
@@ -573,7 +574,7 @@ if exist %SYSTEMROOT%\DuckOS_Modules\DirectX\dxsetup.exe (
 if exist %windir%\DuckOS_Modules\vcredist.exe (
     echo %c_cyan%Installing VCRedists..
     cd %windir%\DuckOS_Modules
-    start /wait "" "vcredist.exe" /ai
+    start /wait "" "vcredist.exe" /aiV /gm2
     echo %c_green%Done.
 ) else (
     echo %c_red%Couldn't file VCRedists installation file! Skipping it... 
