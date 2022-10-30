@@ -129,8 +129,7 @@ if '%errorlevel%' == '0' (
     goto gotPrivileges
 ) else (
     setlocal DisableDelayedExpansion
-    title Permission denied
-::    cls
+    title DuckOS Post Script: Permission denied
     color 0c
     echo ██╗    ██╗ █████╗ ██████╗ ███╗   ██╗██╗███╗   ██╗ ██████╗ 
     echo ██║    ██║██╔══██╗██╔══██╗████╗  ██║██║████╗  ██║██╔════╝ 
