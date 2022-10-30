@@ -3,9 +3,9 @@
 :::::::::::::::::::::::::::::::::
 :: DuckOS Post Install Script. ::
 :::::::::::::::::::::::::::::::::
-=======
+REM =======
 :: Quick disclaimer: If you think the script broke/changed something very important, remember that the DuckOS post script is provided AS IS, and doesn't come with ANY warranty.
-=======
+REM =======
 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :: Made by fikinoob#6487 for any Windows 10 installation ::
@@ -204,7 +204,7 @@ cls
 
 :: Ask the user if they use "Windows Firewall", if not, disable it.. if yes, do nothing...
 title Do not close this window - [1/66] Windows Firewall
-call :MsgBox "Will you use Windows Firewall? -- NOTE: It will break Microsoft Store reinstallation. Pressing 'no' disables it!"  "VBYesNo+VBQuestion" "Configuration"
+call :MsgBox "Will you use Windows Firewall? -- NOTE: If you select 'no' will break Microsoft Store reinstallation and some games like OverWatch 2. Pressing 'no' disables it!"  "VBYesNo+VBQuestion" "Configuration"
 if errorlevel 7 (
     echo %c_green%Alright, destroying firewall...
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\mpssvc" /v "Start" /t REG_DWORD /d "4" /f
