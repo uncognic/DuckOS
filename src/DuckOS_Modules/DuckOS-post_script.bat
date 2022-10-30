@@ -3,16 +3,19 @@
 :::::::::::::::::::::::::::::::::
 :: DuckOS Post Install Script. ::
 :::::::::::::::::::::::::::::::::
+REM =======
+:: Quick disclaimer: If you think the script broke/changed something very important, remember that the DuckOS post script is provided AS IS, and doesn't come with ANY warranty.
+REM =======
 
-:: Quick disclaimer: If you think the script broke/changed something very importnant, remember that the DuckOS post script doesn't come with ANY warranty.
-
-::::::::::::::::::::::::::::::::::::::
-:: Made by fikinoob#6487 for DuckOS ::
-:: Contributed by AnhNguyen#7472    ::
-::::::::::::::::::::::::::::::::::::::
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:: Made by fikinoob#6487 for any Windows 10 installation ::
+::             Contributed by AnhNguyen#7472             ::
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 :: Set up initial title
-title Do not close this window - [0/20] Preparing..
+title Do not close this window - [0/66] Preparing
+:: Set up colors in echo
+:: Some colors might not be used as of now, but we'll keep it.
 
 :: Set the post script version
 set version=0.46
@@ -33,9 +36,9 @@ set c_white=[37m
 :: Get the post script version ::
 :::::::::::::::::::::::::::::::::
 
-:: Detect if there's any wifi.
-ping -n 1 google.com | findstr Sent >NUL && set NETWORK_AVAILABLE=yes
-ping -n 1 google.com | findstr Sent >NUL || set NETWORK_AVAILABLE=no
+:: Check if connection to GitHub is possible.
+ping -n 1 github.com | findstr Sent >NUL && set network=1
+ping -n 1 github.com | findstr Sent >NUL || set network=0
 
 :: Compare it to the one on the internet.
 :: 1709 doesn't have curl, so we are gonna use powershell if curl doesnt exist
@@ -43,36 +46,55 @@ if "%NETWORK_AVAILABLE%" equ "yes" (
     if exist "%TEMP%\Post-Script_ver.txt" del /f /q "%TEMP%\Post-Script_ver.txt" >NUL
     if exist "%windir%\System32\curl.exe" ( curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/version.txt -o "%TEMP%\Post-Script_ver.txt" ) else ( powershell iwr -Method Get -Uri https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/version.txt -OutFile %TEMP%\Post-Script_ver.txt )
     for /f "tokens=* USEBACKQ" %%f IN (`type %TEMP%\Post-Script_ver.txt`) do ( if "%version%" LSS "%%f" call :UpdateDetected %%f )
+) else (
+    if "%network%" equ "0" (
+        echo No network connectivity detected, skipping update!
+    )
 )
 
 :: Set a variable.. that we will use later... that points into an executable.
 set currentuser=%windir%\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait
+
+cls
 powershell -WindowStyle Maximized Write-Host The post install script is starting...
+
+echo ██████╗ ██╗     ███████╗ █████╗ ███████╗███████╗    ██╗    ██╗ █████╗ ██╗████████╗      
+echo ██╔══██╗██║     ██╔════╝██╔══██╗██╔════╝██╔════╝    ██║    ██║██╔══██╗██║╚══██╔══╝      
+echo ██████╔╝██║     █████╗  ███████║███████╗█████╗      ██║ █╗ ██║███████║██║   ██║         
+echo ██╔═══╝ ██║     ██╔══╝  ██╔══██║╚════██║██╔══╝      ██║███╗██║██╔══██║██║   ██║         
+echo ██║     ███████╗███████╗██║  ██║███████║███████╗    ╚███╔███╔╝██║  ██║██║   ██║██╗██╗██╗
+echo ╚═╝     ╚══════╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝     ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝   ╚═╝╚═╝╚═╝╚═╝
 
 ::::::::::::::::::::::::::::
 :: Command line arguments ::
 ::::::::::::::::::::::::::::
 
 :: Default values
-set noRestart=0
-set isDuck=0
-set onlyTweak=0
+set "noRestart=0"
+set "isDuck=0"
+set "onlyTweak=0"
 
 :: Check if there are no arguments...
-if /i "%*"=="" ( goto :noArgs )
+if /i "%*" == "" goto noArgs
 
 :: Go to the correct function if one of the command line arguments is a valid one.
-for %%i in (%*) do (
-    if /i "%%i" equ "-noRestart" set noRestart=1
-    if /i "%%i" equ "-isDuck" set isDuck=1
-    if /i "%%i" equ "-onlyTweak" goto :tweaks
-    if /i "%%i" equ "/noRestart" set noRestart=1
-    if /i "%%i" equ "/onlyTweak" goto :tweaks
+for %%i in ("%*") do (
+    if /i "%%i" equ "-noRestart" set "noRestart=1"
+    if /i "%%i" equ "-isDuck" set "isDuck=1"
+    if /i "%%i" equ "-onlyTweak" goto tweaks
+    if /i "%%i" equ "/noRestart" set "noRestart=1"
+    if /i "%%i" equ "/onlyTweak" goto tweaks
 )
 
-:: Make the script faster by putting a higher priority.
-wmic process where name="cmd.exe" CALL setpriority 128
-echo %c_purple%Please wait. This may take a moment.
+if %isDuck% equ 0 (
+    call :MsgBox "This script will tweak your computer. If you think the script broke/changed something very important, remember that the DuckOS post script is provided AS IS, and doesn't come with ANY warranty!"  "VBYesNo+VBQuestion+VBDefaultButton2" "Continue?"
+    if errorlevel 7 ( goto begin ) else (
+        echo Alright, no changes have been made. Press any key to exit.
+        pause >nul
+    )
+) else ( goto begin )
+
+:begin
 
 :::::::::::::
 :: Credits :: 
@@ -92,26 +114,72 @@ echo %c_purple%Please wait. This may take a moment.
 
 :tweaks
 
-DISM >NUL || ( @pushd %~dp0 & fltmc | find "." && (powershell start '%~f0' ' %* -tweakONLY' -verb runas 2>nul && exit /b) )
+:: Here we go
+:init
+setlocal DisableDelayedExpansion
+set "batchPath=%~0"
+for %%k in (%0) do set batchName=%%~nk
+set "vbsGetPrivileges=%temp%\OEgetPriv_%batchName%.vbs"
+setlocal EnableDelayedExpansion
 
-:: Check if the user didn't accept the uac prompt...
-dism >nul 2>&1 || (
-	mode 500, 800
-	title DuckOS Post Script: Permission Denied
-	color cf
-	cls
-	echo.
-	echo  DuckOS Post Script: Permission Denied:
-	echo.
-	echo  Can't use %USERNAME%'s Administrator rights.
-    echo  To properly apply the tweaks, make sure to run it as admin!
+:checkPrivileges
+:: Sure, using DISM for elev check because we're cool
+DISM >NUL
+if '%errorlevel%' == '0' (
+    goto gotPrivileges
+) else (
+    setlocal DisableDelayedExpansion
+    title DuckOS Post Script: Permission denied
+    color 0c
+    echo ██╗    ██╗ █████╗ ██████╗ ███╗   ██╗██╗███╗   ██╗ ██████╗ 
+    echo ██║    ██║██╔══██╗██╔══██╗████╗  ██║██║████╗  ██║██╔════╝ 
+    echo ██║ █╗ ██║███████║██████╔╝██╔██╗ ██║██║██╔██╗ ██║██║  ███╗
+    echo ██║███╗██║██╔══██║██╔══██╗██║╚██╗██║██║██║╚██╗██║██║   ██║
+    echo ╚███╔███╔╝██║  ██║██║  ██║██║ ╚████║██║██║ ╚████║╚██████╔╝
+    echo  ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
     echo.
-	powershell -NoProfile -Command "start-Process %~0 -Verb runas | Out-Null" >NUL && exit
-	echo Press any key to exit...
-	pause >nul
-	exit 3
+    choice /n /m "Permission denied. Try again? [Y/N]"
+    if errorlevel 2 (
+        cls
+        echo ███╗   ██╗ ██████╗     ██████╗ ███████╗██████╗ ███╗   ███╗██╗███████╗███████╗██╗ ██████╗ ███╗   ██╗
+        echo ████╗  ██║██╔═══██╗    ██╔══██╗██╔════╝██╔══██╗████╗ ████║██║██╔════╝██╔════╝██║██╔═══██╗████╗  ██║
+        echo ██╔██╗ ██║██║   ██║    ██████╔╝█████╗  ██████╔╝██╔████╔██║██║███████╗███████╗██║██║   ██║██╔██╗ ██║
+        echo ██║╚██╗██║██║   ██║    ██╔═══╝ ██╔══╝  ██╔══██╗██║╚██╔╝██║██║╚════██║╚════██║██║██║   ██║██║╚██╗██║
+        echo ██║ ╚████║╚██████╔╝    ██║     ███████╗██║  ██║██║ ╚═╝ ██║██║███████║███████║██║╚██████╔╝██║ ╚████║
+        echo ╚═╝  ╚═══╝ ╚═════╝     ╚═╝     ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚══════╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+        echo.
+        echo Permission denied. To properly apply the tweaks, make sure to run it as admin!
+        echo Press any key to close this window... & pause >nul
+	exit
+    ) else (
+        if errorlevel 1 (
+            title Do not close this window - [0/66] Preparing
+            echo Alright.
+            goto getPrivileges
+        )
+    )
 )
 
+:getPrivileges
+setlocal EnableDelayedExpansion
+if '%1'=='ELEV' (echo ELEV & shift /1 & goto gotPrivileges)
+echo Set UAC = CreateObject^("Shell.Application"^) > "%vbsGetPrivileges%"
+echo args = "ELEV " >> "%vbsGetPrivileges%"
+echo For Each strArg in WScript.Arguments >> "%vbsGetPrivileges%"
+echo args = args ^& strArg ^& " "  >> "%vbsGetPrivileges%"
+echo Next >> "%vbsGetPrivileges%"
+echo UAC.ShellExecute "!batchPath!", args, "", "runas", 1 >> "%vbsGetPrivileges%"
+"%SystemRoot%\System32\WScript.exe" "%vbsGetPrivileges%" %*
+exit /B
+
+:gotPrivileges
+setlocal & pushd .
+cd /d %~dp0
+if '%1'=='ELEV' (del "%vbsGetPrivileges%" 1>nul 2>nul  &  shift /1)
+
+:: Make the script faster by putting a higher priority.
+wmic process where name="cmd.exe" CALL setpriority 128
+echo %c_purple%Please wait. This may take a moment.
 
 :: Check if the user is running the script as TrustedInstaller...
 whoami|findstr /i "NT AUTHORITY\SYSTEM" >nul
@@ -128,13 +196,14 @@ if %isDuck% equ 1 (
     call :MsgBox "You will be prompted with a few questions, then you can leave your computer running and let us do the rest." 64+4096 "DuckOS Tweaks"
 )
 
-:: Change the directory and clear the screen
+:: Change the directory.
 cd %windir%\DuckOS_Modules
+
 cls
 
 :: Ask the user if they use "Windows Firewall", if not, disable it.. if yes, do nothing...
 title Do not close this window - [1/66] Windows Firewall
-call :MsgBox "Will you use Windows Firewall? -- NOTE: It will break Microsoft Store reinstallation. Pressing 'no' disables it!"  "VBYesNo+VBQuestion" "Configuration"
+call :MsgBox "Will you use Windows Firewall? -- NOTE: If you select 'no' will break Microsoft Store reinstallation and some games like OverWatch 2. Pressing 'no' disables it!"  "VBYesNo+VBQuestion" "Configuration"
 if errorlevel 7 (
     echo %c_green%Alright, destroying firewall...
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\mpssvc" /v "Start" /t REG_DWORD /d "4" /f
@@ -167,19 +236,19 @@ if errorlevel 7 (
 :: Ask the user if they want to use a webcam
 title Do not close this window - [2/66] Webcam Setup
 call :MsgBox "Are you gonna use a webcam?"  "VBYesNo+VBQuestion" "Configuration"
-if errorlevel 6 (
-    echo %c_green%Got it, we will keep webcam services.
-    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Allow" /f
-	reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Allow" /f
-	reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam\NonPackaged" /v "Value" /t REG_SZ /d "Allow" /f
-    reg add "HKLM\SYSTEM\CurrentControlSet\Services\swenum" /v "Start" /t REG_DWORD /d "3" /f
-    if exist %windir%\DuckOS_Modules\devmanview.exe %windir%\DuckOS_Modules\devmanview.exe /disable "Plug and Play Software Device Enumerator"
-) else if errorlevel 7 (
+if errorlevel 7 (
     echo %c_green%Okay... Disabling webcam services...
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\swenum" /v "Start" /t REG_DWORD /d "4" /f
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Deny" /f
-	reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Deny" /f
-	reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam\NonPackaged" /v "Value" /t REG_SZ /d "Deny" /f
+    reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Deny" /f
+    reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam\NonPackaged" /v "Value" /t REG_SZ /d "Deny" /f
+    if exist %windir%\DuckOS_Modules\devmanview.exe %windir%\DuckOS_Modules\devmanview.exe /disable "Plug and Play Software Device Enumerator"
+) else if errorlevel 6 (
+    echo %c_green%Got it, we will keep webcam services.
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Allow" /f
+    reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Allow" /f
+    reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam\NonPackaged" /v "Value" /t REG_SZ /d "Allow" /f
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\swenum" /v "Start" /t REG_DWORD /d "3" /f
     if exist %windir%\DuckOS_Modules\devmanview.exe %windir%\DuckOS_Modules\devmanview.exe /disable "Plug and Play Software Device Enumerator"
 )
 
@@ -218,7 +287,7 @@ if exist %SystemRoot%\System32\drivers\etc\hosts.temp (
 :: Enable dark mode, disable transparency and disable Task View
 :: WE DON'T LIKE LIGHT MODE!
 title Do not close this window - [6/66] Windows appearence
-if %isDuck equ 1 (
+if %isDuck% equ 1 (
     echo %c_green%Enabling dark mode, disabling transparency and disabling Task View...
     %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "SystemUsesLightTheme" /t REG_DWORD /d "0" /f
     %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "AppsUseLightTheme" /t REG_DWORD /d "0" /f
@@ -247,7 +316,6 @@ if exist %windir%\DuckOS_Modules\Utils\7z2201-x64.msi (
     cd %windir%\DuckOS_Modules\Utils
     start /wait "" "7z2201-x64.msi" /passive
     echo Done.
-
     echo Making sure 7zip is the default format for zips...
     reg add "HKCU\Software\7-Zip\Options" /v "ContextMenu" /t REG_DWORD /d "2147488038" /f >nul 2>&1
     reg add "HKCU\Software\7-Zip\Options" /v "ElimDupExtract" /t REG_DWORD /d "0" /f >nul 2>&1
@@ -479,17 +547,18 @@ if exist %windir%\DuckOS_Modules\Utils\7z2201-x64.msi (
 :: Detect if it's 1709
 reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v ReleaseID | find "1709"
 if %errorlevel% equ 0 (
-
-    :: Install OpenShell
-    echo %c_red%Installing OpenShell v4.4 if it exists...
-    if exist "%windir%\DuckOS_Modules\Utils\OpenShellSetup_4_4_170.exe" start /wait "" "%windir%\DuckOS_Modules\Utils\OpenShellSetup_4_4_170.exe" /qn ADDLOCAL=StartMenu
-    echo %c_green%Done.
+    if %isDuck% equ 1 (
+        echo %c_red%Installing OpenShell v4.4 if it exists...
+        if exist "%windir%\DuckOS_Modules\Utils\OpenShellSetup_4_4_170.exe" start /wait "" "%windir%\DuckOS_Modules\Utils\OpenShellSetup_4_4_170.exe" /qn ADDLOCAL=StartMenu
+        echo %c_green%Done.
+    )
 )
 
 :: Debloat 7zip - security [fix the 0-day chm help exploit]
 cd /d %ProgramFiles%\7-zip
 echo %c_cyan%Debloating 7-Zip...
 for %%i in (*.txt *.chm) do del /F /Q "%%i"
+rd /s "%programdata%\Microsoft\Windows\Start Menu\Programs\7-Zip"
 echo %c_green%Done.
 
 :: Install DirectX
@@ -505,10 +574,8 @@ if exist %SYSTEMROOT%\DuckOS_Modules\DirectX\dxsetup.exe (
 if exist %windir%\DuckOS_Modules\vcredist.exe (
     echo %c_cyan%Installing VCRedists..
     cd %windir%\DuckOS_Modules
-    start /wait "" "vcredist.exe" /ai
+    start /wait "" "vcredist.exe" /aiV /gm2
     echo %c_green%Done.
-    echo %c_cyan%Re-registering msvcp just in case...
-    for %%i in (ntdll.dll msdxm.ocx dxmasf.dll wmp.dll wmpdxm.dll) do regsvr32 %%i /s
 ) else (
     echo %c_red%Couldn't file VCRedists installation file! Skipping it... 
 )
@@ -519,7 +586,7 @@ if exist %windir%\DuckOS_Modules\vcredist.exe (
 :: Remove Telemetry IPs ::
 ::::::::::::::::::::::::::
 
-title Do not close this window - [9/66] Telemetry ^& Privacy
+title Do not close this window - [9/66] Telemetry and Privacy
 echo %c_red%Disabling Telemetry IPs..
 
 :: Inbound
@@ -596,12 +663,10 @@ echo %c_green%Done.
 if %isDuck% equ 1 ( goto skipDuckOnly )
 
 :: Set up the toolbox to be in the context menu
-if %isDuck% equ 1 (
-    title Do not close this window - [12/66] Context Menu
-    echo %c_cyan%Setting up the toolbox in the context menu..
-    reg add "HKEY_CLASSES_ROOT\Directory\Background\shell\DuckOS Toolbox\command" /v "" /d "%windir%\DuckOS_Modules\DuckOS_Toolbox\DuckOS Toolbox.exe" /t REG_SZ /f
-    echo %c_green%Done.
-)
+title Do not close this window - [12/66] Context Menu
+echo %c_cyan%Setting up the toolbox in the context menu..
+reg add "HKEY_CLASSES_ROOT\Directory\Background\shell\DuckOS Toolbox\command" /v "" /d "%windir%\DuckOS_Modules\DuckOS_Toolbox\DuckOS Toolbox.exe" /t REG_SZ /f
+echo %c_green%Done.
 
 :: Make the computer restart 1 time after the current restart, because THAT fixed OS issues
 title Do not close this window - [13/66] Configuring restart
@@ -629,12 +694,12 @@ if %INTEL% equ 0 (
     echo $ Intel processor detected, making sure power plan = idle OFF
     echo $ MIGHT CAUSE THE CPU % TO BE INACCURATE!
     powercfg -import "%windir%\DuckOS_Modules\Duck.pow" d6344778-a03d-4e00-a73a-dbc3f3f5f236
-    powercfg /SETACTIVE d6344778-a03d-4e00-a73a-dbc3f3f5f236
+    powercfg /setactive d6344778-a03d-4e00-a73a-dbc3f3f5f236
 ) else if %AMD% equ 0 (
     echo $ AMD processor detected, making sure the power plan = idle ON
     echo $ Also making sure some AMD unneeded services aren't gonna start...
     powercfg -import "%windir%\DuckOS_Modules\Duck_IDLE_ENABLED.pow" d6344778-a03d-4e00-a73a-dbc3f3f5f236
-    powercfg /SETACTIVE d6344778-a03d-4e00-a73a-dbc3f3f5f236
+    powercfg /setactive d6344778-a03d-4e00-a73a-dbc3f3f5f236
     for %%i in ("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\AMD Log Utility" "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\amdlog" "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\AMD External Events Utility") do ( reg add %%i /v Start /t REG_DWORD /d 4 /f )
 )
 echo %c_green%Done.
@@ -762,8 +827,8 @@ echo %c_cyan%Mitigating a security vulnerability...
 icacls %SystemRoot%\system32\config\* /inheritance:e
 echo %c_green%Done.
 
-:: Disable TsX to mitigate ZombieLoad
-reg add "HKLM\System\CurrentControlSet\Control\Session Manager\kernel" /v "DisableTsx" /t REG_DWORD /d 1 /f
+:: Disable TsX to mitigate ZombieLoad
+reg add "HKLM\System\CurrentControlSet\Control\Session Manager\kernel" /v "DisableTsx" /t REG_DWORD /d 1 /f
 
 :: Remove SOME dependencies
 title Do not close this window - [28/66] Removing some dependencies...
@@ -1147,7 +1212,7 @@ for %%i in (lsass.exe sppsvc.exe SearchIndexer.exe fontdrvhost.exe sihost.exe ct
 :::::::::::::::::::::::
 
 :: Generate the script
-if exist %windir%\Temp\disable.ps1 del /f /q %windir%\Temp\disable.ps1
+if exist %windir%\Temp\disable.ps1 ( del /f /q %windir%\Temp\disable.ps1 )
 for %%i in (DEP, EmulateAtlThunks, SEHOP, ForceRelocateImages, RequireInfo, BottomUp, HighEntropy, StrictHandle, DisableWin32kSystemCalls, AuditSystemCall, DisableExtensionPoints, BlockDynamicCode, AllowThreadsToOptOut, AuditDynamicCode, CFG, SuppressExports, StrictCFG, MicrosoftSignedOnly, AllowStoreSignedBinaries, AuditMicrosoftSigned, AuditStoreSigned, EnforceModuleDependencySigning, DisableNonSystemFonts, AuditFont, BlockRemoteImageLoads, BlockLowLabelImageLoads, PreferSystem32, AuditRemoteImageLoads, AuditLowLabelImageLoads, AuditPreferSystem32, SEHOP, AuditSEHOP, SEHOPTelemetry, TerminateOnError) do echo Set-ProcessMitigation -System -Disable %%i>>%WINDIR%\Temp\disable.ps1
 powershell -ep bypass -mta %windir%\Temp\disable.ps1
 
@@ -1371,9 +1436,9 @@ echo %c_green%Done.
 :: GPU Tweaks ::
 ::::::::::::::::
 
-:: DXKrnl
 title Do not close this window - [63/66] Tweaking more things
 echo Tweaking more things...
+:: DXKrnl
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v DpiMapIommuContiguous /t REG_DWORD /d 1 /f >NUL 2>&1
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\DXGKrnl" /v "CreateGdiPrimaryOnSlaveGPU" /t REG_DWORD /d "1" /f >NUL 2>&1
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\DXGKrnl" /v "DriverSupportsCddDwmInterop" /t REG_DWORD /d "1" /f >NUL 2>&1
@@ -1570,41 +1635,6 @@ reg add "HKEY_CLASSES_ROOT\CLSID\{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}\ShellFol
 for /f "tokens=*" %%i in ('reg query "HKLM\SYSTEM\CurrentControlSet\Enum" /s /f "StorPort"^| findstr "StorPort"') do reg add "%%i" /v "EnableIdlePowerManagement" /t REG_DWORD /d "0" /f
 powershell -NoProfile -Command "$devices = Get-WmiObject Win32_PnPEntity; $powerMgmt = Get-WmiObject MSPower_DeviceEnable -Namespace root\wmi; foreach ($p in $powerMgmt){$IN = $p.InstanceName.ToUpper(); foreach ($h in $devices){$PNPDI = $h.PNPDeviceID; if ($IN -like \"*$PNPDI*\"){$p.enable = $False; $p.psbase.put()}}}" >nul 2>nul
 
-:: Unhide powerplan attributes
-:: Credits to: Eugene Muzychenko
-for /f "tokens=1-9* delims=\ " %%A in ('reg query HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings /s /f attributes /e') do (
-  if /i "%%A" == "HKLM" (
-    set Ident=
-    if not "%%G" == "" (
-      set Err=
-      set Group=%%G
-      set Setting=%%H
-      if "!Group:~35,1!" == "" set Err=group
-      if not "!Group:~36,1!" == "" set Err=group
-      if not "!Setting!" == "" (
-        if "!Setting:~35,1!" == "" set Err=setting
-        if not "!Setting:~36,1!" == "" set Err=setting
-        Set Ident=!Group!:!Setting!
-      ) else (
-        Set Ident=!Group!
-      )
-      if not "!Err!" == "" (
-        echo ***** Error in !Err! GUID: !Ident"
-      )
-    )
-  ) else if "%%A" == "Attributes" (
-    if "!Ident!" == "" (
-      echo ***** No group/setting GUIDs before Attributes value
-    )
-    set /a Attr = %%C
-    set /a Hidden = !Attr! ^& 1
-    if !Hidden! equ 1 (
-      echo Unhiding !Ident!
-      powercfg -attributes !Ident::= ! -attrib_hide
-    )
-  )
-)
-
 :: Windows Server Update Client ID
 sc stop wuauserv >nul 2>nul
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\WindowsUpdate" /v "SusClientId" /t REG_SZ /d "00000000-0000-0000-0000-000000000000" /f
@@ -1678,6 +1708,9 @@ reg add "HKLM\Software\Policies\Microsoft\InputPersonalization" /v "RestrictImpl
 reg add "HKLM\Software\Policies\Microsoft\InputPersonalization" /v "RestrictImplicitInkCollection" /t REG_DWORD /d "1" /f
 reg add "HKLM\Software\Policies\Microsoft\Windows\TabletPC" /v "PreventHandwritingDataSharing" /t REG_DWORD /d "1" /f
 reg add "HKLM\Software\Policies\Microsoft\Windows\HandwritingErrorReports" /v "PreventHandwritingErrorReports" /t REG_DWORD /d "1" /f
+
+:: Disable Sending KMS client activation data to Microsoft automatically.. -- you tryna pirate?? damn??
+reg add "HKLM\Software\Policies\Microsoft\Windows NT\CurrentVersion\Software Protection Platform" /v "NoGenTicket" /t REG_DWORD /d "1" /f
 
 :: Disable Settings Sync
 reg add "HKLM\Software\Policies\Microsoft\Windows\SettingSync" /v "DisableSettingSync" /t REG_DWORD /d "2" /f
@@ -1799,7 +1832,7 @@ powershell -NoProfile "$net=get-netconnectionprofile; Set-NetConnectionProfile -
 echo %c_green%Done, finalizing...
 
 :: Cancel any pending shutdowns, and restart in 2 seconds.. [with force option]
-:: If the argument -doRestart is selected, then we will restart..
+:: If the argument -noRestart is selected, then we will restart..
 shutdown /a
 
 if /i "%noRestart%" equ "0" ( shutdown /r /t 5 /f ) else (
@@ -1823,21 +1856,39 @@ exit
 :noArgs
 color 0a
 title Hold up!
-cls
+cls 
+echo ██╗  ██╗ ██████╗ ██╗     ██████╗     ██╗   ██╗██████╗ ██╗
+echo ██║  ██║██╔═══██╗██║     ██╔══██╗    ██║   ██║██╔══██╗██║
+echo ███████║██║   ██║██║     ██║  ██║    ██║   ██║██████╔╝██║
+echo ██╔══██║██║   ██║██║     ██║  ██║    ██║   ██║██╔═══╝ ╚═╝
+echo ██║  ██║╚██████╔╝███████╗██████╔╝    ╚██████╔╝██║     ██╗
+echo ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═════╝      ╚═════╝ ╚═╝     ╚═╝
+echo.
 echo $ No CMDLine args were passed. The script doesn't know what to do.
 echo.
-echo $ 1 - Tweak the computer
+echo $ 1 - Tweak the computer only
 echo $ 2 - Turn off automatic restarting after the tweaks are done.
-echo $ 3 - Exit
+echo $ 3 - Exit the script without making any changes to your device
 :askAgain
-set /p choice=Your choice:
-for %%i in (1 2 3) do (
-    if /i not %choice% equ %%i do ( echo $ Invalid choice. && goto :askAgain)
+set /p choice="Your choice: "
+if %choice% equ 1 ( goto :tweaks ) else (
+    echo $ Invalid choice. && goto askAgain
 )
-if %choice% equ 1 ( goto :tweaks )
-if %choice% equ 2 ( set noRestart=1 )
-if %choice% equ 3 ( exit )
-goto :noArgs
+if %choice% equ 2 (
+    set noRestart=1
+    cls
+    goto begin
+) else (
+    echo $ Invalid choice. && goto askAgain
+)
+if %choice% equ 3 (
+    cls
+    echo $ You've chosen to exit the script. You may relaunch the script at any time.
+    echio Press any key to exit. & pause >nul
+    exit
+) else (
+    echo $ Invalid choice. && goto askAgain
+)
 
 :TrustedInstaller
 echo $ Relaunching as TrustedInstaller...
@@ -1855,7 +1906,7 @@ if not exist %nsudo% (
     if /i exist %nsudo% ( %nsudo% -P:E -U:T "%~f0" -onlyTweak %* && exit )
 )
 
-:UpdateDetected
+:updateDetected
 if exist "%TEMP%\type.txt" del /f /q "%TEMP%\type.txt" >NUL
 if exist "%windir%\system32\curl.exe" ( curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/changelog_type.txt -o "%TEMP%\type.txt" ) else ( powershell iwr -Method Get -Uri https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/changelog_type.txt -OutFile "%TEMP%\type.txt" )
 
@@ -1875,10 +1926,6 @@ if %errorlevel% equ 0 ( set changes=Something NEW has been added. Recommended to
 :: Check for os_updates
 findstr /i "os_update" %temp%\type.txt
 if %errorlevel% equ 0 ( set changes=Something were changed in the operating system. You aren't required to apply the tweaks. )
-
-:: Check if os_update and feature_update were combined
-findstr /i "operating_system_features" %temp%\type.txt
-if %errorlevel% equ 0 ( set changes=Something were changed in the operating system. We recommend applying the tweaks since you might get some features. )
 
 :: The "Update found" screen.
 title Woah! New update detected.
