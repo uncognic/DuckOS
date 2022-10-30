@@ -237,19 +237,19 @@ if errorlevel 7 (
 :: Ask the user if they want to use a webcam
 title Do not close this window - [2/66] Webcam Setup
 call :MsgBox "Are you gonna use a webcam?"  "VBYesNo+VBQuestion" "Configuration"
-if errorlevel 6 (
-    echo %c_green%Got it, we will keep webcam services.
-    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Allow" /f
-	reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Allow" /f
-	reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam\NonPackaged" /v "Value" /t REG_SZ /d "Allow" /f
-    reg add "HKLM\SYSTEM\CurrentControlSet\Services\swenum" /v "Start" /t REG_DWORD /d "3" /f
-    if exist %windir%\DuckOS_Modules\devmanview.exe %windir%\DuckOS_Modules\devmanview.exe /disable "Plug and Play Software Device Enumerator"
-) else if errorlevel 7 (
+if errorlevel 7 (
     echo %c_green%Okay... Disabling webcam services...
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\swenum" /v "Start" /t REG_DWORD /d "4" /f
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Deny" /f
-	reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Deny" /f
-	reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam\NonPackaged" /v "Value" /t REG_SZ /d "Deny" /f
+    reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Deny" /f
+    reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam\NonPackaged" /v "Value" /t REG_SZ /d "Deny" /f
+    if exist %windir%\DuckOS_Modules\devmanview.exe %windir%\DuckOS_Modules\devmanview.exe /disable "Plug and Play Software Device Enumerator"
+) else if errorlevel 6 (
+    echo %c_green%Got it, we will keep webcam services.
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Allow" /f
+    reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Allow" /f
+    reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam\NonPackaged" /v "Value" /t REG_SZ /d "Allow" /f
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\swenum" /v "Start" /t REG_DWORD /d "3" /f
     if exist %windir%\DuckOS_Modules\devmanview.exe %windir%\DuckOS_Modules\devmanview.exe /disable "Plug and Play Software Device Enumerator"
 )
 
@@ -288,7 +288,7 @@ if exist %SystemRoot%\System32\drivers\etc\hosts.temp (
 :: Enable dark mode, disable transparency and disable Task View
 :: WE DON'T LIKE LIGHT MODE!
 title Do not close this window - [6/66] Windows appearence
-if %isDuck equ 1 (
+if %isDuck% equ 1 (
     echo %c_green%Enabling dark mode, disabling transparency and disabling Task View...
     %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "SystemUsesLightTheme" /t REG_DWORD /d "0" /f
     %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "AppsUseLightTheme" /t REG_DWORD /d "0" /f
@@ -1634,41 +1634,6 @@ reg add "HKEY_CLASSES_ROOT\CLSID\{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}\ShellFol
 :: Disable Power savings on drives
 for /f "tokens=*" %%i in ('reg query "HKLM\SYSTEM\CurrentControlSet\Enum" /s /f "StorPort"^| findstr "StorPort"') do reg add "%%i" /v "EnableIdlePowerManagement" /t REG_DWORD /d "0" /f
 powershell -NoProfile -Command "$devices = Get-WmiObject Win32_PnPEntity; $powerMgmt = Get-WmiObject MSPower_DeviceEnable -Namespace root\wmi; foreach ($p in $powerMgmt){$IN = $p.InstanceName.ToUpper(); foreach ($h in $devices){$PNPDI = $h.PNPDeviceID; if ($IN -like \"*$PNPDI*\"){$p.enable = $False; $p.psbase.put()}}}" >nul 2>nul
-
-:: Unhide powerplan attributes
-:: Credits to: Eugene Muzychenko
-for /f "tokens=1-9* delims=\ " %%A in ('reg query HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings /s /f attributes /e') do (
-  if /i "%%A" == "HKLM" (
-    set Ident=
-    if not "%%G" == "" (
-      set Err=
-      set Group=%%G
-      set Setting=%%H
-      if "!Group:~35,1!" == "" set Err=group
-      if not "!Group:~36,1!" == "" set Err=group
-      if not "!Setting!" == "" (
-        if "!Setting:~35,1!" == "" set Err=setting
-        if not "!Setting:~36,1!" == "" set Err=setting
-        Set Ident=!Group!:!Setting!
-      ) else (
-        Set Ident=!Group!
-      )
-      if not "!Err!" == "" (
-        echo ***** Error in !Err! GUID: !Ident"
-      )
-    )
-  ) else if "%%A" == "Attributes" (
-    if "!Ident!" == "" (
-      echo ***** No group/setting GUIDs before Attributes value
-    )
-    set /a Attr = %%C
-    set /a Hidden = !Attr! ^& 1
-    if !Hidden! equ 1 (
-      echo Unhiding !Ident!
-      powercfg -attributes !Ident::= ! -attrib_hide
-    )
-  )
-)
 
 :: Windows Server Update Client ID
 sc stop wuauserv >nul 2>nul
