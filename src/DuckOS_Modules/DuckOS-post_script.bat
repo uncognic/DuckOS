@@ -203,7 +203,7 @@ cls
 
 :: Ask the user if they use "Windows Firewall", if not, disable it.. if yes, do nothing...
 title Do not close this window - [1/66] Windows Firewall
-call :MsgBox "Will you use Windows Firewall? -- NOTE: If you select 'no' will break Microsoft Store reinstallation and some games like OverWatch 2. Pressing 'no' disables it!"  "VBYesNo+VBQuestion" "Configuration"
+call :MsgBox "Will you use Windows Firewall? -- NOTE: By disabling Windows Firewall, it will break Microsoft Store reinstallation and some games like Overwatch 2!"  "VBYesNo+VBQuestion" "Configuration"
 if errorlevel 7 (
     echo %c_green%Alright, destroying firewall...
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\mpssvc" /v "Start" /t REG_DWORD /d "4" /f
@@ -558,7 +558,7 @@ if %errorlevel% equ 0 (
 cd /d %ProgramFiles%\7-zip
 echo %c_cyan%Debloating 7-Zip...
 for %%i in (*.txt *.chm) do del /F /Q "%%i"
-rd /s "%programdata%\Microsoft\Windows\Start Menu\Programs\7-Zip"
+rd /s /q "%programdata%\Microsoft\Windows\Start Menu\Programs\7-Zip"
 echo %c_green%Done.
 
 :: Install DirectX
