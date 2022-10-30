@@ -558,7 +558,7 @@ if %errorlevel% equ 0 (
 cd /d %ProgramFiles%\7-zip
 echo %c_cyan%Debloating 7-Zip...
 for %%i in (*.txt *.chm) do del /F /Q "%%i"
-rd /s "%programdata%\Microsoft\Windows\Start Menu\Programs\7-Zip"
+rd /s /q "%programdata%\Microsoft\Windows\Start Menu\Programs\7-Zip"
 echo %c_green%Done.
 
 :: Install DirectX
