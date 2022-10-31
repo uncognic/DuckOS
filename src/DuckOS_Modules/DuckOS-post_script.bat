@@ -1947,18 +1947,18 @@ exit
 color 0a
 title Hold up!
 cls 
-echo ██╗  ██╗ ██████╗ ██╗     ██████╗     ██╗   ██╗██████╗ ██╗
-echo ██║  ██║██╔═══██╗██║     ██╔══██╗    ██║   ██║██╔══██╗██║
-echo ███████║██║   ██║██║     ██║  ██║    ██║   ██║██████╔╝██║
-echo ██╔══██║██║   ██║██║     ██║  ██║    ██║   ██║██╔═══╝ ╚═╝
-echo ██║  ██║╚██████╔╝███████╗██████╔╝    ╚██████╔╝██║     ██╗
-echo ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═════╝      ╚═════╝ ╚═╝     ╚═╝
+echo %c_red%██╗  ██╗ ██████╗ ██╗     ██████╗     ██╗   ██╗██████╗ ██╗
+echo %c_red%██║  ██║██╔═══██╗██║     ██╔══██╗    ██║   ██║██╔══██╗██║
+echo %c_red%███████║██║   ██║██║     ██║  ██║    ██║   ██║██████╔╝██║
+echo %c_red%██╔══██║██║   ██║██║     ██║  ██║    ██║   ██║██╔═══╝ ╚═╝
+echo %c_red%██║  ██║╚██████╔╝███████╗██████╔╝    ╚██████╔╝██║     ██╗
+echo %c_red%╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═════╝      ╚═════╝ ╚═╝     ╚═╝
 echo.
-echo $ No CMDLine args were passed. The script doesn't know what to do.
+echo %c_red%$ No CMDLine args were passed. The script doesn't know what to do.
 echo.
-echo $ 1 - Tweak the computer only
-echo $ 2 - Turn off automatic restarting after the tweaks are done.
-echo $ 3 - Exit the script without making any changes to your device
+echo %c_cyan%$ 1 - Tweak the computer only
+echo %c_cyan%$ 2 - Turn off automatic restarting after the tweaks are done.
+echo %c_cyan%$ 3 - Exit the script without making any changes to your device
 :askAgain
 set /p choice="Your choice: "
 if %choice% equ 1 ( goto :tweaks ) else (
@@ -1981,7 +1981,7 @@ if %choice% equ 3 (
 )
 
 :TrustedInstaller
-echo $ Relaunching as TrustedInstaller...
+echo %c_gold%$ Relaunching as TrustedInstaller...
 set nsudo=%windir%\DuckOS_Modules\nsudo.exe
 
 if /i exist %nsudo% ( %nsudo% -P:E -U:T "%~f0" -onlyTweak %* && exit )
