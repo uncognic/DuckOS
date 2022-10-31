@@ -37,12 +37,12 @@ set c_white=[37m
 :::::::::::::::::::::::::::::::::
 
 :: Check if connection to GitHub is possible.
-ping -n 1 github.com | findstr Sent >NUL && set network=1
-ping -n 1 github.com | findstr Sent >NUL || set network=0
+ping -n 1 raw.github.com | findstr Reply >NUL && set network=1
+ping -n 1 raw.github.com | findstr Reply >NUL || set network=0
 
 :: Compare it to the one on the internet.
 :: 1709 doesn't have curl, so we are gonna use powershell if curl doesnt exist
-if "%NETWORK_AVAILABLE%" equ "yes" (
+if "%network%" equ "1" (
     if exist "%TEMP%\Post-Script_ver.txt" del /f /q "%TEMP%\Post-Script_ver.txt" >NUL
     if exist "%windir%\System32\curl.exe" ( curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/version.txt -o "%TEMP%\Post-Script_ver.txt" ) else ( powershell iwr -Method Get -Uri https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/version.txt -OutFile %TEMP%\Post-Script_ver.txt )
     for /f "tokens=* USEBACKQ" %%f IN (`type %TEMP%\Post-Script_ver.txt`) do ( if "%version%" LSS "%%f" call :UpdateDetected %%f )
