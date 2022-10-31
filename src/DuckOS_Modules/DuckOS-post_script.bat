@@ -37,8 +37,8 @@ set c_white=[37m
 :::::::::::::::::::::::::::::::::
 
 :: Check if connection to GitHub is possible.
-ping -n 1 raw.github.com | findstr Reply >NUL && set network=1
-ping -n 1 raw.github.com | findstr Reply >NUL || set network=0
+ping -n 1 raw.githubusercontent.com | findstr Reply >NUL && set network=1
+ping -n 1 raw.githubusercontent.com | findstr Reply >NUL || set network=0
 
 :: Compare it to the one on the internet.
 :: 1709 doesn't have curl, so we are gonna use powershell if curl doesnt exist
