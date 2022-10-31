@@ -1254,6 +1254,13 @@ reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "Del
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /v "StartupDelayInMSec" /t reg_DWORD /d "0" /f >NUL 2>&1
 echo %c_green%Done.
 
+:: Make the post install desktop folder read only with attributes
+if %isDuck% equ 1 (
+    echo %c_gold%Making the post install desktop folder read only with attributes..
+    if exist "%userprofile%\Desktop\DuckOS - Post Install Folder" attrib +r +a +s "%userprofile%\Desktop\DuckOS - Post Install Folder"
+    echo %c_green%Done.
+)
+
 :::::::::::::::::
 :: Mitigations ::
 :::::::::::::::::
