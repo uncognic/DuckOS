@@ -18,7 +18,7 @@ title Do not close this window - [0/66] Preparing
 :: Some colors might not be used as of now, but we'll keep it.
 
 :: Set the post script version
-set version=0.46
+set version=0.461
 
 :: Set up colors in echo
 :: Some colors might not be used as of now, but we'll keep it.
