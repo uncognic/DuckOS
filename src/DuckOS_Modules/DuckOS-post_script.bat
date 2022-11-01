@@ -580,6 +580,13 @@ if exist %windir%\DuckOS_Modules\vcredist.exe (
     echo %c_red%Couldn't file VCRedists installation file! Skipping it... 
 )
 
+:: Install bleachbit
+if exist %WINDIR%\DuckOS_Modules\Utils\BleachBit-4.4.2-setup.exe (
+    echo %c_gold%Installing BleachBit..
+    start /wait "" "%WINDIR%\DuckOS_Modules\Utils\BleachBit-4.4.2-setup.exe" /allusers /S
+    echo %c_green%Done.
+)
+
 :skipPrograms
 
 ::::::::::::::::::::::::::
