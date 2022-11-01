@@ -305,6 +305,9 @@ title Do not close this window - [7/66] Setting UTC
 echo %c_cyan%Setting UTC to prevent issues with dual booting (specifically with Linux)...
 reg add "HKLM\System\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /d 1 /t REG_DWORD /f >nul
 
+:: Enable numlock on startup
+reg add "HKEY_CURRENT_USER\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /d "2" /t REG_DWORD /f
+
 if %isDuck% equ 1 ( goto skipPrograms )
 
 ::::::::::::::
