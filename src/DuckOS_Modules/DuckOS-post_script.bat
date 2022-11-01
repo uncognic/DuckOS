@@ -91,6 +91,7 @@ if %isDuck% equ 0 (
     if errorlevel 7 ( goto begin ) else (
         echo Alright, no changes have been made. Press any key to exit.
         pause >nul
+        exit /b
     )
 ) else ( goto begin )
 
@@ -199,6 +200,7 @@ if %isDuck% equ 1 (
 :: Change the directory.
 cd %windir%\DuckOS_Modules
 
+:: Clear the screen
 cls
 
 :: Ask the user if they use "Windows Firewall", if not, disable it.. if yes, do nothing...
