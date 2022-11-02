@@ -79,6 +79,8 @@ if /i "%*" == "" goto noArgs
 
 :: Go to the correct function if one of the command line arguments is a valid one.
 for %%i in ("%*") do (
+    if /i "%%i" equ "-debug" @echo on
+    if /i "%%i" equ "-d" @echo on
     if /i "%%i" equ "-noRestart" set "noRestart=1"
     if /i "%%i" equ "-isDuck" set "isDuck=1"
     if /i "%%i" equ "-onlyTweak" goto tweaks
