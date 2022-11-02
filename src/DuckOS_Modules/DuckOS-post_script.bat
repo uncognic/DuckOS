@@ -960,7 +960,7 @@ if %Isduck% equ 1 (
 )
 
 :: Add "Open Command Prompt here" to context menus
-if %Isduck% equ 1 (
+if %isDuck% equ 1 (
     reg delete "HKCR\Directory\shell\cmd" /f
     reg delete "HKCR\Directory\Background\shell\cmd" /f
     reg add "HKCR\Directory\shell\runas" /v "" /t REG_SZ /d "Open Command Prompt here" /f
