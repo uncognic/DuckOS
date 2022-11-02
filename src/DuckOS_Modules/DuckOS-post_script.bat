@@ -1,8 +1,8 @@
 @echo off && cls
 
-:::::::::::::::::::::::::::::::::
-:: DuckOS Post Install Script. ::
-:::::::::::::::::::::::::::::::::
+::::::::::::::::::::::::::::::::
+:: DuckOS Post Install Script ::
+::::::::::::::::::::::::::::::::
 REM =======
 :: Quick disclaimer: If you think the script broke/changed something very important, remember that the DuckOS post script is provided AS IS, and doesn't come with ANY warranty.
 REM =======
@@ -14,8 +14,6 @@ REM =======
 
 :: Set up initial title
 title Do not close this window - [0/66] Preparing
-:: Set up colors in echo
-:: Some colors might not be used as of now, but we'll keep it.
 
 :: Set the post script version
 set version=0.461
@@ -32,9 +30,9 @@ set c_purple=[35m
 set c_cyan=[36m
 set c_white=[37m
 
-:::::::::::::::::::::::::::::::::
-:: Get the post script version ::
-:::::::::::::::::::::::::::::::::
+:::::::::::::
+:: Updater ::
+:::::::::::::
 
 :: Check if connection to GitHub is possible.
 ping -n 1 raw.githubusercontent.com | findstr Reply >NUL && set network=1
@@ -55,6 +53,7 @@ if "%network%" equ "1" (
 :: Set a variable.. that we will use later... that points into an executable.
 set currentuser=%windir%\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait
 
+:: Force the window to go maximized and clear the screen.
 cls
 powershell -WindowStyle Maximized Write-Host The post install script is starting...
 
@@ -102,16 +101,16 @@ if %isDuck% equ 1 (
 :::::::::::::
 
 :: DuckOS' tweaks aren't 100% made by it's author, but the author and some people's tweaks..
-:: Today you cannot make a good operating system by yourself.. you gotta use AT LEAST 1 source.
+:: Today you cannot make a good operating system by yourself... you gotta use AT LEAST 1 source.
 :: Here are credits to the people -- whose code is currently in use in this script: (no order)
-:: 1. He3als - gave this idea to make DuckOS a open-sourced project
-:: 2. Zusier - We use some tweaks he wrote for AtlasOS, which is an another good modified operating system based on windows!
+:: 1. He3als - gave this idea to make DuckOS an open-sourced project
+:: 2. Zusier - We used some tweaks he wrote for AtlasOS, which is an another good modified operating system based on Windows 10!
 :: 3. Imribiy - NIC settings
-:: 4. CatGamerOP - I used his commands.. that delete registry classes :skull: :skull:
-:: 5. stefkeec - block telemetry ip commands
-:: 6. vojt. - provided toolbox icons
+:: 4. CatGamerOP - I used his commands... that delete registry classes :skull:
+:: 5. stefkeec - Commands to block telemetry IP
+:: 6. vojt. - toolbox icons
 :: 7. amit @ EVA - same thing as for 2. but just applies to amit
-:: Various different sources and google..
+:: Various different sources...
 
 :tweaks
 
