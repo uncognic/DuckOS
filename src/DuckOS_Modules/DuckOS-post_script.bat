@@ -86,14 +86,14 @@ for %%i in ("%*") do (
     if /i "%%i" equ "/onlyTweak" goto tweaks
 )
 
-:: if %isDuck% equ 0 (
-::     call :MsgBox "This script will tweak your computer. If you think the script broke/changed something very important, remember that the DuckOS post script is provided AS IS, and doesn't come with ANY warranty! Do you wanna continue?"  "VBYesNo+VBQuestion+VBDefaultButton2" "Continue?"
-::     if errorlevel 7 ( goto :begin ) else (
-::         echo Alright, no changes have been made. Press any key to exit.
-::         pause >nul
-::         exit
-::     )
-:: ) else ( goto begin )
+if %isDuck% equ 1 (
+    call :MsgBox "This script will tweak your computer. If you think the script broke/changed something very important, remember that the DuckOS post script is provided AS IS, and doesn't come with ANY warranty! Do you wanna continue?"  "VBYesNo+VBQuestion+VBDefaultButton2" "Continue?"
+    if errorlevel 7 ( goto begin ) else (
+        echo Alright, no changes have been made. Press any key to exit.
+        pause >nul
+        exit
+    )
+) else ( goto begin )
 
 :begin
 
