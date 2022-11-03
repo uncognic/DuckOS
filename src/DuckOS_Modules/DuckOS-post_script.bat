@@ -78,8 +78,8 @@ if /i "%*" == "" goto noArgs
 
 :: Go to the correct function if one of the command line arguments is a valid one.
 for %%i in ("%*") do (
-    if /i "%%i" equ "-debug" @echo on
-    if /i "%%i" equ "-d" @echo on
+    if /i "%%i" equ "-debug" set "debugMode=1"
+    if /i "%%i" equ "-d" set "debugMode=1"
     if /i "%%i" equ "-noRestart" set "noRestart=1"
     if /i "%%i" equ "-isDuck" set "isDuck=1"
     if /i "%%i" equ "-onlyTweak" goto tweaks
@@ -97,7 +97,22 @@ if %isDuck% equ 1 (
 ) else ( goto begin )
 
 :begin
-
+if %debugMode% equ 1 (
+    choice /n /m "You've chosen to run the script in debug mode. Echo will be set to on to display all inputs. Continue with debug mode on? [Y/N]"
+    if errorlevel 2 (
+        echo Debug mode is now OFF.
+        @echo off
+        goto tweaks
+    ) else (
+        if errorlevel 1 (
+	    echo Alright.
+	    @echo on
+	    cls
+	    goto tweaks
+	    )
+	)
+    )
+)
 :::::::::::::
 :: Credits :: 
 :::::::::::::
@@ -956,7 +971,7 @@ reg add "HKLM\System\CurrentControlSet\Control\Diagnostics\Performance" /v "Disa
 reg add "HKLM\Software\Policies\Microsoft\Windows\WDI\{9c5a40da-b965-4fc3-8781-88dd50a6299d}" /v "ScenarioExecutionEnabled" /t REG_DWORD /d "0" /f
 
 :: Remove "Open PowerShell window here" from Shift+Right-click context menus
-if %Isduck% equ 1 (
+if %isDuck% equ 1 (
     reg delete "HKCR\Directory\Background\shell\Powershell" /f
     reg delete "HKCR\Directory\shell\Powershell" /f
 )
