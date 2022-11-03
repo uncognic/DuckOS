@@ -2120,8 +2120,9 @@ echo %c_red%██║╚██╗██║██║   ██║    ██║   �
 echo %c_red%██║ ╚████║╚██████╔╝    ╚██████╔╝██║     ██████╔╝██║  ██║   ██║   ███████╗███████║
 echo %c_red%╚═╝  ╚═══╝ ╚═════╝      ╚═════╝ ╚═╝     ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝╚══════╝
 echo.
-echo $ No updates detected.
+echo %c_gold%$ %c_green%No updates detected, you are up to date!
+echo %c_gold%$ Current version: %c_green%%version%
 echo.
-echo $ Press any key to quit.
+echo %c_red%$ Press any key to quit.
 pause >nul
 exit
