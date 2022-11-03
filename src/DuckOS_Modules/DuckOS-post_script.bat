@@ -697,7 +697,7 @@ reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Device Metadata" /f >
 echo %c_green%Done.
 
 :: Skip some parts that should be exclusive only to DuckOS
-if %isDuck% equ 1 ( goto :notDuck )
+if %isDuck% equ 0 ( goto :notDuck )
 
 ::::::::::::::::::
 :: Context Menu ::
