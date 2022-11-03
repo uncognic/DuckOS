@@ -43,7 +43,9 @@ ping -n 1 raw.githubusercontent.com | findstr Reply >NUL || set network=0
 if "%network%" equ "1" (
     if exist "%TEMP%\Post-Script_ver.txt" del /f /q "%TEMP%\Post-Script_ver.txt" >NUL
     if exist "%windir%\System32\curl.exe" ( curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/version.txt -o "%TEMP%\Post-Script_ver.txt" ) else ( powershell iwr -Method Get -Uri https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/version.txt -OutFile %TEMP%\Post-Script_ver.txt )
-    for /f "tokens=* USEBACKQ" %%f IN (`type %TEMP%\Post-Script_ver.txt`) do ( if "%version%" LSS "%%f" call :UpdateDetected %%f )
+    for /f "tokens=* USEBACKQ" %%f IN (`type %TEMP%\Post-Script_ver.txt`) do ( 
+        if "%version%" LSS "%%f" ( call :UpdateDetected %%f ) else ( set "NoNewUpdatesDetected=yes" )
+    )
 ) else (
     if "%network%" equ "0" (
         echo No network connectivity detected, skipping update!
@@ -77,19 +79,21 @@ set "onlyTweak=0"
 if /i "%*" == "" goto noArgs
 
 :: Go to the correct function if one of the command line arguments is a valid one.
-for %%i in ("%*") do (
+for %%i in (%*) do (
     if /i "%%i" equ "-debug" @echo on
     if /i "%%i" equ "-d" @echo on
+    if /i "%%i" equ "-updateCM"  if /i "%NoNewUpdatesDetected%"=="yes" goto :noUpdates
     if /i "%%i" equ "-noRestart" set "noRestart=1"
     if /i "%%i" equ "-isDuck" set "isDuck=1"
-    if /i "%%i" equ "-onlyTweak" goto tweaks
+    if /i "%%i" equ "-onlyTweak" goto :tweaks
     if /i "%%i" equ "/noRestart" set "noRestart=1"
-    if /i "%%i" equ "/onlyTweak" goto tweaks
+    if /i "%%i" equ "/onlyTweak" goto :tweaks
 )
 
+:: Warning prompt
 if %isDuck% equ 1 (
     call :MsgBox "This script will tweak your computer. If you think the script broke/changed something very important, remember that the DuckOS post script is provided AS IS, and doesn't come with ANY warranty! Do you wanna continue?"  "VBYesNo+VBQuestion+VBDefaultButton2" "Continue?"
-    if errorlevel 7 ( goto begin ) else (
+    if errorlevel 6 ( goto begin ) else (
         echo Alright, no changes have been made. Press any key to exit.
         pause >nul
         exit
@@ -109,7 +113,7 @@ if %isDuck% equ 1 (
 :: 2. Zusier - We used some tweaks he wrote for AtlasOS, which is an another good modified operating system based on Windows 10!
 :: 3. Imribiy - NIC settings
 :: 4. CatGamerOP - I used his commands... that delete registry classes :skull:
-:: 5. stefkeec - Commands to block telemetry IP
+:: 5. stefkeec - Commands to block telemetry IPs
 :: 6. vojt. - toolbox icons
 :: 7. amit @ EVA - same thing as for 2. but just applies to amit
 :: Various different sources...
@@ -223,7 +227,7 @@ if errorlevel 7 (
 	
 ) else if errorlevel 6 (
 	echo %c_green%OK! Skipped removal. Re-Enabling Windows Firewall.
-        reg add "HKLM\SYSTEM\CurrentControlSet\Services\mpssvc" /v "Start" /t REG_DWORD /d "2" /f
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\mpssvc" /v "Start" /t REG_DWORD /d "2" /f
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\BFE" /v "Start" /t REG_DWORD /d "2" /f
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile" /v "EnableFirewall" /t REG_DWORD /d "1" /f
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile" /v "DisableNotifications" /t REG_DWORD /d "0" /f
@@ -282,6 +286,9 @@ if exist %SystemRoot%\System32\drivers\etc\hosts.temp (
     ren hosts.temp hosts 
     echo %c_green%Done!
 )
+
+:: Show Detailed Information on Startup/Shutdown
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\System" /v "VerboseStatus" /t REG_DWORD /d "1" /f
 
 ::::::::::::::::::::::::
 :: Windows Appearance ::
@@ -564,7 +571,7 @@ if %errorlevel% equ 0 (
 cd /d %ProgramFiles%\7-zip
 echo %c_cyan%Debloating 7-Zip...
 for %%i in (*.txt *.chm) do del /F /Q "%%i"
-rd /s /q "%programdata%\Microsoft\Windows\Start Menu\Programs\7-Zip"
+rd /s /q "%programdata%\Microsoft\Windows\Start Menu\Programs\7-Zip"
 echo %c_green%Done.
 
 :: Install DirectX
@@ -673,12 +680,30 @@ reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Device Metadata" /f >
 echo %c_green%Done.
 
 :: Skip some parts that should be exclusive only to DuckOS
-if %isDuck% equ 1 goto :skipDuckOnly
+if %isDuck% equ 1 ( goto :notDuck )
+
+::::::::::::::::::
+:: Context Menu ::
+::::::::::::::::::
+
+title Do not close this window - [12/66] Context Menu
+echo %c_cyan%Setting up the toolbox and "check for updates" in the context menu..
+
+:: Set up the template and it's functions
+reg add "HKCR\DesktopBackground\Shell\DuckOS" /ve /t REG_SZ /d "" /f
+reg add "HKCR\DesktopBackground\Shell\DuckOS" /v "Position" /t REG_SZ /d "Bottom" /f
+reg add "HKCR\DesktopBackground\Shell\DuckOS" /v "Icon" /t REG_SZ /d "shell32.dll,-47" /f
+reg add "HKCR\DesktopBackground\Shell\DuckOS" /v "SubCommands" /t REG_SZ /d "" /f
+
+:: Set up "check for updates" and the toolbox in the context menu
+reg add "HKCR\DesktopBackground\Shell\DuckOS\Shell\Check for DuckOS updates" /v "Icon" /t REG_SZ /d "shell32.dll,-193" /f
+reg add "HKCR\DesktopBackground\Shell\DuckOS\Shell\Check for DuckOS updates\Command" /ve /t REG_SZ /d "%~0 -updateCM" /f
+echo %c_green%Done.
 
 :: Set up the toolbox to be in the context menu
-title Do not close this window - [12/66] Context Menu
-echo %c_cyan%Setting up the toolbox in the context menu..
-reg add "HKEY_CLASSES_ROOT\Directory\Background\shell\DuckOS Toolbox\command" /v "" /d "%windir%\DuckOS_Modules\DuckOS_Toolbox\DuckOS Toolbox.exe" /t REG_SZ /f
+reg add "HKCR\DesktopBackground\Shell\DuckOS\Shell\DuckOS Toolbox" /v "MUIVerb" /t REG_SZ /d "DuckOS Toolbox" /f
+reg add "HKCR\DesktopBackground\Shell\DuckOS\Shell\DuckOS Toolbox" /v "Icon" /t REG_SZ /d "shell32.dll,-25" /f
+reg add "HKCR\DesktopBackground\Shell\DuckOS\Shell\DuckOS Toolbox\Command" /ve /t REG_SZ /d "\"%SystemRoot%\DuckOS_Modules\DuckOS_Toolbox\DuckOS Toolbox.exe\"" /f
 echo %c_green%Done.
 
 :: Make the computer restart 1 time after the current restart, because THAT fixed OS issues
@@ -726,7 +751,7 @@ echo %c_green%Done.
 :: Make the cache cleaner a protected sys file
 attrib +r +s %windir%\ProgramData\Cache_Cleaner.bat
 
-:skipDuckOnly
+:notDuck
 
 :: Disable unneeded Tasks -- already credited
 title Do not close this window - [16/66] Disabling unneeded scheduled tasks
@@ -1945,14 +1970,11 @@ echo %c_green%Done, finalizing...
 :: If the argument -noRestart is selected, then we will restart..
 shutdown /a
 
-if /i "%noRestart%" equ "0" ( shutdown /r /t 5 /f ) else (
+if /i "%noRestart%" equ "0" ( shutdown /r /t 0 /f ) else (
     echo $ You selected to not restart. Please restart as soon as possible to apply changes!
     echo $ Quitting soon in 8 seconds..
     timeout 8 /nobreak
 )
-
-:: Delete the post script!
-start /min "" "cmd.exe" /c del /f /q %0
 exit
 
 :MsgBox [Prompt] [Type] [Title]
@@ -2069,3 +2091,20 @@ if %errorlevel% equ 1 (
     if exist %TEMP%\type.txt del /f /q %TEMP%\type.txt
     echo %c_red%Fine.
 )
+
+:noUpdates
+cls
+title No updates detected :^(
+chcp 65001 >nul
+echo %c_red%███╗   ██╗ ██████╗     ██╗   ██╗██████╗ ██████╗  █████╗ ████████╗███████╗███████╗
+echo %c_red%████╗  ██║██╔═══██╗    ██║   ██║██╔══██╗██╔══██╗██╔══██╗╚══██╔══╝██╔════╝██╔════╝
+echo %c_red%██╔██╗ ██║██║   ██║    ██║   ██║██████╔╝██║  ██║███████║   ██║   █████╗  ███████╗
+echo %c_red%██║╚██╗██║██║   ██║    ██║   ██║██╔═══╝ ██║  ██║██╔══██║   ██║   ██╔══╝  ╚════██║
+echo %c_red%██║ ╚████║╚██████╔╝    ╚██████╔╝██║     ██████╔╝██║  ██║   ██║   ███████╗███████║
+echo %c_red%╚═╝  ╚═══╝ ╚═════╝      ╚═════╝ ╚═╝     ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝╚══════╝
+echo.
+echo $ No updates detected.
+echo.
+echo $ Press any key to quit.
+pause >nul
+exit
