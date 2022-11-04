@@ -44,7 +44,7 @@ if "%network%" equ "1" (
     if exist "%TEMP%\Post-Script_ver.txt" del /f /q "%TEMP%\Post-Script_ver.txt" >NUL
     if exist "%windir%\System32\curl.exe" ( curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/version.txt -o "%TEMP%\Post-Script_ver.txt" ) else ( powershell iwr -Method Get -Uri https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/version.txt -OutFile %TEMP%\Post-Script_ver.txt )
     for /f "tokens=* USEBACKQ" %%f IN (`type %TEMP%\Post-Script_ver.txt`) do ( 
-        if "%version%" LSS "%%f" ( call :UpdateDetected %%f ) else ( set "NoNewUpdatesDetected=yes" )
+        if "%version%" LSS "%%f" ( call :UpdateDetected %%f ) else ( set "noUpdates=1" )
     )
 ) else (
     if "%network%" equ "0" (
@@ -80,9 +80,7 @@ if /i "%*" == "" goto noArgs
 
 :: Go to the correct function if one of the command line arguments is a valid one.
 for %%i in (%*) do (
-    if /i "%%i" equ "-debug" @echo on
-    if /i "%%i" equ "-d" @echo on
-    if /i "%%i" equ "-updateCM"  if /i "%NoNewUpdatesDetected%"=="yes" goto :noUpdates
+    if /i "%%i" equ "-updateCM" if /i "%noUpdates%"=="1" goto :noUpdates
     if /i "%%i" equ "-debug" set "debugMode=1"
     if /i "%%i" equ "-d" set "debugMode=1"
     if /i "%%i" equ "-noRestart" set "noRestart=1"
