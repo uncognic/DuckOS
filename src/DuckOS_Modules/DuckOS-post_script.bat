@@ -30,13 +30,20 @@ set c_purple=[35m
 set c_cyan=[36m
 set c_white=[37m
 
+:: Default values
+set "noRestart=0"
+set "isDuck=0"
+set "onlyTweak=0"
+set "noUpdates=0"
+set "debugMode=0"
+set "network=0"
+
 :::::::::::::
 :: Updater ::
 :::::::::::::
 
 :: Check if connection to GitHub is possible.
 ping -n 1 raw.githubusercontent.com | findstr Reply >NUL && set network=1
-ping -n 1 raw.githubusercontent.com | findstr Reply >NUL || set network=0
 
 :: Compare it to the one on the internet.
 :: 1709 doesn't have curl, so we are gonna use powershell if curl doesnt exist
@@ -69,11 +76,6 @@ echo ╚═╝     ╚══════╝╚══════╝╚═╝  �
 ::::::::::::::::::::::::::::
 :: Command line arguments ::
 ::::::::::::::::::::::::::::
-
-:: Default values
-set "noRestart=0"
-set "isDuck=0"
-set "onlyTweak=0"
 
 :: Check if there are no arguments...
 if /i "%*" == "" goto noArgs
