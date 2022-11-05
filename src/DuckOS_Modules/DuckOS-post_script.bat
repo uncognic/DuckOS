@@ -66,6 +66,7 @@ set currentuser=%windir%\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait
 cls
 powershell -WindowStyle Maximized Write-Host The post install script is starting...
 
+:: Show logo
 echo ██████╗ ██╗     ███████╗ █████╗ ███████╗███████╗    ██╗    ██╗ █████╗ ██╗████████╗      
 echo ██╔══██╗██║     ██╔════╝██╔══██╗██╔════╝██╔════╝    ██║    ██║██╔══██╗██║╚══██╔══╝      
 echo ██████╔╝██║     █████╗  ███████║███████╗█████╗      ██║ █╗ ██║███████║██║   ██║         
