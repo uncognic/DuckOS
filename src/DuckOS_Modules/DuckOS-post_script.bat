@@ -80,6 +80,9 @@ echo ╚═╝     ╚══════╝╚══════╝╚═╝  �
 :: Check if there are no arguments...
 if /i "%*" == "" goto noArgs
 
+:: Set the args as a var (incase we update)
+set UpdateArgs=%*
+
 :: Go to the correct function if one of the command line arguments is a valid one.
 for %%i in (%*) do (
     if /i "%%i" equ "-isDuck" set "isDuck=1"
@@ -2107,11 +2110,11 @@ if %errorlevel% equ 1 (
     if exist %TEMP%\Post-script_ver.txt del /f /q %TEMP%\Post-script_ver.txt
     if exist %TEMP%\type.txt del /f /q %TEMP%\type.txt
     if exist "%windir%\system32\curl.exe" ( curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/DuckOS_Modules/DuckOS-post_script.bat -o "%~f0" ) else ( powershell iwr -Method Get -Uri https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/DuckOS_Modules/DuckOS-post_script.bat -OutFile "%~f0" )
-    call "%~f0" %*
+    call "%~f0" %UpdateArgs%
 ) else (
     if exist %TEMP%\Post-script_ver.txt del /f /q %TEMP%\Post-script_ver.txt
     if exist %TEMP%\type.txt del /f /q %TEMP%\type.txt
-    echo %c_red%Fine.
+    goto :noArgs
 )
 
 :noUpdates
