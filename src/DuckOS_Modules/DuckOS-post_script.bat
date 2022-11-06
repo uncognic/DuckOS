@@ -2025,10 +2025,12 @@ echo %c_red%$ No CMDLine args were passed. The script doesn't know what to do.
 echo.
 echo %c_cyan%$ 1 - Tweak the computer only
 echo %c_cyan%$ 2 - Turn off automatic restarting after the tweaks are done.
-echo %c_cyan%$ 3 - Exit the script without making any changes to your device
+echo %c_cyan%$ 3 - Launch the script in debug mode
+echo %c_cyan%$ 4 - Exit the script without making any changes to your device
 :askAgain
 set /p choice="Your choice: "
 if %choice% equ 1 ( goto :tweaks ) else (
+    echo.
     echo $ Invalid choice. && goto askAgain
 )
 if %choice% equ 2 (
@@ -2036,15 +2038,24 @@ if %choice% equ 2 (
     cls
     goto begin
 ) else (
-    echo $ Invalid choice. && goto askAgain
+    echo.
+    echo %c_red%$ Invalid choice. && goto askAgain
 )
 if %choice% equ 3 (
+    set debugMode=1
+    cls
+    goto begin
+) else (
+    echo.
+    echo %c_red%$ Invalid choice. && goto askAgain
+if %choice% equ 4 (
     cls
     echo $ You've chosen to exit the script. You may relaunch the script at any time.
-    echio Press any key to exit. & pause >nul
+    echo Press any key to exit. & pause >nul
     exit
 ) else (
-    echo $ Invalid choice. && goto askAgain
+    echo.
+    echo %c_red%$ Invalid choice. && goto askAgain
 )
 
 :TrustedInstaller
