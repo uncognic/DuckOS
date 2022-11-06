@@ -307,7 +307,7 @@ if exist %SystemRoot%\System32\drivers\etc\hosts.temp (
     cd %SystemRoot%\System32\drivers\etc
     del /f /q hosts
     ren hosts.temp hosts 
-    echo %c_green%Done!
+    echo %c_green%Done.
 )
 
 :: Show Detailed Information on Startup/Shutdown
