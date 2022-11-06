@@ -290,10 +290,10 @@ for /f "tokens=2 delims==" %%a in ('wmic os get TotalVisibleMemorySize /format:v
 set /a RAM=%TotalVisibleMemorySize%+1024000
 echo %c_green%Done.
 
-:: Import gray accent color.reg
+:: Import accent color registry file
 title Do not close this window - [4/66] Importing registry
 if %isDuck% equ 1 (
-    if exist %windir%\DuckOS_Modules\gray_accent_color.reg ( %currentuser% "%WINDIR%\regedit.exe" /s %windir%\DuckOS_Modules\gray_accent_color.reg )
+    if exist %windir%\DuckOS_Modules\accent_color.reg ( %currentuser% "%WINDIR%\regedit.exe" /s %windir%\DuckOS_Modules\accent_color.reg )
 ) else (
     echo %c_green%******************************************************
     echo %c_red%We've detected that you're not using DuckOS, skipping.
