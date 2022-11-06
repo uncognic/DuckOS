@@ -25,7 +25,7 @@ These are all to prove we don't copy files from other operating systems and that
 - Source: https://www.nirsoft.net/utils/device_manager_view.html
 - Version: x64 Executable -- Current latest version.
 
-### VCredists
+### VCRedists
 - Name: `VisualCppRedist_AIO_x86_x64.exe`
 - Size: `28328234 bytes (27 MiB)`
 - SHA256: `46efa4fe4cb445ecb0b50680c1de03f42a45666c80c9f3782f15b26d78675908`
