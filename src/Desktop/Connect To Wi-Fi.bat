@@ -32,7 +32,7 @@ if '%errorlevel%' NEQ '0' (
     CD /D "%~dp0"
 
 color d
-title DuckOS; Connect To WiFi (through command prompt) - Free minitool made for duckOS, by fikinoob
+title DuckOS; Connect To Wi-Fi (through command prompt) - Free minitool made for DuckOS, by fikinoob
 sc start wlansvc
 cls
 echo ! Generating a list of available networks...
