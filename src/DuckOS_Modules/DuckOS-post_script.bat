@@ -92,7 +92,6 @@ for %%i in (%*) do (
     if /i "%%i" equ "-d" set "debugMode=1"
     if /i "%%i" equ "-noRestart" set "noRestart=1"
     if /i "%%i" equ "-onlyTweak" goto :tweaks
-    if /i "%%i" equ "/updateCM" if /i "%noUpdates%"=="1" goto :noUpdates
     if /i "%%i" equ "/debug" set "debugMode=1"
     if /i "%%i" equ "/d" set "debugMode=1"
     if /i "%%i" equ "/noRestart" set "noRestart=1"
