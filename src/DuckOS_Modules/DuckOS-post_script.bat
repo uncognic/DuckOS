@@ -2058,6 +2058,7 @@ if %choice% equ 3 (
 ) else (
     echo.
     echo %c_red%$ Invalid choice. && goto askAgain
+)
 if %choice% equ 4 (
     cls
     echo $ You've chosen to exit the script. You may relaunch the script at any time.
