@@ -5,7 +5,7 @@ These are all to prove we don't copy files from other operating systems and that
 ## Post Script
 - Name: `DuckOS-post_script.bat`
 - Checked and Made by: `fikinoob`
-- SHA256: `C1B724B6B243C72939B93995909F95DB68C32085DF38D39F964F83F123CEB541`
+- SHA256: `c1b724b6b243c72939b93995909f95dB68c32085df38d39f964f83f123ceb541`
 
 ### DirectX
 
