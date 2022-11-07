@@ -99,7 +99,7 @@ for %%i in (%*) do (
 )
 
 :: Warning prompt
-if %isDuck% equ 1 (
+if /i %isDuck% equ 1 (
     call :MsgBox "This script will tweak your computer. If you think the script broke/changed something very important, remember that the DuckOS post script is provided AS IS, and doesn't come with ANY warranty! Do you wanna continue?"  "VBYesNo+VBQuestion+VBDefaultButton2" "Continue?"
     if errorlevel 6 ( goto begin ) else (
         echo Alright, no changes have been made. Press any key to exit.
@@ -218,7 +218,7 @@ if %errorlevel% equ 1 ( goto :TrustedInstaller )
 title Do not close this window, tweaking your computer!
 
 :: Send a message!
-if %isDuck% equ 1 (
+if /i %isDuck% equ 1 (
     call :MsgBox "Welcome to DuckOS, a modification to Windows for enhanced privacy and performance! Thank you for downloading and using DuckOS, we are preparing DuckOS and will be available to use shortly..." 64+4096 "DuckOS Post Install Tweaks"
     call :MsgBox "You will be prompted with a few questions, then you can leave your computer running and let us do the rest." 64+4096 "DuckOS Post Install Tweaks"
 ) else (
@@ -292,7 +292,7 @@ echo %c_green%Done.
 
 :: Import accent color registry file
 title Do not close this window - [4/66] Importing registry
-if %isDuck% equ 1 (
+if /i %isDuck% equ 1 (
     if exist %windir%\DuckOS_Modules\accent_color.reg ( %currentuser% "%WINDIR%\regedit.exe" /s %windir%\DuckOS_Modules\accent_color.reg )
 ) else (
     echo %c_green%******************************************************
@@ -320,7 +320,7 @@ reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersio
 :: Enable dark mode, disable transparency and disable Task View
 :: WE DON'T LIKE LIGHT MODE!
 title Do not close this window - [6/66] Windows appearence
-if %isDuck% equ 1 (
+if /i %isDuck% equ 1 (
     echo %c_green%Enabling dark mode, disabling transparency and disabling Task View...
     %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "SystemUsesLightTheme" /t REG_DWORD /d "0" /f
     %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "AppsUseLightTheme" /t REG_DWORD /d "0" /f
@@ -339,7 +339,7 @@ reg add "HKLM\System\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeI
 :: Enable numlock on startup
 reg add "HKEY_CURRENT_USER\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /d "2" /t REG_DWORD /f
 
-if %isDuck% equ 1 ( goto skipPrograms )
+if /i %isDuck% equ 1 ( goto skipPrograms )
 
 ::::::::::::::
 :: Software ::
@@ -583,7 +583,7 @@ if exist %windir%\DuckOS_Modules\Utils\7z2201-x64.msi (
 :: Detect if it's 1709
 reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v ReleaseID | find "1709"
 if %errorlevel% equ 0 (
-    if %isDuck% equ 1 (
+    if /i %isDuck% equ 1 (
         echo %c_red%Installing OpenShell v4.4 if it exists...
         if exist "%windir%\DuckOS_Modules\Utils\OpenShellSetup_4_4_170.exe" start /wait "" "%windir%\DuckOS_Modules\Utils\OpenShellSetup_4_4_170.exe" /qn ADDLOCAL=StartMenu
         echo %c_green%Done.
@@ -703,7 +703,7 @@ reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Device Metadata" /f >
 echo %c_green%Done.
 
 :: Skip some parts that should be exclusive only to DuckOS
-if %isDuck% equ 0 ( goto :notDuck )
+if /i %isDuck% equ 0 ( goto :notDuck )
 
 ::::::::::::::::::
 :: Context Menu ::
@@ -1020,14 +1020,14 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "DisablePreemptionO
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "ComputePreemption" /t REG_DWORD /d "0" /f
 
 :: Remove "Open PowerShell window here" from Shift+Right-click context menus
-if %isDuck% equ 1 (
+if /i %isDuck% equ 1 (
     reg delete "HKCR\Directory\Background\shell\Powershell" /f
     reg delete "HKCR\Directory\shell\Powershell" /f
     reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\Winlogon" /v "AutoRestartShell" /t REG_DWORD /d "1" /f
 )
 
 :: Add "Open Command Prompt here" to context menus
-if %isDuck% equ 1 (
+if /i %isDuck% equ 1 (
     reg delete "HKCR\Directory\shell\cmd" /f
     reg delete "HKCR\Directory\Background\shell\cmd" /f
     reg add "HKCR\Directory\shell\runas" /v "" /t REG_SZ /d "Open Command Prompt here" /f
@@ -1333,7 +1333,7 @@ reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /v "
 echo %c_green%Done.
 
 :: Make the post install desktop folder read only with attributes
-if %isDuck% equ 1 (
+if /i %isDuck% equ 1 (
     echo %c_gold%Making the post install desktop folder read only with attributes..
     if exist "%userprofile%\Desktop\DuckOS - Post Install Folder" attrib +r +a +s "%userprofile%\Desktop\DuckOS - Post Install Folder"
     echo %c_green%Done.
@@ -1667,7 +1667,7 @@ for /f "tokens=*" %%i in ('wmic PATH Win32_PnPEntity GET DeviceID ^| findstr "US
 )
 
 :: Import and set the powerplan
-if %isDuck% equ 1 (
+if /i %isDuck% equ 1 (
     powercfg -delete a1841308-3541-4fab-bc81-f71556f20b4a
     powercfg -delete 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
     powercfg -delete e9a42b02-d5df-448d-aa00-03f14749eb61
@@ -1726,12 +1726,12 @@ bcdedit /set {globalsettings} custom:16000069 true > NUL 2>&1
 bcdedit /set {globalsettings} custom:16000068 true > NUL 2>&1
 
 :: Set the DuckOS' name to DuckOS.. so it can be easily identified when dualbooting.
-if %isDuck% equ 1 (
+if /i %isDuck% equ 1 (
     bcdedit /set {current} description DuckOS
 )
 
 :: Disable Recovery
-if %isDuck% equ 1 (
+if /i %isDuck% equ 1 (
     if exist %windir%\System32\reagentc.exe reagentc.exe /disable
     bcdedit /set {current} recoveryenabled no
 ) else (
@@ -1739,7 +1739,7 @@ if %isDuck% equ 1 (
 )
 
 :: Disable Devices with DevManView
-if %isDuck% equ 1 (
+if /i %isDuck% equ 1 (
     cd /d %windir%\DuckOS_Modules
     if exist %windir%\DuckOS_Modules\devmanview.exe (
         devmanview /disable "Composite Bus Enumerator"
@@ -1962,7 +1962,7 @@ reg add "HKLM\Software\Classes\.reg\ShellNew" /v "ItemName" /t REG_EXPAND_SZ /d 
 reg add "HKLM\Software\Classes\.reg\ShellNew" /v "NullFile" /t REG_SZ /d "" /f
 
 :: "Merge as TrustedInstaller" for registry files
-if %isDuck% equ 1 (
+if /i %isDuck% equ 1 (
     reg add "HKEY_CLASSES_ROOT\regfile\Shell\RunAs" /ve /t REG_SZ /d "Merge as TrustedInstaller" /f
     reg add "HKEY_CLASSES_ROOT\regfile\Shell\RunAs" /v "HasLUAShield" /t REG_SZ /d "1" /f
     reg add "HKEY_CLASSES_ROOT\regfile\Shell\RunAs\Command" /ve /t REG_SZ /d "%windir%\DuckOS_modules\nsudo.exe -U:T -P:E reg import "%%1"" /f
