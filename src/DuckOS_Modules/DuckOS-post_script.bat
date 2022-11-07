@@ -154,7 +154,7 @@ setlocal EnableDelayedExpansion
 :checkPrivileges
 :: Sure, using DISM for elev check because we're cool
 DISM >NUL
-if '%errorlevel%' == '0' (
+if errorlevel 0 (
     goto gotPrivileges
 ) else (
     setlocal DisableDelayedExpansion
@@ -212,7 +212,7 @@ echo %c_purple%Please wait. This may take a moment.
 
 :: Check if the user is running the script as TrustedInstaller...
 whoami|findstr /i "NT AUTHORITY\SYSTEM" >nul
-if %errorlevel% equ 1 ( goto :TrustedInstaller )
+if errorlevel 1 goto TrustedInstaller
 
 :: Set the initial title
 title Do not close this window, tweaking your computer!
@@ -582,7 +582,7 @@ if exist %windir%\DuckOS_Modules\Utils\7z2201-x64.msi (
 
 :: Detect if it's 1709
 reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v ReleaseID | find "1709"
-if %errorlevel% equ 0 (
+if errorlevel 0 (
     if /i %isDuck% equ 1 (
         echo %c_red%Installing OpenShell v4.4 if it exists...
         if exist "%windir%\DuckOS_Modules\Utils\OpenShellSetup_4_4_170.exe" start /wait "" "%windir%\DuckOS_Modules\Utils\OpenShellSetup_4_4_170.exe" /qn ADDLOCAL=StartMenu
@@ -2096,15 +2096,15 @@ if exist "%windir%\system32\curl.exe" ( curl --progress-bar https://raw.githubus
 
 :: Check for bug_fixes
 findstr /i "bug_fixes" %temp%\type.txt
-if %errorlevel% equ 0 ( set changes=Fixed bugs, which makes your experience better. Recommended to apply the tweaks. )
+if errorlevel 0 ( set changes=Fixed bugs, which makes your experience better. Recommended to apply the tweaks. )
 
 :: Check for feature_updates
 findstr /i "feature_update" %temp%\type.txt
-if %errorlevel% equ 0 ( set changes=Something NEW has been added. Recommended to apply the tweaks, might give performance. )
+if errorlevel 0 ( set changes=Something NEW has been added. Recommended to apply the tweaks, might give performance. )
 
 :: Check for os_updates
 findstr /i "os_update" %temp%\type.txt
-if %errorlevel% equ 0 ( set changes=Something were changed in the operating system. You aren't required to apply the tweaks. )
+if errorlevel 0 ( set changes=Something were changed in the operating system. You aren't required to apply the tweaks. )
 
 :: The "Update found" screen.
 title Woah! New update detected.
@@ -2127,7 +2127,7 @@ echo %c_white%==================================================================
 echo.
 echo %c_cyan%$ Would you like to %c_red%update? [Y/N]
 choice /n >nul
-if %errorlevel% equ 1 (
+if errorlevel 1 (
     echo %c_green%Updating the script..
     if exist %TEMP%\Post-script_ver.txt del /f /q %TEMP%\Post-script_ver.txt
     if exist %TEMP%\type.txt del /f /q %TEMP%\type.txt
