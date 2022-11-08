@@ -1711,19 +1711,45 @@ reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\QoS\VALORANT" /v "Remote IP Pr
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\QoS\VALORANT" /v "DSCP Value" /t REG_SZ /d "46" /f
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\QoS\VALORANT" /v "Throttle Rate" /t REG_SZ /d "-1" /f
 
-:: BCDEdit configuration.
+:::::::::::::::::::::::::
+:: Boot configuration. ::
+:::::::::::::::::::::::::
+
+:: Disable NX
 bcdedit /deletevalue nx
-bcdedit /deletevalue useplatformclock > NUL 2>&1
-bcdedit /set disabledynamictick yes > NUL 2>&1
-bcdedit /set useplatformtick yes > NUL 2>&1
-bcdedit /timeout 10 > NUL 2>&1
-bcdedit /set bootux disabled > NUL 2>&1
-bcdedit /set bootmenupolicy Legacy > NUL 2>&1
-bcdedit /set hypervisorlaunchtype off > NUL 2>&1
-bcdedit /set tpmbootentropy ForceDisable > NUL 2>&1
-bcdedit /set {globalsettings} custom:16000067 true > NUL 2>&1
-bcdedit /set {globalsettings} custom:16000069 true > NUL 2>&1
-bcdedit /set {globalsettings} custom:16000068 true > NUL 2>&1
+
+:: Disable HPET
+bcdedit /deletevalue useplatformclock
+
+:: Disable dynamic tick (mostly for laptops, laptops use this feature for power saving)
+bcdedit /set disabledynamictick yes
+
+:: Use synthetic timers
+bcdedit /set useplatformtick yes
+
+:: Dualboot timer (doesn't impact the performance)
+bcdedit /timeout 10
+
+:: Disable the boot-screen animation
+bcdedit /set bootux disabled
+
+:: Legacy Windows 7 boot menu policy
+bcdedit /set bootmenupolicy Legacy
+
+:: Disable Hyper virtualization
+bcdedit /set hypervisorlaunchtype off
+
+:: Disable the Trusted Platform Module (TPM)
+bcdedit /set tpmbootentropy ForceDisable
+
+:: Disable the boot logo
+bcdedit /set {globalsettings} custom:16000067 true
+
+:: Disable the spinning animation
+bcdedit /set {globalsettings} custom:16000069 true
+
+:: Disable boot messages 
+bcdedit /set {globalsettings} custom:16000068 true
 
 :: Set the DuckOS' name to DuckOS.. so it can be easily identified when dualbooting.
 if /i "%isDuck" equ "1" (
