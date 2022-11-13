@@ -1769,18 +1769,15 @@ bcdedit /set hypervisorlaunchtype off
 :: Disable the Trusted Platform Module (TPM)
 bcdedit /set tpmbootentropy ForceDisable
 
-:: Disable the boot logo
-bcdedit /set {globalsettings} custom:16000067 true
-
-:: Disable the spinning animation
-bcdedit /set {globalsettings} custom:16000069 true
-
-:: Disable boot messages 
-bcdedit /set {globalsettings} custom:16000068 true
-
-:: Set the DuckOS' name to DuckOS.. so it can be easily identified when dualbooting.
 if /i "%isDuck" equ "1" (
+    :: Set the DuckOS' name to DuckOS.. so it can be easily identified when dualbooting.
     bcdedit /set {current} description DuckOS
+    :: Disable boot logo
+    bcdedit /set {globalsettings} custom:16000067 true
+    :: Disable spinning dots
+    bcdedit /set {globalsettings} custom:16000068 true
+    :: Disable boot messages
+    bcdedit /set {globalsettings} custom:16000069 true
 )
 
 :: Disable Recovery
