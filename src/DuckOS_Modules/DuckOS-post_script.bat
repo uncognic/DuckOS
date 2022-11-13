@@ -778,6 +778,33 @@ echo %c_green%Making the cache cleaner run on startup..
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v Shell /t REG_SZ /d "%windir%\explorer.exe, C:\ProgramData\Cache_Cleaner.bat" /F
 echo %c_green%Done.
 
+:: Make memreduct start on by default...
+echo %c_gold%Making memreduct start by default...
+attrib +s %windir%\DuckOS_Modules
+reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run" /v "Memory reduct" /d "%windir%\DuckOS_Modules\Utils\memreduct.exe" /t REG_SZ /f
+echo %c_green%Done.
+echo %c_gold%Writing memreduct configuration file...
+>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:[memreduct]
+>>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:CheckUpdatesLast=1668361365
+>>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:IsShowReductConfirmation=false
+>>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:StatisticLastReduct=1668361861
+>>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:IsStartMinimized=true
+>>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:CheckUpdatesPeriod=0
+>>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:AutoreductEnable=true
+>>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:AutoreductIntervalEnable=true
+>>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:HotkeyCleanEnable=true
+>>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:SettingsLastPage=102
+>>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:ReductMask2=39
+>>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:AutoreductIntervalValue=1
+>>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:TrayRoundCorners=true
+>>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:TrayShowBorder=true
+>>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:TrayUseTransparency=true
+>>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:TrayUseAntialiasing=false
+>>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:BalloonCleanResults=false
+>>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:IsNotificationsSound=false
+>>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:IsTrayIconSingleClick=false
+echo %c_green%Done.
+
 :: Make the cache cleaner a protected sys file
 attrib +r +s %windir%\ProgramData\Cache_Cleaner.bat
 
