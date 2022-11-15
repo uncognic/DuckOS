@@ -305,7 +305,7 @@ if /i "%isDuck" equ "1" (
 :: Block every single websites telemetry with the help of a modified hosts file.
 title Do not close this window - [5/66] Blocking telemetry
 echo %c_blue%Blocking every single websites telemetry with the help of a modified hosts file.
-if exist "%windir%\system32\curl.exe" ( curl -l -s https://winhelp2002.mvps.org/hosts.txt -o %SystemRoot%\System32\drivers\etc\hosts.temp ) else ( powershell iwr -Method Get -Uri https://winhelp2002.mvps.org/hosts.txt -OutFile %SystemRoot%\System32\drivers\etc\hosts.temp )
+if exist "%windir%\system32\curl.exe" ( curl -l -s https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts -o %SystemRoot%\System32\drivers\etc\hosts.temp ) else ( powershell iwr -Method Get -Uri https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts -OutFile %SystemRoot%\System32\drivers\etc\hosts.temp )
 if exist %SystemRoot%\System32\drivers\etc\hosts.temp (
     cd %SystemRoot%\System32\drivers\etc
     del /f /q hosts
