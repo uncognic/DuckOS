@@ -721,16 +721,21 @@ reg add "HKCR\DesktopBackground\Shell\DuckOS" /v "Position" /t REG_SZ /d "Bottom
 reg add "HKCR\DesktopBackground\Shell\DuckOS" /v "Icon" /t REG_SZ /d "shell32.dll,-47" /f
 reg add "HKCR\DesktopBackground\Shell\DuckOS" /v "SubCommands" /t REG_SZ /d "" /f
 
-:: Set up "check for updates" and the toolbox in the context menu
+:: Set up "check for updates" and the toolbox in the context menu..
 reg add "HKCR\DesktopBackground\Shell\DuckOS\Shell\Check for DuckOS updates" /v "Icon" /t REG_SZ /d "shell32.dll,-193" /f
 reg add "HKCR\DesktopBackground\Shell\DuckOS\Shell\Check for DuckOS updates\Command" /ve /t REG_SZ /d "%~0 -updateCM" /f
 echo %c_green%Done.
 
-:: Set up the toolbox to be in the context menu
+:: Set up the toolbox to be in the context menu..
 reg add "HKCR\DesktopBackground\Shell\DuckOS\Shell\DuckOS Toolbox" /v "MUIVerb" /t REG_SZ /d "DuckOS Toolbox" /f
 reg add "HKCR\DesktopBackground\Shell\DuckOS\Shell\DuckOS Toolbox" /v "Icon" /t REG_SZ /d "shell32.dll,-25" /f
 reg add "HKCR\DesktopBackground\Shell\DuckOS\Shell\DuckOS Toolbox\Command" /ve /t REG_SZ /d "\"%SystemRoot%\DuckOS_Modules\DuckOS_Toolbox\DuckOS Toolbox.exe\"" /f
 echo %c_green%Done.
+
+:: Set up the "Kill not responding apps" button in the context menu..
+reg add "HKCR\DesktopBackground\Shell\DuckOS\Shell\KillNotResponding" /v "MUIVerb" /t REG_SZ /d "Kill not responding apps" /f
+reg add "HKCR\DesktopBackground\Shell\DuckOS\Shell\KillNotResponding" /v "Icon" /t REG_SZ /d "%SystemRoot%\System32\imageres.dll,-98" /f
+reg add "HKCR\DesktopBackground\Shell\DuckOS\Shell\KillNotResponding\Command" /ve /t REG_SZ /d "cmd.exe /c taskkill.exe /F /FI \"status eq NOT RESPONDING\"" /f
 
 :: Make the computer restart 1 time after the current restart, because THAT fixed OS issues
 title Do not close this window - [13/66] Configuring restart
