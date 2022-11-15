@@ -206,9 +206,10 @@ setlocal & pushd .
 cd /d %~dp0
 if '%1'=='ELEV' (del "%vbsGetPrivileges%" 1>nul 2>nul  &  shift /1)
 
-:: Make the script faster by putting a higher priority.
+:: Make the script faster by putting a higher priority on all cmd related processes.
+echo %c_green%Making processes have higher priorities for faster execution.
 wmic process where name="cmd.exe" CALL setpriority 32768
-:: Cmd.exe probably does not do the actual script execution. conhost might. idk. but just in case -WilliamAnimate
+:: cmd.exe probably does not do the actual script execution, conhost might. idk. but just in case -WilliamAnimate
 wmic process where name="conhost.exe" CALL setpriority 32768
 echo %c_purple%Please wait. This may take a moment.
 
