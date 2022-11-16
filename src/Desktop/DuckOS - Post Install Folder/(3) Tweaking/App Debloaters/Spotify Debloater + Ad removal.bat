@@ -11,10 +11,10 @@ if errorlevel 1 (
     echo $ Terminating Spotify if it's running...
     taskkill /f /im spotify.exe
 	echo $ Initializing
-	:: set varables for lowering file size -william -anhnguyenlost13
+	:: set variables for lowering file size -william -anhnguyenlost13
 	set s=%appdata%\Spotify
-	set sa=%appdata%\Spotify\Apps
-	set sl=%appdata%\Spotify\locales
+	set sa=%s%\Apps
+	set sl=%s%\locales
     echo $ Debloating...
     for %%a in ( SpotifyMigrator.exe SpotifyStartupTask.exe ) do (
         del /f /q "%s%\%%a"
