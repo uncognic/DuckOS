@@ -334,10 +334,32 @@ if /i "%isDuck" equ "1" (
     echo %c_red%Appearance tweaks might not fit with you, so we're skipping it.
 )
 
+title Do not close this window - [7/66] Configuring time settings
 :: Set UTC to prevent issues with dual booting (specifically with Linux)
-title Do not close this window - [7/66] Setting UTC
 echo %c_cyan%Setting UTC to prevent issues with dual booting (specifically with Linux)...
 reg add "HKLM\System\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /d 1 /t REG_DWORD /f >nul
+
+:: Change the NTP server from the Windows Server to pool.ntp.org
+sc config W32Time start=demand >nul 2>nul
+sc start W32Time >nul 2>nul
+w32tm /config /syncfromflags:manual /manualpeerlist:"0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org"
+sc queryex "w32time"|Find "STATE"|Find /v "RUNNING"||(
+    net stop w32time
+    net start w32time
+) >nul 2>nul
+
+:: Re-sync the time to pool.ntp.org
+w32tm /config /update
+w32tm /resync
+sc stop W32Time
+sc config W32Time start=disabled
+.
+:: Turn on automatic time update
+C:\WINDOWS\System32\SystemSettingsAdminFlows.exe SetInternetTime 1
+:: Turn on automatic time zone update
+C:\WINDOWS\System32\SystemSettingsAdminFlows.exe SetAutoTimeZoneUpdate 1
+:: Finally, force sync the time with the internet time
+C:\WINDOWS\System32\SystemSettingsAdminFlows.exe ForceTimeSync 1
 
 :: Enable numlock on startup
 reg add "HKEY_CURRENT_USER\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /d "2" /t REG_DWORD /f
@@ -821,7 +843,7 @@ attrib +r +s %windir%\ProgramData\Cache_Cleaner.bat
 :: Disable unneeded Tasks -- already credited
 title Do not close this window - [16/66] Disabling unneeded scheduled tasks
 echo %c_cyan%Disabling unneeded scheduled tasks...
-for %%a in ("\Microsoft\Windows\PushToInstall\LoginCheck" "\Microsoft\Windows\Ras\MobilityManager" "\Microsoft\Windows\UpdateOrchestrator\Reportpolicies" "\Microsoft\Windows\CloudExperienceHost\CreateObjectTask" "\Microsoft\Windows\ApplicationExperience\StartupAppTask" "\Microsoft\Windows\WindowsUpdate\ScheduledStart" "\Microsoft\Windows\Shell\FamilySafetyMonitor" "\Microsoft\Windows\Shell\FamilySafetyMonitor" "\Microsoft\Windows\WindowsErrorReporting\QueueReporting" "\Microsoft\Windows\MemoryDiagnostic\RunFullMemoryDiagnostic" "\Microsoft\Windows\Diagnosis\Scheduled" "\Microsoft\Windows\DiskFootprint\StorageSense" "\Microsoft\Windows\MobileBroadbandAccounts\MNOMetadataParser" "\Microsoft\Windows\PushToInstall\LoginCheck" "\Microsoft\Windows\PowerEfficiencyDiagnostics\AnalyzeSystem" "\Microsoft\Windows\DiskCleanup\SilentCleanup" "\Microsoft\Windows\Multimedia\Microsoft\Windows\Multimedia" "\Microsoft\Windows\TimeZone\SynchronizeTimeZone" "\Microsoft\Windows\Diagnosis\Scheduled" "\Microsoft\Windows\UpdateOrchestrator\ScheduleScanStaticTask" "\MicrosoftEdgeUpdateBrowserReplacementTask" "\Microsoft\Windows\WindowsUpdate\ScheduledStart" "\Microsoft\Windows\UPnP\UPnPHostConfig" "\Microsoft\Windows\DiskFootprint\Diagnostics" "\Microsoft\Windows\WindowsFilteringPlatform\BfeOnLoltartTypeChange" "\Microsoft\Windows\International\SynchronizeLanguageSettings" "\Microsoft\Windows\UpdateOrchestrator\ScheduleWork" "\Microsoft\Windows\SoftwareProtectionPlatform\SvcRestartTaskLogon" "\Microsoft\Windows\ApplicationExperience\PcaPatchDbTask" "\Microsoft\Windows\TimeZone\SynchronizeTimeZone" "\Microsoft\Windows\Shell\IndexerAutomaticMaintenance" "\Microsoft\Windows\WindowsFilteringPlatform\BfeOnServiceStartTypeChange" "\Microsoft\Windows\WaaSMedic\PerformRemediation" "\Microsoft\Windows\RemoteAssistance\RemoteAssistanceTask" "\Microsoft\Windows\RemoteAssistance\RemoteAssistanceTask" "\Microsoft\Windows\Autochk\Proxy" "\Microsoft\Windows\SoftwareProtectionPlatform\SvcRestartTaskNetwork" "\Microsoft\Windows\SoftwareProtectionPlatform\SvcRestartTaskLogon" "\Microsoft\Windows\InstallService\SmartRetry" "\Microsoft\Windows\Printing\EduPrintProv" "\Microsoft\Windows\Shell\IndexerAutomaticMaintenance" "\Microsoft\Windows\MemoryDiagnostic\ProcessMemoryDiagnosticEvents" "\Microsoft\Windows\UpdateOrchestrator\UpdateModelTask" "\Microsoft\Windows\UpdateOrchestrator\Reportpolicies" "\Microsoft\Windows\UpdateOrchestrator\UpdateModelTask" "\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector" "\Microsoft\Windows\Multimedia\Microsoft\Windows\Multimedia" "\Microsoft\Windows\Wininet\CacheTask" "\Microsoft\Windows\Ras\MobilityManager" "\Microsoft\Windows\DiskCleanup\SilentCleanup" "\Microsoft\Windows\UpdateOrchestrator\USO_UxBroker" "\Microsoft\Windows\StateRepository\MaintenanceTasks" "\Microsoft\Windows\DeviceSetup\MetadataRefresh" "\Microsoft\Windows\WaaSMedic\PerformRemediation" "\Microsoft\Windows\RetailDemo\CleanupOfflineContent" "\Microsoft\Windows\UpdateOrchestrator\ScheduleScan" "\Microsoft\Windows\MemoryDiagnostic\ProcessMemoryDiagnosticEvents" "\Microsoft\Windows\Autochk\Proxy" "\Microsoft\Windows\BrokerInfrastructure\BgTaskregistrationMaintenanceTask" "\Microsoft\Windows\TimeSynchronization\SynchronizeTime" "\Microsoft\Windows\Wininet\CacheTask" "\Microsoft\Windows\ApplicationExperience\PcaPatchDbTask" "\Microsoft\Windows\UpdateOrchestrator\ScheduleWork" "\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector" "\Microsoft\Windows\ApplicationExperience\MicrosoftCompatibilityAppraiser" "\Microsoft\Windows\UpdateOrchestrator\USO_UxBroker" "\Microsoft\Windows\TimeSynchronization\ForceSynchronizeTime" "\Microsoft\Windows\InstallService\ScanForUpdatesAsUser" "\Microsoft\Windows\TimeSynchronization\ForceSynchronizeTime" "\Microsoft\Windows\ApplicationExperience\StartupAppTask" "\Microsoft\Windows\International\SynchronizeLanguageSettings" "\Microsoft\Windows\ApplicationExperience\MicrosoftCompatibilityAppraiser" "\Microsoft\Windows\UpdateOrchestrator\ScheduleScan" "\Microsoft\Windows\UPnP\UPnPHostConfig" "\Microsoft\Windows\MemoryDiagnostic\RunFullMemoryDiagnostic" "\Microsoft\Windows\CloudExperienceHost\CreateObjectTask" "\Microsoft\Windows\registry\regIdleBackup" "\Microsoft\Windows\TimeSynchronization\SynchronizeTime" "\Microsoft\Windows\Printing\EduPrintProv" "\Microsoft\Windows\MobileBroadbandAccounts\MNOMetadataParser" "\Microsoft\Windows\WindowsErrorReporting\QueueReporting" "\Microsoft\Windows\RetailDemo\CleanupOfflineContent" "\Microsoft\Windows\DiskFootprint\Diagnostics" "\Microsoft\Windows\InstallService\ScanForUpdates" "\Microsoft\Windows\Defrag\ScheduledDefrag" "\Microsoft\Windows\SoftwareProtectionPlatform\SvcRestartTaskNetwork" "\Microsoft\Windows\DeviceSetup\MetadataRefresh" "\Microsoft\Windows\StateRepository\MaintenanceTasks" "\Microsoft\Windows\BrokerInfrastructure\BgTaskRegistrationMaintenanceTask" "\Microsoft\Windows\UpdateOrchestrator\ScheduleScanStaticTask" "\Microsoft\Windows\PowerEfficiencyDiagnostics\AnalyzeSystem") do (
+for %%a in ("\Microsoft\Windows\PushToInstall\LoginCheck" "\Microsoft\Windows\Ras\MobilityManager" "\Microsoft\Windows\UpdateOrchestrator\Reportpolicies" "\Microsoft\Windows\CloudExperienceHost\CreateObjectTask" "\Microsoft\Windows\ApplicationExperience\StartupAppTask" "\Microsoft\Windows\WindowsUpdate\ScheduledStart" "\Microsoft\Windows\Shell\FamilySafetyMonitor" "\Microsoft\Windows\Shell\FamilySafetyMonitor" "\Microsoft\Windows\WindowsErrorReporting\QueueReporting" "\Microsoft\Windows\MemoryDiagnostic\RunFullMemoryDiagnostic" "\Microsoft\Windows\Diagnosis\Scheduled" "\Microsoft\Windows\DiskFootprint\StorageSense" "\Microsoft\Windows\MobileBroadbandAccounts\MNOMetadataParser" "\Microsoft\Windows\PushToInstall\LoginCheck" "\Microsoft\Windows\PowerEfficiencyDiagnostics\AnalyzeSystem" "\Microsoft\Windows\DiskCleanup\SilentCleanup" "\Microsoft\Windows\Multimedia\Microsoft\Windows\Multimedia" "\Microsoft\Windows\Diagnosis\Scheduled" "\Microsoft\Windows\UpdateOrchestrator\ScheduleScanStaticTask" "\MicrosoftEdgeUpdateBrowserReplacementTask" "\Microsoft\Windows\WindowsUpdate\ScheduledStart" "\Microsoft\Windows\UPnP\UPnPHostConfig" "\Microsoft\Windows\DiskFootprint\Diagnostics" "\Microsoft\Windows\WindowsFilteringPlatform\BfeOnLoltartTypeChange" "\Microsoft\Windows\International\SynchronizeLanguageSettings" "\Microsoft\Windows\UpdateOrchestrator\ScheduleWork" "\Microsoft\Windows\SoftwareProtectionPlatform\SvcRestartTaskLogon" "\Microsoft\Windows\ApplicationExperience\PcaPatchDbTask" "\Microsoft\Windows\Shell\IndexerAutomaticMaintenance" "\Microsoft\Windows\WindowsFilteringPlatform\BfeOnServiceStartTypeChange" "\Microsoft\Windows\WaaSMedic\PerformRemediation" "\Microsoft\Windows\RemoteAssistance\RemoteAssistanceTask" "\Microsoft\Windows\RemoteAssistance\RemoteAssistanceTask" "\Microsoft\Windows\Autochk\Proxy" "\Microsoft\Windows\SoftwareProtectionPlatform\SvcRestartTaskNetwork" "\Microsoft\Windows\SoftwareProtectionPlatform\SvcRestartTaskLogon" "\Microsoft\Windows\InstallService\SmartRetry" "\Microsoft\Windows\Printing\EduPrintProv" "\Microsoft\Windows\Shell\IndexerAutomaticMaintenance" "\Microsoft\Windows\MemoryDiagnostic\ProcessMemoryDiagnosticEvents" "\Microsoft\Windows\UpdateOrchestrator\UpdateModelTask" "\Microsoft\Windows\UpdateOrchestrator\Reportpolicies" "\Microsoft\Windows\UpdateOrchestrator\UpdateModelTask" "\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector" "\Microsoft\Windows\Multimedia\Microsoft\Windows\Multimedia" "\Microsoft\Windows\Wininet\CacheTask" "\Microsoft\Windows\Ras\MobilityManager" "\Microsoft\Windows\DiskCleanup\SilentCleanup" "\Microsoft\Windows\UpdateOrchestrator\USO_UxBroker" "\Microsoft\Windows\StateRepository\MaintenanceTasks" "\Microsoft\Windows\DeviceSetup\MetadataRefresh" "\Microsoft\Windows\WaaSMedic\PerformRemediation" "\Microsoft\Windows\RetailDemo\CleanupOfflineContent" "\Microsoft\Windows\UpdateOrchestrator\ScheduleScan" "\Microsoft\Windows\MemoryDiagnostic\ProcessMemoryDiagnosticEvents" "\Microsoft\Windows\Autochk\Proxy" "\Microsoft\Windows\BrokerInfrastructure\BgTaskregistrationMaintenanceTask" "\Microsoft\Windows\Wininet\CacheTask" "\Microsoft\Windows\ApplicationExperience\PcaPatchDbTask" "\Microsoft\Windows\UpdateOrchestrator\ScheduleWork" "\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector" "\Microsoft\Windows\ApplicationExperience\MicrosoftCompatibilityAppraiser" "\Microsoft\Windows\UpdateOrchestrator\USO_UxBroker" "\Microsoft\Windows\InstallService\ScanForUpdatesAsUser" "\Microsoft\Windows\ApplicationExperience\StartupAppTask" "\Microsoft\Windows\International\SynchronizeLanguageSettings" "\Microsoft\Windows\ApplicationExperience\MicrosoftCompatibilityAppraiser" "\Microsoft\Windows\UpdateOrchestrator\ScheduleScan" "\Microsoft\Windows\UPnP\UPnPHostConfig" "\Microsoft\Windows\MemoryDiagnostic\RunFullMemoryDiagnostic" "\Microsoft\Windows\CloudExperienceHost\CreateObjectTask" "\Microsoft\Windows\registry\regIdleBackup" "\Microsoft\Windows\Printing\EduPrintProv" "\Microsoft\Windows\MobileBroadbandAccounts\MNOMetadataParser" "\Microsoft\Windows\WindowsErrorReporting\QueueReporting" "\Microsoft\Windows\RetailDemo\CleanupOfflineContent" "\Microsoft\Windows\DiskFootprint\Diagnostics" "\Microsoft\Windows\InstallService\ScanForUpdates" "\Microsoft\Windows\Defrag\ScheduledDefrag" "\Microsoft\Windows\SoftwareProtectionPlatform\SvcRestartTaskNetwork" "\Microsoft\Windows\DeviceSetup\MetadataRefresh" "\Microsoft\Windows\StateRepository\MaintenanceTasks" "\Microsoft\Windows\BrokerInfrastructure\BgTaskRegistrationMaintenanceTask" "\Microsoft\Windows\UpdateOrchestrator\ScheduleScanStaticTask" "\Microsoft\Windows\PowerEfficiencyDiagnostics\AnalyzeSystem") do (
     schtasks /Change /Disable /TN %%a
 )
 echo %c_green%Done.
@@ -1941,21 +1963,6 @@ if not exist %windir%\DuckOS_Modules\devmanview.exe ( echo $ DevManView is missi
  
 :: Misc Tweaks
 lodctr /r >nul 2>&1
-
-:: Change the NTP server from the Windows Server to pool.ntp.org
-sc config W32Time start=demand >nul 2>nul
-sc start W32Time >nul 2>nul
-w32tm /config /syncfromflags:manual /manualpeerlist:"0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org"
-sc queryex "w32time"|Find "STATE"|Find /v "RUNNING"||(
-    net stop w32time
-    net start w32time
-) >nul 2>nul
-
-:: Re-sync the time to pool.ntp.org
-w32tm /config /update
-w32tm /resync
-sc stop W32Time
-sc config W32Time start=disabled
 
 :: Disable USB Autorun/play
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoAutorun" /t REG_DWORD /d "1" /f
