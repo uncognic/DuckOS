@@ -314,7 +314,7 @@ if exist %SystemRoot%\System32\drivers\etc\hosts.temp (
 )
 
 :: Show Detailed Information on Startup/Shutdown
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\System" /v "VerboseStatus" /t REG_DWORD /d "1" /f
+reg add "HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\System" /v "VerboseStatus" /t REG_DWORD /d "1" /f
 
 ::::::::::::::::::::::::
 :: Windows Appearance ::
@@ -355,14 +355,14 @@ sc stop W32Time
 sc config W32Time start=disabled
 .
 :: Turn on automatic time update
-C:\WINDOWS\System32\SystemSettingsAdminFlows.exe SetInternetTime 1
+%windir%\System32\SystemSettingsAdminFlows.exe SetInternetTime 1
 :: Turn on automatic time zone update
-C:\WINDOWS\System32\SystemSettingsAdminFlows.exe SetAutoTimeZoneUpdate 1
+%windir%\System32\SystemSettingsAdminFlows.exe SetAutoTimeZoneUpdate 1
 :: Finally, force sync the time with the internet time
-C:\WINDOWS\System32\SystemSettingsAdminFlows.exe ForceTimeSync 1
+%windir%\System32\SystemSettingsAdminFlows.exe ForceTimeSync 1
 
 :: Enable numlock on startup
-reg add "HKEY_CURRENT_USER\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /d "2" /t REG_DWORD /f
+reg add "HKCU\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /d "2" /t REG_DWORD /f
 
 if /i "%isDuck" equ "1" ( goto skipPrograms )
 
@@ -761,14 +761,14 @@ reg add "HKCR\DesktopBackground\Shell\DuckOS\Shell\KillNotResponding\Command" /v
 
 :: Make the computer restart 1 time after the current restart, because THAT fixed OS issues
 title Do not close this window - [13/66] Configuring restart
-reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce" /v "*Silent System Restart" /t REG_SZ /d "%windir%\System32\shutdown.exe -r -t 0 -f" /f
+reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnce" /v "*Silent System Restart" /t REG_SZ /d "%windir%\System32\shutdown.exe -r -t 0 -f" /f
 
 :: Start menu layout
 :: source: atlas
-reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Explorer" /v "StartLayoutFile" /t REG_EXPAND_SZ /d "C:\Windows\System32\start-menu_layout.xml" /f
-reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Explorer" /v "LockedStartLayout" /t REG_DWORD /d "1" /f
-reg add "HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Explorer" /v "DisableNotificationCenter" /t REG_DWORD /d "1" /f
-%currentuser% reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Group Policy Objects\{2F5183E9-4A32-40DD-9639-F9FAF80C79F4}Machine\Software\Policies\Microsoft\Windows\Explorer" /v "StartLayoutFile" /t REG_EXPAND_SZ /d "C:\Windows\System32\start-menu_layout.xml" /f
+reg add "HKLM\Software\Policies\Microsoft\Windows\Explorer" /v "StartLayoutFile" /t REG_EXPAND_SZ /d "%windir%\System32\start-menu_layout.xml" /f
+reg add "HKLM\Software\Policies\Microsoft\Windows\Explorer" /v "LockedStartLayout" /t REG_DWORD /d "1" /f
+reg add "HKLM\Software\Policies\Microsoft\Windows\Explorer" /v "DisableNotificationCenter" /t REG_DWORD /d "1" /f
+%currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Group Policy Objects\{2F5183E9-4A32-40DD-9639-F9FAF80C79F4}Machine\Software\Policies\Microsoft\Windows\Explorer" /v "StartLayoutFile" /t REG_EXPAND_SZ /d "%windir%\System32\start-menu_layout.xml" /f
 
 :: Import the powerplan BASED on your processor
 :: Explanation: AMD has worse speeds, more cores, IDLE isn't ideal, Intel has faster speeds, but less cores, IDLE is ideal.
@@ -798,7 +798,7 @@ if %INTEL% equ 0 (
     echo $ Also making sure some AMD unneeded services aren't gonna start...
     powercfg -import "%windir%\DuckOS_Modules\Duck_IDLE_ENABLED.pow" d6344778-a03d-4e00-a73a-dbc3f3f5f236
     powercfg /setactive d6344778-a03d-4e00-a73a-dbc3f3f5f236
-    for %%i in ("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\AMD Log Utility" "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\amdlog" "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\AMD External Events Utility") do ( reg add %%i /v Start /t REG_DWORD /d 4 /f )
+    for %%i in ("HKLM\SYSTEM\CurrentControlSet\Services\AMD Log Utility" "HKLM\SYSTEM\CurrentControlSet\Services\amdlog" "HKLM\SYSTEM\CurrentControlSet\Services\AMD External Events Utility") do ( reg add %%i /v Start /t REG_DWORD /d 4 /f )
 )
 echo %c_green%Done.
 
@@ -811,7 +811,7 @@ echo %c_green%Done.
 :: Make memreduct start on by default...
 echo %c_gold%Making memreduct start by default...
 attrib +s %windir%\DuckOS_Modules
-reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run" /v "Memory reduct" /d "%windir%\DuckOS_Modules\Utils\memreduct.exe" /t REG_SZ /f
+reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /v "Memory reduct" /d "%windir%\DuckOS_Modules\Utils\memreduct.exe" /t REG_SZ /f
 echo %c_green%Done.
 echo %c_gold%Writing memreduct configuration file...
 >"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:[memreduct]
@@ -1032,7 +1032,7 @@ echo %c_green%Done.
 
 :: Just read: http://www.apdl.org.uk/riscworld/volumes/volume4/issue4/makemode2/index.htm
 :: Works for Windows 7 and up..
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm" /v "DisableIndependentFlip" /t REG_DWORD /d "1" /f 
+reg add "HKLM\SOFTWARE\Microsoft\Windows\Dwm" /v "DisableIndependentFlip" /t REG_DWORD /d "1" /f 
 
 :: Disable Annoying Keyboard Features
 :: Who needs those shift spamming stuff?
@@ -1216,7 +1216,7 @@ echo %c_green%Done.
 :: Disable Remote Desktop
 title Do not close this window - [44/66] Disabling Remote Desktop
 echo %c_red%Disabling Remote Desktop...
-reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurRentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d "1" /f
+reg add "HKLM\SYSTEM\CurRentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d "1" /f
 
 :: Hide audio devices that ARENT connected.
 title Do not close this window - [45/66] Hiding unconnected audio devices...
@@ -1307,17 +1307,17 @@ reg add "HKLM\System\CurrentControlSet\Control\DeviceGuard\Scenarios\HypervisorE
 title Do not close this window - [56/66] Configuring context menu
 echo %c_cyan%Configuring context menu...
 :: Install .CAB files in the "Context Menu"
-reg delete "HKEY_CLASSES_ROOT\CABFolder\Shell\RunAs" /f >nul 2>nul
-reg add "HKEY_CLASSES_ROOT\CABFolder\Shell\RunAs" /ve /t REG_SZ /d "Install" /f
-reg add "HKEY_CLASSES_ROOT\CABFolder\Shell\RunAs" /v "HasLUAShield" /t REG_SZ /d "" /f
-reg add "HKEY_CLASSES_ROOT\CABFolder\Shell\RunAs\Command" /ve /t REG_SZ /d "cmd /k dism /online /add-package /packagepath:\"%%1\"" /f
+reg delete "HKCR\CABFolder\Shell\RunAs" /f >nul 2>nul
+reg add "HKCR\CABFolder\Shell\RunAs" /ve /t REG_SZ /d "Install" /f
+reg add "HKCR\CABFolder\Shell\RunAs" /v "HasLUAShield" /t REG_SZ /d "" /f
+reg add "HKCR\CABFolder\Shell\RunAs\Command" /ve /t REG_SZ /d "cmd /k dism /online /add-package /packagepath:\"%%1\"" /f
 
 :: Remove "Include in library" in the context menu
-reg delete "HKEY_CLASSES_ROOT\Folder\ShellEx\ContextMenuHandlers\Library Location" /f >nul 2>nul
+reg delete "HKCR\Folder\ShellEx\ContextMenuHandlers\Library Location" /f >nul 2>nul
 reg delete "HKLM\SOFTWARE\Classes\Folder\ShellEx\ContextMenuHandlers\Library Location" /f >nul 2>nul
 
 :: Remove Share in context menu
-reg delete "HKEY_CLASSES_ROOT\*\shellex\ContextMenuHandlers\ModernSharing" /f >nul 2>nul
+reg delete "HKCR\*\shellex\ContextMenuHandlers\ModernSharing" /f >nul 2>nul
 echo %c_green%Done.
 
 :: Double click to import power-plans, but not set them automaticlly.
@@ -1968,7 +1968,7 @@ lodctr /r >nul 2>&1
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoAutorun" /t REG_DWORD /d "1" /f
 
 :: Disable Network Navigation pane in file explorer
-reg add "HKEY_CLASSES_ROOT\CLSID\{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}\ShellFolder" /v "Attributes" /t REG_DWORD /d 2962489444 /f
+reg add "HKCR\CLSID\{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}\ShellFolder" /v "Attributes" /t REG_DWORD /d 2962489444 /f
 
 :: tokens arg breaks path to just \Device instead of \Device Parameters
 :: Disable Power savings on drives
@@ -2077,13 +2077,13 @@ reg add "HKLM\Software\Policies\Microsoft\Windows\AdvertisingInfo" /v "DisabledB
 %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v "Enabled" /t REG_DWORD /d "0" /f
 
 :: Delete the "Readyboost" tab from external drives.
-reg delete "HKEY_CLASSES_ROOT\Drive\shellex\PropertySheetHandlers\{55B3A0BD-4D28-42fe-8CFB-FA3EDFF969B8}" /f >nul 2>nul
+reg delete "HKCR\Drive\shellex\PropertySheetHandlers\{55B3A0BD-4D28-42fe-8CFB-FA3EDFF969B8}" /f >nul 2>nul
 
 :: Disable Windows Media Player DRM Online Access
 reg add "HKLM\Software\Policies\Microsoft\WMDRM" /v "DisableOnline" /t REG_DWORD /d "1" /f
 
 :: Clear page file at shutdown
-reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "ClearPageFileAtShutdown" /d "1" /t REG_DWORD /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "ClearPageFileAtShutdown" /d "1" /t REG_DWORD /f
 
 :: Show all tasks on the "Control Panel", credits: Tenforums
 reg add "HKLM\Software\Classes\CLSID\{D15ED2E1-C75B-443c-BD7C-FC03B2F08C17}" /ve /t REG_SZ /d "All Tasks" /f
@@ -2134,9 +2134,9 @@ reg add "HKLM\Software\Classes\.reg\ShellNew" /v "NullFile" /t REG_SZ /d "" /f
 
 :: "Merge as TrustedInstaller" for registry files
 if /i "%isDuck" equ "1" (
-    reg add "HKEY_CLASSES_ROOT\regfile\Shell\RunAs" /ve /t REG_SZ /d "Merge as TrustedInstaller" /f
-    reg add "HKEY_CLASSES_ROOT\regfile\Shell\RunAs" /v "HasLUAShield" /t REG_SZ /d "1" /f
-    reg add "HKEY_CLASSES_ROOT\regfile\Shell\RunAs\Command" /ve /t REG_SZ /d "%windir%\DuckOS_modules\nsudo.exe -U:T -P:E reg import "%%1"" /f
+    reg add "HKCR\regfile\Shell\RunAs" /ve /t REG_SZ /d "Merge as TrustedInstaller" /f
+    reg add "HKCR\regfile\Shell\RunAs" /v "HasLUAShield" /t REG_SZ /d "1" /f
+    reg add "HKCR\regfile\Shell\RunAs\Command" /ve /t REG_SZ /d "%windir%\DuckOS_modules\nsudo.exe -U:T -P:E reg import "%%1"" /f
 )
 
 :: Disable Bluetooth
