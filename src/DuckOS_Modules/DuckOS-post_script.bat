@@ -38,6 +38,18 @@ set "noUpdates=0"
 set "debugMode=0"
 set "network=0"
 
+:: Force the window to go maximized and clear the screen.
+cls
+powershell -WindowStyle Maximized Write-Host The post install script is starting...
+
+:: Show splash text
+echo ██████╗ ██╗     ███████╗ █████╗ ███████╗███████╗    ██╗    ██╗ █████╗ ██╗████████╗      
+echo ██╔══██╗██║     ██╔════╝██╔══██╗██╔════╝██╔════╝    ██║    ██║██╔══██╗██║╚══██╔══╝      
+echo ██████╔╝██║     █████╗  ███████║███████╗█████╗      ██║ █╗ ██║███████║██║   ██║         
+echo ██╔═══╝ ██║     ██╔══╝  ██╔══██║╚════██║██╔══╝      ██║███╗██║██╔══██║██║   ██║         
+echo ██║     ███████╗███████╗██║  ██║███████║███████╗    ╚███╔███╔╝██║  ██║██║   ██║██╗██╗██╗
+echo ╚═╝     ╚══════╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝     ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝   ╚═╝╚═╝╚═╝╚═╝
+
 :::::::::::::
 :: Updater ::
 :::::::::::::
@@ -61,18 +73,6 @@ if "%network%" equ "1" (
 
 :: Set a variable.. that we will use later... that points into an executable.
 set currentuser=%windir%\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait
-
-:: Force the window to go maximized and clear the screen.
-cls
-powershell -WindowStyle Maximized Write-Host The post install script is starting...
-
-:: Show logo
-echo ██████╗ ██╗     ███████╗ █████╗ ███████╗███████╗    ██╗    ██╗ █████╗ ██╗████████╗      
-echo ██╔══██╗██║     ██╔════╝██╔══██╗██╔════╝██╔════╝    ██║    ██║██╔══██╗██║╚══██╔══╝      
-echo ██████╔╝██║     █████╗  ███████║███████╗█████╗      ██║ █╗ ██║███████║██║   ██║         
-echo ██╔═══╝ ██║     ██╔══╝  ██╔══██║╚════██║██╔══╝      ██║███╗██║██╔══██║██║   ██║         
-echo ██║     ███████╗███████╗██║  ██║███████║███████╗    ╚███╔███╔╝██║  ██║██║   ██║██╗██╗██╗
-echo ╚═╝     ╚══════╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝     ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝   ╚═╝╚═╝╚═╝╚═╝
 
 ::::::::::::::::::::::::::::
 :: Command line arguments ::
