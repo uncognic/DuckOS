@@ -5,4 +5,6 @@ rd /s /q %WINDIR%\Logs
 del /q %userprofile%\AppData\Local\Microsoft\Windows\INetCache\IE\*.*
 del /q %WINDIR%\Downloaded Program Files\*.*
 rd /s /q %SYSTEMDRIVE%\$RECYCLE.BIN
-exit
+if exist "%WINDIR%\DuckOS_Modules\DuckOS-post_script.bat" (
+    call "%WINDIR%\DuckOS_Modules\DuckOS-post_script.bat" -check_for_updates_and_exit
+)

@@ -37,6 +37,7 @@ set "onlyTweak=0"
 set "noUpdates=0"
 set "debugMode=0"
 set "network=0"
+set "check_for_updates-and_exit=no"
 
 :: Force the window to go maximized and clear the screen.
 cls
@@ -86,6 +87,7 @@ set UpdateArgs=%*
 
 :: Go to the correct function if one of the command line arguments is a valid one.
 for %%i in (%*) do (
+    if /i "%%i" equ "-check_for_updates_and_exit" set "check_for_updates-and_exit=yes"
     if /i "%%i" equ "-isDuck" set "isDuck=1"
     if /i "%%i" equ "-updateCM" if /i "%noUpdates%"=="1" goto :noUpdates
     if /i "%%i" equ "-debug" set "debugMode=1"
@@ -2277,6 +2279,10 @@ if errorlevel 0 ( set changes=Something NEW has been added. Recommended to apply
 findstr /i "os_update" %temp%\type.txt
 if errorlevel 0 ( set changes=Something were changed in the operating system. You aren't required to apply the tweaks. )
 
+:: Check for profile picture/wallpaper updates
+findstr /i "img_updates" %temp%\type.txt
+if errorlevel 0 ( set changes=The wallpaper/profile pictures were changed. )
+
 :: The "Update found" screen.
 title Woah! New update detected.
 cls
@@ -2324,6 +2330,8 @@ echo.
 echo %c_gold%$ %c_green%No updates detected, you are up to date!
 echo %c_gold%$ Current version: %c_green%%version%
 echo.
-echo %c_red%$ Press any key to quit.
-pause >nul
-exit
+if "%check_for_updates-and_exit%" equ "no" (
+    echo %c_red%$ Press any key to quit.
+    pause >nul
+    exit
+) else ( exit 0 )
