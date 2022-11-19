@@ -3,4 +3,3 @@ start "" "%SystemRoot%\DuckOS_Modules\nsudo.exe" -U:T -P:E "C:\Windows\DuckOS_Mo
 
 :: Delete this batch file & exit
 del /F /Q %0
-exit
