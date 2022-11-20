@@ -237,6 +237,12 @@ cd %windir%\DuckOS_Modules
 :: Clear the screen
 cls
 
+:: Make the command prompt fullscreen if duckOS is detected..
+echo:Set WshShell = WScript.CreateObject("WScript.Shell")>%TEMP%\fullscreen.vbs
+echo:WshShell.SendKeys "{F11}">>%TEMP%\fullscreen.vbs
+wscript "%TEMP%\fullscreen.vbs"
+del /f /q "%TEMP%\fullscreen.vbs"
+
 :: Ask the user if they use "Windows Firewall", if not, disable it.. if yes, do nothing...
 title Do not close this window - [1/66] Windows Firewall
 call :MsgBox "Will you use Windows Firewall? -- NOTE: By disabling Windows Firewall, it will break Microsoft Store reinstallation and some games like Overwatch 2!"  "VBYesNo+VBQuestion" "Configuration"
@@ -253,7 +259,6 @@ if errorlevel 7 (
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\PublicProfile" /v "EnableFirewall" /t REG_DWORD /d "0" /f
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\PublicProfile" /v "DisableNotifications" /t REG_DWORD /d "1" /f
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\PublicProfile" /v "DoNotAllowExceptions" /t REG_DWORD /d "1" /f
-	
 ) else if errorlevel 6 (
 	echo %c_green%OK! Skipped removal. Re-Enabling Windows Firewall.
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\mpssvc" /v "Start" /t REG_DWORD /d "2" /f
