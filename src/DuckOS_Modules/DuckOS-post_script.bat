@@ -101,16 +101,6 @@ for %%i in (%*) do (
     if /i "%%i" equ "/onlyTweak" goto :tweaks
 )
 
-:: Warning prompt
-if /i "%isDuck" equ "1" (
-    call :MsgBox "This script will tweak your computer. If you think the script broke/changed something very important, remember that the DuckOS post script is provided AS IS, and doesn't come with ANY warranty! Do you wanna continue?"  "VBYesNo+VBQuestion+VBDefaultButton2" "Continue?"
-    if errorlevel 6 ( goto begin ) else (
-        echo Alright, no changes have been made. Press any key to exit.
-        pause >nul
-        exit
-    )
-) else ( goto begin )
-
 :begin
 if %debugMode% equ 1 (
     choice /n /m "You've chosen to run the script in debug mode. Echo will be set to on to display all inputs. Continue with debug mode on? [Y/N]"
@@ -143,6 +133,16 @@ if %debugMode% equ 1 (
 :: 6. vojt. - toolbox icons
 :: 7. amit @ EVA - same thing as for 2. but just applies to amit
 :: Various different sources...
+
+:: Warning prompt
+if /i "%isDuck" equ "0" (
+    call :MsgBox "This script will tweak your computer. If you think the script broke/changed something very important, remember that the DuckOS post script is provided AS IS, and doesn't come with ANY warranty! Do you wanna continue?"  "VBYesNo+VBQuestion+VBDefaultButton2" "Continue?"
+    if errorlevel 6 ( goto begin ) else (
+        echo Alright, no changes have been made. Press any key to exit.
+        pause >nul
+        exit
+    )
+) else ( goto tweaks )
 
 :tweaks
 
