@@ -160,6 +160,7 @@ DISM >NUL
 if errorlevel 0 (
     goto gotPrivileges
 ) else (
+    chcp 65001 >nul
     setlocal DisableDelayedExpansion
     title DuckOS Post Script: Permission denied
     color 0c
@@ -172,6 +173,7 @@ if errorlevel 0 (
     echo.
     choice /n /m "Permission denied. Try again? [Y/N]"
     if errorlevel 2 (
+        chcp 65001 >nul
         cls
         echo ███╗   ██╗ ██████╗     ██████╗ ███████╗██████╗ ███╗   ███╗██╗███████╗███████╗██╗ ██████╗ ███╗   ██╗
         echo ████╗  ██║██╔═══██╗    ██╔══██╗██╔════╝██╔══██╗████╗ ████║██║██╔════╝██╔════╝██║██╔═══██╗████╗  ██║
@@ -202,7 +204,7 @@ echo args = args ^& strArg ^& " "  >> "%vbsGetPrivileges%"
 echo Next >> "%vbsGetPrivileges%"
 echo UAC.ShellExecute "!batchPath!", args, "", "runas", 1 >> "%vbsGetPrivileges%"
 "%SystemRoot%\System32\WScript.exe" "%vbsGetPrivileges%" %*
-exit /B
+exit /b
 
 :gotPrivileges
 setlocal & pushd .
@@ -2260,13 +2262,24 @@ if not exist %nsudo% (
     echo $ NSudo doesn't exist in the default directory you specified! The script can't run with it's full potential.
     :ask_NSUDO
     set /p nsudo=Please enter the NSudo path:
-    if /i not exist %nsudo% goto :ask_NSUDO
-    if /i exist %nsudo% ( %nsudo% -P:E -U:T "%~f0" -onlyTweak %* && exit )
+    if /i not exist "%nsudo%" goto :ask_NSUDO
+    if /i exist "%nsudo%" ( "%nsudo%" -P:E -U:T "%~f0" -onlyTweak %* && exit )
+    break
 )
 
 :updateDetected
 if exist "%TEMP%\type.txt" del /f /q "%TEMP%\type.txt" >NUL
 if exist "%windir%\system32\curl.exe" ( curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/changelog_type.txt -o "%TEMP%\type.txt" ) else ( powershell iwr -Method Get -Uri https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/changelog_type.txt -OutFile "%TEMP%\type.txt" )
+
+::::::::::::::::::::::::::::::::::::::::::::::
+:: Check if necessery variables aren't set  ::
+::::::::::::::::::::::::::::::::::::::::::::::
+
+:: Check if the version is empty..
+if "%version%" equ "" ( break && goto :noArgs )
+
+:: Check if the changes is empty..
+if "%changes%" equ "" ( break && goto :noArgs )
 
 :: The "type" of the new versions can be:
 ::  1. bug_fixes
@@ -2290,6 +2303,7 @@ findstr /i "img_updates" %temp%\type.txt
 if errorlevel 0 ( set changes=The wallpaper/profile pictures were changed. )
 
 :: The "Update found" screen.
+color 0e
 title Woah! New update detected.
 cls
 chcp 65001 >nul
@@ -2314,7 +2328,7 @@ if errorlevel 1 (
     echo %c_green%Updating the script..
     if exist %TEMP%\Post-script_ver.txt del /f /q %TEMP%\Post-script_ver.txt
     if exist %TEMP%\type.txt del /f /q %TEMP%\type.txt
-    if exist "%windir%\system32\curl.exe" ( curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/DuckOS_Modules/DuckOS-post_script.bat -o "%~f0" ) else ( powershell iwr -Method Get -Uri https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/DuckOS_Modules/DuckOS-post_script.bat -OutFile "%~f0" )
+    if exist "%windir%\system32\curl.exe" ( curl -L --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/DuckOS_Modules/DuckOS-post_script.bat -o "%~f0" ) else ( powershell -mta iwr -Method Get -Uri https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/DuckOS_Modules/DuckOS-post_script.bat -OutFile "%~f0" )
     call "%~f0" %UpdateArgs%
 ) else (
     if exist %TEMP%\Post-script_ver.txt del /f /q %TEMP%\Post-script_ver.txt
@@ -2323,6 +2337,7 @@ if errorlevel 1 (
 )
 
 :noUpdates
+color 0e
 cls
 title No updates detected :^(
 chcp 65001 >nul
