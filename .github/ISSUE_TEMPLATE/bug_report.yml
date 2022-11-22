@@ -33,12 +33,23 @@ body:
   attributes:
     label: Screenshots / Videos
     description: If applicable, add screenshots/videos to help explain your problem.
+- type: dropdown
+  id: vm
+  attributes:
+    label: Virtualization
+    description: Are you using a virtualized environment?
+    options:
+      - Yes
+      - No
+  validations:
+    required: true
 - type: textarea
   attributes:
     label: Desktop Info
     description: |
       - CPU [Intel or AMD, include specifics]
       - System Drive Type [e.g. SSD, HDD]
+      - *(If you're using a virtualized environment, please also specify the configurations if possible.)*
   validations:
     required: true
 - type: dropdown
