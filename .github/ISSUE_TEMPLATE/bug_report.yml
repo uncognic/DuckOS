@@ -37,7 +37,7 @@ body:
   id: vm
   attributes:
     label: Virtualization
-    description: Are you using a virtualized environment?
+    description: Were you using a virtualized environment?
     options:
       - "Yes"
       - "No"
@@ -56,7 +56,7 @@ body:
   id: version
   attributes:
     label: DuckOS Version
-    description: What version of DuckOS were you using?
+    description: What version of DuckOS did you replicate this bug on?
     options:
       - 1709
       - 1803
