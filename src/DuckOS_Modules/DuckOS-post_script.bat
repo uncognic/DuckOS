@@ -72,9 +72,6 @@ if "%network%" equ "1" (
     )
 )
 
-:: Set a variable.. that we will use later... that points into an executable.
-set currentuser=%windir%\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait
-
 ::::::::::::::::::::::::::::
 :: Command line arguments ::
 ::::::::::::::::::::::::::::
@@ -211,6 +208,9 @@ setlocal & pushd .
 cd /d %~dp0
 if '%1'=='ELEV' (del "%vbsGetPrivileges%" 1>nul 2>nul  &  shift /1)
 
+:: Set a variable.. that we will use later... that points into an executable.
+set currentuser=%windir%\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait
+
 :: Make the script faster by putting a higher priority on all cmd related processes.
 echo %c_green%Making processes have higher priorities for faster execution.
 wmic process where name="cmd.exe" CALL setpriority 32768
@@ -239,11 +239,16 @@ cd %windir%\DuckOS_Modules
 :: Clear the screen
 cls
 
+:: Kill explorer, intentionally resulting in black screen.
+if %isDuck%" equ "1" ( taskkill /f /im explorer.exe )
+
 :: Make the command prompt fullscreen if duckOS is detected..
-echo:Set WshShell = WScript.CreateObject("WScript.Shell")>%TEMP%\fullscreen.vbs
-echo:WshShell.SendKeys "{F11}">>%TEMP%\fullscreen.vbs
-wscript "%TEMP%\fullscreen.vbs"
-del /f /q "%TEMP%\fullscreen.vbs"
+if "%isDuck% equ "1" (
+    echo:Set WshShell = WScript.CreateObject("WScript.Shell")>%TEMP%\fullscreen.vbs
+    echo:WshShell.SendKeys "{F11}">>%TEMP%\fullscreen.vbs
+    wscript "%TEMP%\fullscreen.vbs"
+    del /f /q "%TEMP%\fullscreen.vbs"
+)
 
 :: Ask the user if they use "Windows Firewall", if not, disable it.. if yes, do nothing...
 title Do not close this window - [1/66] Windows Firewall
@@ -627,7 +632,7 @@ if errorlevel 0 (
 
 :: Make the post script run on by default if it doesn't finish executing
 :: The asterisk at the beginning (*) makes it forcefully start even in safe mode.
-:: Why? People like to close the post script... and they say duckOS gives bad performance... so we make it start by default, but IF the script sucessfully runs, it deletes it at the end.
+:: Why? People like to close the post script... and they say duckOS gives bad performance... so we make it start by default, but IF the script sucessfully runs, it deletes itself at the end.
 if "%isDuck%" equ "1" ( reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run" /v "*DuckOS Post Install Tweaks" /d "%~f0" /t REG_SZ /f )
 
 :: Debloat 7zip - security [fix the 0-day chm help exploit]
@@ -2187,7 +2192,7 @@ reg add "HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell" 
 powershell -NoProfile "$net=get-netconnectionprofile; Set-NetConnectionProfile -Name $net.Name -NetworkCategory Private" >nul 2>&1
 echo %c_green%Done, finalizing...
 
-:: Make the post script not run every time you start the computer...
+:: Make the post script not run every time you start the computer again anymore, since tweaking is complete...
 if "%isDuck%" equ "1" ( reg delete "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run" /v "*DuckOS Post Install Tweaks" /f )
 
 :: Cancel any pending shutdowns, and restart in 2 seconds.. [with force option]
