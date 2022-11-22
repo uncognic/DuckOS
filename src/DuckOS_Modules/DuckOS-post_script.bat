@@ -625,6 +625,11 @@ if errorlevel 0 (
     )
 )
 
+:: Make the post script run on by default if it doesn't finish executing
+:: The asterisk at the beginning (*) makes it forcefully start even in safe mode.
+:: Why? People like to close the post script... and they say duckOS gives bad performance... so we make it start by default, but IF the script sucessfully runs, it deletes it at the end.
+if "%isDuck%" equ "1" ( reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run" /v "*DuckOS Post Install Tweaks" /d "%~f0" /t REG_SZ /f )
+
 :: Debloat 7zip - security [fix the 0-day chm help exploit]
 cd /d %ProgramFiles%\7-zip
 echo %c_cyan%Debloating 7-Zip...
@@ -2181,6 +2186,9 @@ reg add "HKCU\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell" 
 :: Switch from Public To Private firewall..
 powershell -NoProfile "$net=get-netconnectionprofile; Set-NetConnectionProfile -Name $net.Name -NetworkCategory Private" >nul 2>&1
 echo %c_green%Done, finalizing...
+
+:: Make the post script not run every time you start the computer...
+if "%isDuck%" equ "1" ( reg delete "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run" /v "*DuckOS Post Install Tweaks" /f )
 
 :: Cancel any pending shutdowns, and restart in 2 seconds.. [with force option]
 :: If the argument -noRestart is selected, then we will restart..
