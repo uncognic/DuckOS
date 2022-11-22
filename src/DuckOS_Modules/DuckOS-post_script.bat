@@ -239,11 +239,10 @@ cd %windir%\DuckOS_Modules
 :: Clear the screen
 cls
 
-:: Kill explorer, intentionally resulting in black screen.
-if %isDuck%" equ "1" ( taskkill /f /im explorer.exe )
-
 :: Make the command prompt fullscreen if duckOS is detected..
 if "%isDuck% equ "1" (
+    :: Kill explorer to make desktop black.
+    taskkill /f/ im explorer.exe
     echo:Set WshShell = WScript.CreateObject("WScript.Shell")>%TEMP%\fullscreen.vbs
     echo:WshShell.SendKeys "{F11}">>%TEMP%\fullscreen.vbs
     wscript "%TEMP%\fullscreen.vbs"
