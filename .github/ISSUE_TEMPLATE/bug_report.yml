@@ -33,13 +33,34 @@ body:
   attributes:
     label: Screenshots / Videos
     description: If applicable, add screenshots/videos to help explain your problem.
+- type: dropdown
+  id: vm
+  attributes:
+    label: Virtualization
+    description: Were you using a virtualized environment?
+    options:
+      - "Yes"
+      - "No"
+  validations:
+    required: true
 - type: textarea
   attributes:
     label: Desktop Info
     description: |
       - CPU [Intel or AMD, include specifics]
       - System Drive Type [e.g. SSD, HDD]
-      - Version [e.g. 20H2]
+      - *(If you're using a virtualized environment, please also specify the configurations if possible.)*
+  validations:
+    required: true
+- type: dropdown
+  id: version
+  attributes:
+    label: DuckOS Version
+    description: What version of DuckOS did you replicate this bug on?
+    options:
+      - 1709
+      - 1803
+      - 21H2
   validations:
     required: true
 - type: textarea
