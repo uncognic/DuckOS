@@ -42,12 +42,14 @@ body:
   validations:
     required: true
 - type: dropdown
+  label: DuckOS Version
   id: version
-  description: What version of DuckOS were you using?
-  options:
-    - 1709
-    - 1803
-    - 21H2
+  attributes:
+    description: What version of DuckOS were you using?
+    options:
+      - 1709
+      - 1803
+      - 21H2
   validations:
     required: true
 - type: textarea
