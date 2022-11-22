@@ -42,9 +42,9 @@ body:
   validations:
     required: true
 - type: dropdown
-  label: DuckOS Version
   id: version
   attributes:
+    label: DuckOS Version
     description: What version of DuckOS were you using?
     options:
       - 1709
