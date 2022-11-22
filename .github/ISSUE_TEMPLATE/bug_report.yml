@@ -39,8 +39,8 @@ body:
     label: Virtualization
     description: Are you using a virtualized environment?
     options:
-      - Yes
-      - No
+      - "Yes"
+      - "No"
   validations:
     required: true
 - type: textarea
