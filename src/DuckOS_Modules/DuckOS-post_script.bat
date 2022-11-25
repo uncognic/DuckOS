@@ -1261,7 +1261,7 @@ reg add "HKLM\SOFTWARE\Microsoft\MediaPlayer\Preferences" /v "AcceptedEULA" /t R
 reg add "HKLM\SOFTWARE\Microsoft\MediaPlayer\Preferences" /v "FirstTime" /t REG_DWORD /d "1" /f >nul 2>&1
 echo %c_green%Done.
 
-:: MMCSS Settings
+:: MMCS (Multimedia Class Scheduler Service) Settings
 title Do not close this window - [48/66] Configuring MMCSS
 echo %c_cyan%Configuring MMCSS...
 reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "NetworkThrottlingIndex" /t REG_DWORD /d "10" /f
