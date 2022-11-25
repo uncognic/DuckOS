@@ -392,44 +392,9 @@ if exist %windir%\DuckOS_Modules\Utils\7z2201-x64.msi (
     start /wait "" "7z2201-x64.msi" /passive
     echo Done.
     echo Making sure 7zip is the default format for zips...
+    for %%i in (".001", ".7z", ".arj", ".bz2", ".bzip2", ".cab", ".cpio", ".deb", ".dmg", ".esd", ".fat", ".gz", ".gzip", ".hfs", ".iso", ".lha", ".lzh", ".lzma", ".ntfs", ".rar", ".rpm", ".squashfs", ".swm", ".tar", ".taz", ".tbz", ".tbz2", ".tgz", ".tpz", ".txz", ".vhd", ".wim", ".xar", ".xz", ".z", ".zip") do ( reg add "HKLM\Software\Classes\.%%~i" /ve /t REG_SZ /d "7-Zip.%%~i" /f >nul 2>&1 )
     reg add "HKCU\Software\7-Zip\Options" /v "ContextMenu" /t REG_DWORD /d "2147488038" /f >nul 2>&1
     reg add "HKCU\Software\7-Zip\Options" /v "ElimDupExtract" /t REG_DWORD /d "0" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.001" /ve /t REG_SZ /d "7-Zip.001" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.7z" /ve /t REG_SZ /d "7-Zip.7z" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.arj" /ve /t REG_SZ /d "7-Zip.arj" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.bz2" /ve /t REG_SZ /d "7-Zip.bz2" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.bzip2" /ve /t REG_SZ /d "7-Zip.bzip2" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.cab" /ve /t REG_SZ /d "7-Zip.cab" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.cpio" /ve /t REG_SZ /d "7-Zip.cpio" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.deb" /ve /t REG_SZ /d "7-Zip.deb" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.dmg" /ve /t REG_SZ /d "7-Zip.dmg" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.esd" /ve /t REG_SZ /d "7-Zip.esd" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.fat" /ve /t REG_SZ /d "7-Zip.fat" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.gz" /ve /t REG_SZ /d "7-Zip.gz" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.gzip" /ve /t REG_SZ /d "7-Zip.gzip" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.hfs" /ve /t REG_SZ /d "7-Zip.hfs" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.iso" /ve /t REG_SZ /d "7-Zip.iso" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.lha" /ve /t REG_SZ /d "7-Zip.lha" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.lzh" /ve /t REG_SZ /d "7-Zip.lzh" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.lzma" /ve /t REG_SZ /d "7-Zip.lzma" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.ntfs" /ve /t REG_SZ /d "7-Zip.ntfs" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.rar" /ve /t REG_SZ /d "7-Zip.rar" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.rpm" /ve /t REG_SZ /d "7-Zip.rpm" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.squashfs" /ve /t REG_SZ /d "7-Zip.squashfs" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.swm" /ve /t REG_SZ /d "7-Zip.swm" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.tar" /ve /t REG_SZ /d "7-Zip.tar" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.taz" /ve /t REG_SZ /d "7-Zip.taz" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.tbz" /ve /t REG_SZ /d "7-Zip.tbz" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.tbz2" /ve /t REG_SZ /d "7-Zip.tbz2" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.tgz" /ve /t REG_SZ /d "7-Zip.tgz" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.tpz" /ve /t REG_SZ /d "7-Zip.tpz" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.txz" /ve /t REG_SZ /d "7-Zip.txz" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.vhd" /ve /t REG_SZ /d "7-Zip.vhd" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.wim" /ve /t REG_SZ /d "7-Zip.wim" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.xar" /ve /t REG_SZ /d "7-Zip.xar" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.xz" /ve /t REG_SZ /d "7-Zip.xz" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.z" /ve /t REG_SZ /d "7-Zip.z" /f >nul 2>&1
-    reg add "HKLM\Software\Classes\.zip" /ve /t REG_SZ /d "7-Zip.zip" /f >nul 2>&1
     reg add "HKLM\Software\Classes\7-Zip.001" /ve /t REG_SZ /d "001 Archive" /f >nul 2>&1
     reg add "HKLM\Software\Classes\7-Zip.001\DefaultIcon" /ve /t REG_SZ /d "C:\Program Files\7-Zip\7z.dll,9" /f >nul 2>&1
     reg add "HKLM\Software\Classes\7-Zip.001\shell" /ve /t REG_SZ /d "" /f >nul 2>&1
@@ -663,7 +628,7 @@ if exist %windir%\DuckOS_Modules\vcredist.exe (
 :: Install bleachbit
 if exist %WINDIR%\DuckOS_Modules\Utils\BleachBit-4.4.2-setup.exe (
     echo %c_gold%Installing BleachBit..
-    start /wait "" "%WINDIR%\DuckOS_Modules\Utils\BleachBit-4.4.2-setup.exe" /allusers /S
+    start /min /wait "" "%WINDIR%\DuckOS_Modules\Utils\BleachBit-4.4.2-setup.exe" /allusers /S
     echo %c_green%Done.
 )
 
@@ -1018,11 +983,11 @@ reg add "HKLM\Software\Policies\Microsoft\Windows\PreviewBuilds" /v "AllowBuildP
 echo %c_green%Done.
 
 :: Change Folder options
-reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowStatusBar" /t REG_DWORD /d "1" /f 1>NUL 2>NUL
-reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "HideFileExt" /t REG_DWORD /d "0" /f 1>NUL 2>NUL
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowStatusBar" /t REG_DWORD /d "1" /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "HideFileExt" /t REG_DWORD /d "0" /f
 
 :: Remove "- Shortcut" text from shortcuts
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\NamingTemplates" /v "ShortcutNameTemplate" /t REG_SZ /d "\"%%s.lnk\"" /f 1>NUL 2>NUL
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\NamingTemplates" /v "ShortcutNameTemplate" /t REG_SZ /d "\"%%s.lnk\"" /f
 
 :: Maps Updates/Downloads
 title Do not close this window - [33/66] Maps Updates/Downloads
@@ -1237,9 +1202,9 @@ title Do not close this window - [44/66] Disabling Remote Desktop
 echo %c_red%Disabling Remote Desktop...
 reg add "HKLM\SYSTEM\CurRentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d "1" /f
 
-:: Hide audio devices that ARENT connected.
-title Do not close this window - [45/66] Hiding unconnected audio devices...
-echo %c_cyan%Hiding audio devices that aren't connected...
+:: Hide audio devices that AREN'T connected.
+title Do not close this window - [45/66] Hiding disconnected audio devices...
+echo %c_cyan%Hiding disconnected audio devices...
 reg add "HKCU\SOFTWARE\Microsoft\Multimedia\Audio\DeviceCpl" /v "ShowHiddenDevices" /t REG_DWORD /d "0" /f >nul 2>&1
 reg add "HKCU\SOFTWARE\Microsoft\Multimedia\Audio\DeviceCpl" /v "ShowDisconnectedDevices" /t REG_DWORD /d "0" /f >nul 2>&1
 echo %c_green%Done.
@@ -1247,9 +1212,7 @@ echo %c_green%Done.
 :: Restore the photo viewer from Windows 7
 title Do not close this window - [46/66] Photo Viewer
 echo %c_cyan%Restoring photo viewer from windows 7...
-for %%i in (tif tiff bmp dib gif jfif jpe jpeg jpg jxr png) do (
-	reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".%%~i" /t REG_SZ /d "PhotoViewer.FileAssoc.Tiff" /f >nul 2>&1
-)
+for %%i in (tif tiff bmp dib gif jfif jpe jpeg jpg jxr png) do ( reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".%%~i" /t REG_SZ /d "PhotoViewer.FileAssoc.Tiff" /f >nul 2>&1 )
 echo %c_green%Done.
 
 :: Windows Media Player configuration
@@ -1277,7 +1240,8 @@ reg add "HKLM\Software\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsRunInBa
 echo %c_green%Done.
 
 :: Set Win32PrioritySeparation 26 hex/38 dec.
-:: Explanation: "foreground processes more priority and make your CPU faster." source: https://richannel.org/win32-priority-separation/
+:: Explanation: "foreground processes more priority and make your CPU faster" 
+:: Guide: https://richannel.org/win32-priority-separation/
 title Do not close this window - [50/66] Setting Win32PrioritySeparation
 reg add "HKLM\System\CurrentControlSet\Control\PriorityControl" /v "Win32PrioritySeparation" /t REG_DWORD /d "38" /f
 
