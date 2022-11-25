@@ -1499,10 +1499,6 @@ reg add "HKLM\System\CurrentControlSet\Control\GraphicsDrivers" /v "HwSchMode" /
 :: Restrict Windows' communication
 reg add "HKLM\Software\Policies\Microsoft\InternetManagement" /v "RestrictCommunication" /t REG_DWORD /d "1" /f
 
-:: Win32PrioritySeparation 26 hex/38 dec
-:: This tweak will give foreground processes (like games) more priority and make your CPU faster.
-reg add "HKLM\System\CurrentControlSet\Control\PriorityControl" /v "Win32PrioritySeparation" /t REG_DWORD /d "38" /f >NUL 2>&1
-
 :: Mouse Settings
 reg add "HKCU\Control Panel\Mouse" /v "MouseSensitivity" /t reg_SZ /d "10" /f >NUL 2>&1
 reg add "HKU\.DEFAULT\Control Panel\Mouse" /v "MouseSpeed" /t reg_SZ /d "0" /f >NUL 2>&1
