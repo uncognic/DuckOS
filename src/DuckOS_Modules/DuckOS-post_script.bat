@@ -240,7 +240,7 @@ cd %windir%\DuckOS_Modules
 cls
 
 :: Make the command prompt fullscreen if duckOS is detected..
-if "%isDuck% equ "1" (
+if "%isDuck%" equ "1" (
     :: Kill explorer to make desktop black.
     taskkill /f /im explorer.exe
     echo:Set WshShell = WScript.CreateObject("WScript.Shell")>%TEMP%\fullscreen.vbs
@@ -367,11 +367,13 @@ w32tm /config /update
 w32tm /resync
 sc stop W32Time
 sc config W32Time start=disabled
-.
+
 :: Turn on automatic time update
 %windir%\System32\SystemSettingsAdminFlows.exe SetInternetTime 1
+
 :: Turn on automatic time zone update
 %windir%\System32\SystemSettingsAdminFlows.exe SetAutoTimeZoneUpdate 1
+
 :: Finally, force sync the time with the internet time
 %windir%\System32\SystemSettingsAdminFlows.exe ForceTimeSync 1
 
