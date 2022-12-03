@@ -25,7 +25,7 @@
 </p>
 
 ## Notes & Disclaimers
-⚠️ ***This ISO IS STILL IN DEVELOPEMENT / ALPHA! Meaning bugs will occur, but DuckOS is stable enough!***<br>
+⚠️ ***This ISO IS STILL IN DEVELOPMENT / ALPHA! Meaning bugs will occur, but DuckOS is stable enough!***<br>
 📝 This ISO is a highly modified fork of a different custom OS! Be aware of this and **don't say the ISO is stolen!**<br>
 🐧 If the Windows image for some reason isn't good for you, check out our Linux version :)<br>
 
