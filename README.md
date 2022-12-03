@@ -21,8 +21,6 @@
   <a href="https://github.com/DuckOS-GitHub/DuckOS/blob/main/LICENSE"><img src="https://img.shields.io/github/license/DuckOS-GitHub/DuckOS" alt="License"></a>
 </p>
 
-# DuckOS
-
 ## Notes & Disclaimers
 ⚠️ ***This ISO IS STILL IN DEVELOPEMENT / ALPHA! Meaning bugs will occur, but DuckOS is stable enough!***<br>
 📝 This ISO is a highly modified fork of a different custom OS! Be aware of this and **don't say the ISO is stolen!**<br>
