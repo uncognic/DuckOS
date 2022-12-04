@@ -2312,9 +2312,17 @@ echo.
 echo %c_cyan%$ What's changed: %c_green%%changes%
 echo %c_white%================================================================================================
 echo.
-echo %c_cyan%$ Would you like to %c_red%update? [Y/N]
+echo %c_cyan%$ %c_red%Would you like to update the post script and the DuckOS Toolbox? [Y/N]
 choice /n >nul
 if errorlevel 1 (
+    echo Updating the DuckOS Toolbox..
+    if not exist "%Windir%\DuckOS_Modules\DuckOS_Toolbox" md "%Windir%\DuckOS_Modules\DuckOS_Toolbox"
+    if exist "%windir%\system32\curl.exe" ( curl -L --progress-bar https://github.com/DuckOS-GitHub/DuckOS/blob/main/src/DuckOS_Modules/DuckOS_Toolbox/DuckOS%20Toolbox.exe?raw=true -o "%Windir%\DuckOS_Modules\DuckOS_Toolbox\DuckOS Toolbox.exe" ) else (
+        powershell -mta iwr -Method Get -Uri https://github.com/DuckOS-GitHub/DuckOS/blob/main/src/DuckOS_Modules/DuckOS_Toolbox/DuckOS%20Toolbox.exe?raw=true -OutFile "%Windir%\DuckOS_Modules\DuckOS_Toolbox\DuckOS-Toolbox.exe"
+        cd "%Windir%\DuckOS_Modules\DuckOS_Toolbox"
+        del /f /q "DuckOS Toolbox.exe"
+        rename "DuckOS-Toolbox.exe" "DuckOS Toolbox.exe"
+    )
     echo %c_green%Updating the script..
     if exist %TEMP%\Post-script_ver.txt del /f /q %TEMP%\Post-script_ver.txt
     if exist %TEMP%\type.txt del /f /q %TEMP%\type.txt
