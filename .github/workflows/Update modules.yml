@@ -25,6 +25,12 @@ jobs:
             curl -L -f https://dl5.oo-software.com/files/ooshutup10/OOSU10.exe > src/DuckOS_Modules/OOSU10.exe
             curl -L -f https://sourceforge.net/projects/sevenzip/files/latest/download > src/DuckOS_Modules/Utils/7zip.exe
             curl -L -f https://sourceforge.net/projects/open-shell.mirror/files/latest/download > src/DuckOS_Modules/Utils/OpenShell.exe
+            curl -L -f https://www.nirsoft.net/utils/devmanview-x64.zip > src/DuckOS_Modules/devmanview.zip
+            cd src/DuckOS_Modules/
+            sudo unzip -o devmanview.zip
+            sudo rm -f DevManView.chm
+            sudo rm -f readme.txt 
+
       # Runs a set of commands using the runners shell
       - name: Commit changes
         run: |
