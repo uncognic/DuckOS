@@ -388,10 +388,10 @@ if /i "%isDuck" equ "1" ( goto skipPrograms )
 
 :: Install 7-zip
 title Do not close this window - [8/66] Programs Installation
-if exist %windir%\DuckOS_Modules\Utils\7z2201-x64.msi (
+if exist %windir%\DuckOS_Modules\Utils\7zip.exe (
     echo %c_cyan%Installing 7-zip..
     cd %windir%\DuckOS_Modules\Utils
-    start /wait "" "7z2201-x64.msi" /passive
+    start /wait "" "7zip.exe" /S
     echo Done.
     echo Making sure 7zip is the default format for zips...
     for %%i in (".001", ".7z", ".arj", ".bz2", ".bzip2", ".cab", ".cpio", ".deb", ".dmg", ".esd", ".fat", ".gz", ".gzip", ".hfs", ".iso", ".lha", ".lzh", ".lzma", ".ntfs", ".rar", ".rpm", ".squashfs", ".swm", ".tar", ".taz", ".tbz", ".tbz2", ".tgz", ".tpz", ".txz", ".vhd", ".wim", ".xar", ".xz", ".z", ".zip") do ( reg add "HKLM\Software\Classes\.%%~i" /ve /t REG_SZ /d "7-Zip.%%~i" /f >nul 2>&1 )
@@ -590,8 +590,8 @@ if exist %windir%\DuckOS_Modules\Utils\7z2201-x64.msi (
 reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v ReleaseID | find "1709"
 if errorlevel 0 (
     if /i "%isDuck" equ "1" (
-        echo %c_red%Installing OpenShell v4.4 if it exists...
-        if exist "%windir%\DuckOS_Modules\Utils\OpenShellSetup_4_4_170.exe" start /wait "" "%windir%\DuckOS_Modules\Utils\OpenShellSetup_4_4_170.exe" /qn ADDLOCAL=StartMenu
+        echo %c_red%Installing OpenShell if it exists...
+        if exist "%windir%\DuckOS_Modules\Utils\OpenShell.exe" start /wait "" "%windir%\DuckOS_Modules\Utils\OpenShell.exe" /qn ADDLOCAL=StartMenu
         echo %c_green%Done.
     )
 )
