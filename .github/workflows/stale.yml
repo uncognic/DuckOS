@@ -11,7 +11,8 @@ on:
 
 jobs:
   stale:
-
+    name: Mark stale issues and pull requests
+    
     runs-on: ubuntu-latest
     permissions:
       issues: write
