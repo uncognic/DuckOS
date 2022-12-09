@@ -56,9 +56,6 @@ if not exist 7z.exe powershell -mta iwr https://github.com/DuckOS-GitHub/DuckOS/
 echo oscdimg.exe executable [3/3]
 if not exist oscdimg.exe powershell -mta iwr https://github.com/DuckOS-GitHub/DuckOS/raw/main/src/build_duckos/oscdimg.exe -outfile oscdimg.exe
 
-:: Ask the user for their iso path so it get's modified and becomes DuckOS..
-:: Guide: https://stackoverflow.com/questions/15885132/file-folder-chooser-dialog-from-a-windows-batch-script#15885133
-
 :choose
 pushd %~dp0
 setlocal
@@ -70,7 +67,7 @@ echo %c_green%
 set /p iso="[ INFO ] Please enter the ISO image path: "
 set "extractedDirectory=%temp%\DuckBuild_%random%%random%"
 
-if not exist "%iso%" (
+if /i not exist "%iso%" (
     goto :askForPath
 )
 
@@ -187,8 +184,10 @@ echo %c_green%[ INFO ] %c_cyan%Done.
 :: Convert to .esd
 echo %c_green%[FINISH] %c_gold%Step 5/5 finished. Converting install.wim to install.esd to save space...
 DISM /export-image /SourceImageFile:"%extractedDirectory%\Sources\install.wim" /SourceIndex:%index% /DestinationImageFile:"%extractedDirectory%\Sources\install.esd" /Compress:recovery /CheckIntegrity
-echo %c_red%Deleting install.wim..
-del /f /q "%extractedDirectory%\Sources\install.wim"
+if "%errorlevel%" neq "0" (
+    echo %c_red%Deleting install.wim..
+    del /f /q "%extractedDirectory%\Sources\install.wim"
+)
 echo %c_green%[ INFO ] %c_cyan%Done x2.
 
 :: Get elapsed time:
@@ -199,6 +198,21 @@ set /A "elap=((((10!end:%time:~2,1%=%%100)*60+1!%%100)-((((10!start:%time:~2,1%=
 :: Convert elapsed time to HH:MM:SS:CC format:
 set /A "cc=elap%%100+100,elap/=100,ss=elap%%60+100,elap/=60,mm=elap%%60+100,hh=elap/60+100"
 
+:: Getting the ISO Label Name
+cls
+echo %c_red%[ NOTE ] %c_green%ISO finished saving, enter some details to convert it to a bootable ISO..
+echo.
+set /p ISOLabel=Enter the ISO Volume Label: 
+echo.
+
+:: Getting the ISO File Name
+set /p ISOFileName=Enter the ISO File Name : 
+set path_iso="%userprofile%\Desktop\%ISOFileName%.iso"
+
+:: Make the bootable iso..
+echo %c_green%[ INFO ] %c_green%Making bootable iso...
+oscdimg -n -d -m "%extractedDirectory%" %path_iso%
+
 :: end screen :^)
 cls
 echo $ All done!
@@ -208,7 +222,7 @@ echo End:      %endTime%
 echo Elapsed:  %hh:~1%%time:~2,1%%mm:~1%%time:~2,1%%ss:~1%%time:~8,1%%cc:~1%
 echo (^Elasped format: HH:MM:SS:CC^)
 echo.
-:: echo %c_gold%ISO Path: %path%
+echo %c_gold%ISO Path: %path_iso%
 pause
 
 :xcopy [folderToCopy] [destination] [folderName]
