@@ -207,18 +207,8 @@ set /A "elap=((((10!end:%time:~2,1%=%%100)*60+1!%%100)-((((10!start:%time:~2,1%=
 :: Convert elapsed time to HH:MM:SS:CC format:
 set /A "cc=elap%%100+100,elap/=100,ss=elap%%60+100,elap/=60,mm=elap%%60+100,hh=elap/60+100"
 
-:: Getting the ISO Label Name
-cls
-echo %c_red%[ NOTE ] %c_green%ISO finished saving, enter some details to convert it to a bootable ISO..
-echo.
-set /p ISOLabel=Enter the ISO Volume Label: 
-echo.
-
-:: Getting the ISO File Name
-set /p ISOFileName=Enter the ISO File Name : 
-set path_iso="%userprofile%\Desktop\%ISOFileName%.iso"
-
 :: Make the bootable iso..
+set path_iso="%userprofile%\Desktop\%ISOFileName%.iso"
 echo %c_green%[ INFO ] %c_green%Making bootable iso...
 oscdimg -n -d -m "%extractedDirectory%" %path_iso%
 
