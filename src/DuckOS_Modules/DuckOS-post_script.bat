@@ -101,20 +101,21 @@ for %%i in (%*) do (
 :begin
 if %debugMode% equ 1 (
     choice /n /m "You've chosen to run the script in debug mode. Echo will be set to on to display all inputs. Continue with debug mode on? [Y/N]"
-    if errorlevel 2 (
-        echo Debug mode is now OFF.
-        @echo off
-        goto tweaks
-    ) else (
-        if errorlevel 1 (
-	    echo Alright.
-	    @echo on
-	    cls
-	    goto tweaks
+        if errorlevel 2 (
+            echo Debug mode is now OFF.
+            @echo off
+            goto tweaks
+        ) else (
+            if errorlevel 1 (
+	        echo Alright.
+	        @echo on
+	        cls
+	        goto tweaks
+	        )
 	    )
-	)
     )
 )
+
 :::::::::::::
 :: Credits :: 
 :::::::::::::
@@ -206,7 +207,7 @@ exit /b
 :gotPrivileges
 setlocal & pushd .
 cd /d %~dp0
-if '%1'=='ELEV' (del "%vbsGetPrivileges%" 1>nul 2>nul  &  shift /1)
+if '%1'=='ELEV' (del "%vbsGetPrivileges%" 1>nul 2>nul & shift /1)
 
 :: Set a variable.. that we will use later... that points into an executable.
 set currentuser=%windir%\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait
@@ -245,7 +246,7 @@ if "%isDuck%" equ "1" (
     taskkill /f /im explorer.exe
     echo:Set WshShell = WScript.CreateObject("WScript.Shell")>%TEMP%\fullscreen.vbs
     echo:WshShell.SendKeys "{F11}">>%TEMP%\fullscreen.vbs
-    wscript "%TEMP%\fullscreen.vbs"
+    wscript //B "%TEMP%\fullscreen.vbs"
     del /f /q "%TEMP%\fullscreen.vbs"
 )
 
@@ -253,7 +254,7 @@ if "%isDuck%" equ "1" (
 title Do not close this window - [1/66] Windows Firewall
 call :MsgBox "Will you use Windows Firewall? -- NOTE: By disabling Windows Firewall, it will break Microsoft Store reinstallation and some games like Overwatch 2!"  "VBYesNo+VBQuestion" "Configuration"
 if errorlevel 7 (
-    echo %c_green%Alright, destroying firewall...
+    echo %c_green%Alright, disabling firewall...
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\mpssvc" /v "Start" /t REG_DWORD /d "4" /f
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\BFE" /v "Start" /t REG_DWORD /d "4" /f
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile" /v "EnableFirewall" /t REG_DWORD /d "0" /f
@@ -266,7 +267,7 @@ if errorlevel 7 (
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\PublicProfile" /v "DisableNotifications" /t REG_DWORD /d "1" /f
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\PublicProfile" /v "DoNotAllowExceptions" /t REG_DWORD /d "1" /f
 ) else if errorlevel 6 (
-	echo %c_green%OK! Skipped removal. Re-Enabling Windows Firewall.
+	echo %c_green%OK, Skipped removal. Re-enabling Windows Firewall.
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\mpssvc" /v "Start" /t REG_DWORD /d "2" /f
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\BFE" /v "Start" /t REG_DWORD /d "2" /f
 	reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile" /v "EnableFirewall" /t REG_DWORD /d "1" /f
@@ -348,8 +349,8 @@ if /i "%isDuck" equ "1" (
     echo %c_red%Appearance tweaks might not fit with you, so we're skipping it.
 )
 
-title Do not close this window - [7/66] Configuring time settings
 :: Set UTC to prevent issues with dual booting (specifically with Linux)
+title Do not close this window - [7/66] Configuring time settings
 echo %c_cyan%Setting UTC to prevent issues with dual booting (specifically with Linux)...
 reg add "HKLM\System\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /d 1 /t REG_DWORD /f >nul
 
@@ -380,7 +381,8 @@ sc config W32Time start=disabled
 :: Enable numlock on startup
 reg add "HKCU\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /d "2" /t REG_DWORD /f
 
-if /i "%isDuck" equ "1" ( goto skipPrograms )
+:: If DuckOS isn't detected, don't preinstall duckOS' preinstalled programs like 7zip and vcredist..
+if /i "%isDuck%" equ "0" ( goto :skipPrograms )
 
 ::::::::::::::
 :: Software ::
@@ -629,9 +631,13 @@ if exist %windir%\DuckOS_Modules\vcredist.exe (
 
 :: Install bleachbit
 if exist %WINDIR%\DuckOS_Modules\Utils\BleachBit-4.4.2-setup.exe (
-    echo %c_gold%Installing BleachBit..
-    start /min /wait "" "%WINDIR%\DuckOS_Modules\Utils\BleachBit-4.4.2-setup.exe" /allusers /S
-    echo %c_green%Done.
+    echo $ Would you like to install BleachBit? [Y/N]
+    choice /n >nul
+    if errorlevel 1 (
+        echo %c_gold%Installing BleachBit..
+        start /min /wait "" "%WINDIR%\DuckOS_Modules\Utils\BleachBit-4.4.2-setup.exe" /allusers /S
+        echo %c_green%Done.
+    ) else ( echo Okay, not installing bleachbit.. )
 )
 
 :skipPrograms
@@ -799,6 +805,13 @@ echo %c_gold%Making memreduct start by default...
 attrib +s %windir%\DuckOS_Modules
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /v "Memory reduct" /d "%windir%\DuckOS_Modules\Utils\memreduct.exe" /t REG_SZ /f
 echo %c_green%Done.
+
+:: Create memreduct's configration file
+start "%windir%\DuckOS_Modules\Utils\memreduct.exe"
+timeout 01 /nobreak
+taskkill /f /im memreduct.exe
+
+:: Write memreduct's configuration file
 echo %c_gold%Writing memreduct configuration file...
 >"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:[memreduct]
 >>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:CheckUpdatesLast=1668361365
@@ -1361,7 +1374,7 @@ echo %c_green%Done.
 :: Memory Optimizations ::
 ::::::::::::::::::::::::::
 
-title Do not close this window - [60/66] Optimizing memory
+title Do not close this window - [60/66] Optimizing memory..
 echo %c_cyan%Optimizing memory...
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "DisablePageCombining" /t REG_DWORD /d "1" /f
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "DisablePagingExecutive" /t REG_DWORD /d "1" /f
