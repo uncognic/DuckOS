@@ -39,6 +39,10 @@ set "debugMode=0"
 set "network=0"
 set "CFUExit=0"
 
+:: VBS script variables
+set "vbsGetPrivileges=%temp%\getPriv_DuckPS.vbs"
+set "vbsFullScreen=%temp%\fullscreen_DuckPS.vbs"
+
 :: Force the window to go maximized and clear the screen.
 cls
 powershell -WindowStyle Maximized Write-Host The post install script is starting...
@@ -148,8 +152,6 @@ if /i "%isDuck" equ "0" (
 :init
 setlocal DisableDelayedExpansion
 set "batchPath=%~0"
-for %%k in (%0) do set batchName=%%~nk
-set "vbsGetPrivileges=%temp%\OEgetPriv_%batchName%.vbs"
 setlocal EnableDelayedExpansion
 
 :checkPrivileges
@@ -240,14 +242,14 @@ cd %windir%\DuckOS_Modules
 :: Clear the screen
 cls
 
-:: Make the command prompt fullscreen if duckOS is detected..
+:: Make the command prompt fullscreen if duckOS is detected...
 if "%isDuck%" equ "1" (
-    :: Kill explorer to make desktop black.
+    :: Kill explorer to make desktop black as well.
     taskkill /f /im explorer.exe
-    echo:Set WshShell = WScript.CreateObject("WScript.Shell")>%TEMP%\fullscreen.vbs
-    echo:WshShell.SendKeys "{F11}">>%TEMP%\fullscreen.vbs
-    wscript //B "%TEMP%\fullscreen.vbs"
-    del /f /q "%TEMP%\fullscreen.vbs"
+    echo:Set WshShell = WScript.CreateObject("WScript.Shell")>%vbsFullScreen%
+    echo:WshShell.SendKeys "{F11}">>%vbsFullScreen%
+    wscript //B "%vbsFullScreen%"
+    del /f /q "%vbsFullScreen%"
 )
 
 :: Ask the user if they use "Windows Firewall", if not, disable it.. if yes, do nothing...
