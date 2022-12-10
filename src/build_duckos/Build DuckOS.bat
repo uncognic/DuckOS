@@ -16,9 +16,15 @@ set c_blue=[34m
 set c_purple=[35m
 set c_cyan=[36m
 set c_white=[37m
+set ver=0.01
 
 :: Change the default title
-title DuckOS Build Script - automatic script to make a DuckOS ISO
+title DuckOS Build Script v%ver% - automatic script to make a DuckOS ISO
+
+:: Screen
+echo %c_red%[NOTE] It is not recommended to use this script yet.
+echo %c_gold%[INFO] %c_green%Version: %ver%
+pause
 
 :: Check if it was ran with administrative privileges..
 DISM >NUL || (
@@ -60,16 +66,13 @@ if not exist oscdimg.exe powershell -mta iwr https://github.com/DuckOS-GitHub/Du
 pushd %~dp0
 setlocal
 
-:: DON'T TOUCH: #>
 :askForPath
 cls
 echo %c_green%
 set /p iso="[ INFO ] Please enter the ISO image path: "
 set "extractedDirectory=%temp%\DuckBuild_%random%%random%"
 
-if /i not exist "%iso%" (
-    goto :askForPath
-)
+if /i not exist "%iso%" ( goto :askForPath )
 
 goto :DISM
 
@@ -182,13 +185,19 @@ rename install2.wim install.wim
 echo %c_green%[ INFO ] %c_cyan%Done.
 
 :: Convert to .esd
+echo %c_cyan%[QUESTION] %c_gold%Would you like to compress install.wim to save iso space?
+choice /n >nul
+if errorlevel 2 ( goto :finishscreen )
+
 echo %c_green%[FINISH] %c_gold%Step 5/5 finished. Converting install.wim to install.esd to save space...
 DISM /export-image /SourceImageFile:"%extractedDirectory%\Sources\install.wim" /SourceIndex:%index% /DestinationImageFile:"%extractedDirectory%\Sources\install.esd" /Compress:recovery /CheckIntegrity
-if "%errorlevel%" neq "0" (
+if "%errorlevel%" equ "0" (
     echo %c_red%Deleting install.wim..
     del /f /q "%extractedDirectory%\Sources\install.wim"
 )
 echo %c_green%[ INFO ] %c_cyan%Done x2.
+
+:finishscreen
 
 :: Get elapsed time:
 set "endTime=%time: =0%"
