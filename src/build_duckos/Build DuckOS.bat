@@ -185,7 +185,7 @@ rename install2.wim install.wim
 echo %c_green%[ INFO ] %c_cyan%Done.
 
 :: Convert to .esd
-echo %c_cyan%[QUESTION] %c_gold%Would you like to compress install.wim to save iso space?
+echo %c_cyan%[QUESTION] %c_gold%Would you like to compress install.wim to save iso space? [Y/N]
 choice /n >nul
 if errorlevel 2 ( goto :finishscreen )
 
