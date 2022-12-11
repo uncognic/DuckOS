@@ -22,7 +22,7 @@ jobs:
             curl -L -f https://www.sordum.org/files/downloads.php?power-run > src/DuckOS_Modules/powerrun.zip
             cd src/DuckOS_Modules/
             sudo unzip -o powerrun.zip
-            cp -r /PowerRun/* $PWD
+            cp -r src/DuckOS_Modules/PowerRun/* $PWD
             sudo unzip -o devmanview.zip
             sudo rm -f DevManView.chm
             sudo rm -f readme.txt 
