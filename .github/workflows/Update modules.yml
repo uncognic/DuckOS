@@ -22,19 +22,12 @@ jobs:
             curl -L -f https://www.sordum.org/files/downloads.php?power-run > src/DuckOS_Modules/powerrun.zip
             cd src/DuckOS_Modules/
             sudo unzip -o powerrun.zip
-            cd ..
-            cd ..
-            cp -a src/DuckOS_Modules/PowerRun src/DuckOS_Modules
-            cd src/DuckOS_Modules/
+            mv -f /PowerRun/PowerRun_x64.exe $PWD
             sudo unzip -o devmanview.zip
-            sudo unzip -o powerrun.zip
             sudo rm -f DevManView.chm
             sudo rm -f readme.txt 
             sudo rm -f devmanview.zip
-            sudo rm -f PowerRun.exe
-            sudo rm -f PowerRun.ini
-            sudo rm -f README.txt
-            sudo rm -f powerrun.zip
+            sudo rm -f PowerRun
             cd ..
             cd "Desktop/DuckOS - Post Install Folder/Tools/ProcessExplorer"
             curl -L -f https://live.sysinternals.com/procexp.exe > "Process Explorer.exe"
