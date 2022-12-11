@@ -1,4 +1,4 @@
-:: DuckOS build tool - tool to build DuckOS for any ISO!
+:: DuckOS build tool - tool to build DuckOS from any Windows 10 base ISO!
 
 @echo off & cls
 setlocal EnableDelayedExpansion
@@ -118,8 +118,8 @@ if "%installType%"=="wim" (
     :: Convert from ESD to WIM and mount the install.wim file
     chcp 65001 >nul
     echo %c_gold%[ WARN ] Converting from a highly compressed format (^ESD^) will need computer resources. You may want to close some programs to free up resources for this operation.
+    start DISM /export-image /SourceImageFile:"%extractedDirectory%\Sources\install.esd" /SourceIndex:%index% /DestinationImageFile:"%extractedDirectory%\Sources\install.wim" /Compress:max /CheckIntegrity
     wmic process where name="dism.exe" CALL setpriority 32768 >nul
-    DISM /export-image /SourceImageFile:"%extractedDirectory%\Sources\install.esd" /SourceIndex:%index% /DestinationImageFile:"%extractedDirectory%\Sources\install.wim" /Compress:max /CheckIntegrity
     echo %c_green%[ INFO ] Deleting install.esd..
     del /f /q "%extractedDirectory%\Sources\install.esd"
     echo [ DONE ] Mounting install.wim..
@@ -208,9 +208,9 @@ set /A "elap=((((10!end:%time:~2,1%=%%100)*60+1!%%100)-((((10!start:%time:~2,1%=
 set /A "cc=elap%%100+100,elap/=100,ss=elap%%60+100,elap/=60,mm=elap%%60+100,hh=elap/60+100"
 
 :: Make the bootable iso..
-set path_iso="%userprofile%\Desktop\%ISOFileName%.iso"
+set isoPath="%userprofile%\Desktop\%ISOFileName%.iso"
 echo %c_green%[ INFO ] %c_green%Making bootable iso...
-oscdimg -n -d -m "%extractedDirectory%" %path_iso%
+oscdimg -n -d -m "%extractedDirectory%" %isoPath%
 
 :: end screen :^)
 cls
