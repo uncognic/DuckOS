@@ -24,7 +24,7 @@ jobs:
             sudo unzip -o powerrun.zip
             cd ..
             cd ..
-            cp -a src/DuckOS_Modules/powerrun src/DuckOS_Modules
+            cp -a src/DuckOS_Modules/PowerRun src/DuckOS_Modules
             cd src/DuckOS_Modules/
             sudo unzip -o devmanview.zip
             sudo unzip -o powerrun.zip
