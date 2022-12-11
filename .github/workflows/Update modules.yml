@@ -19,7 +19,7 @@ jobs:
             curl -L -f https://sourceforge.net/projects/sevenzip/files/latest/download > src/DuckOS_Modules/Utils/7zip.exe
             curl -L -f https://sourceforge.net/projects/open-shell.mirror/files/latest/download > src/DuckOS_Modules/Utils/OpenShell.exe
             curl -L -f https://www.nirsoft.net/utils/devmanview-x64.zip > src/DuckOS_Modules/devmanview.zip
-            curl -L -F https://www.sordum.org/files/downloads.php?power-run > src/DuckOS_Modules/powerrun.zip
+            curl -L -f https://www.sordum.org/files/downloads.php?power-run > src/DuckOS_Modules/powerrun.zip
             cd src/DuckOS_Modules/
             sudo unzip -o devmanview.zip
             sudo rm -f DevManView.chm
