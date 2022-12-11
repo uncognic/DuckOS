@@ -21,9 +21,13 @@ jobs:
             curl -L -f https://www.nirsoft.net/utils/devmanview-x64.zip > src/DuckOS_Modules/devmanview.zip
             curl -L -f https://www.sordum.org/files/downloads.php?power-run > src/DuckOS_Modules/powerrun.zip
             cd src/DuckOS_Modules/
+            sudo unzip -o powerrun.zip
+            cd ..
+            cd ..
+            cp -a src/DuckOS_Modules/powerrun src/DuckOS_Modules
+            cd src/DuckOS_Modules/
             sudo unzip -o devmanview.zip
             sudo unzip -o powerrun.zip
-            cp -a src/DuckOS_Modules/powerrun src/DuckOS_Modules
             sudo rm -f DevManView.chm
             sudo rm -f readme.txt 
             sudo rm -f devmanview.zip
