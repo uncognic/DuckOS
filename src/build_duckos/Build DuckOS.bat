@@ -16,6 +16,8 @@ set c_blue=[34m
 set c_purple=[35m
 set c_cyan=[36m
 set c_white=[37m
+
+:: File version
 set ver=0.01
 
 :: Change the default title
