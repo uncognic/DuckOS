@@ -30,7 +30,7 @@ set c_purple=[35m
 set c_cyan=[36m
 set c_white=[37m
 
-:: Default values
+:: Default values	
 set "noRestart=0"
 set "isDuck=0"
 set "onlyTweak=0"
@@ -246,7 +246,7 @@ cls
 if "%isDuck%" equ "1" (
     :: Kill explorer to make desktop black as well.
     taskkill /f /im explorer.exe
-    echo:Set WshShell = WScript.CreateObject("WScript.Shell")>%vbsFullScreen%
+    echo:Set WshShell = WScript.CreateObject("WScript.Shell")>>%vbsFullScreen%
     echo:WshShell.SendKeys "{F11}">>%vbsFullScreen%
     wscript //B "%vbsFullScreen%"
     del /f /q "%vbsFullScreen%"
