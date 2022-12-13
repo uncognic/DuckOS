@@ -243,7 +243,7 @@ cd %windir%\DuckOS_Modules
 cls
 
 :: Make the command prompt fullscreen if duckOS is detected...
-if "%isDuck%" equ "1" (
+if /i "%isDuck%" equ "1" (
     :: Kill explorer to make desktop black as well.
     taskkill /f /im explorer.exe
     echo:Set WshShell = WScript.CreateObject("WScript.Shell")>>%vbsFullScreen%
@@ -312,7 +312,7 @@ echo %c_green%Done.
 
 :: Import accent color registry file
 title Do not close this window - [4/66] Importing registry
-if /i "%isDuck" equ "1" (
+if /i "%isDuck%" equ "1" (
     if exist %windir%\DuckOS_Modules\accent_color.reg ( %currentuser% "%WINDIR%\regedit.exe" /s %windir%\DuckOS_Modules\accent_color.reg )
 ) else (
     echo %c_green%******************************************************
