@@ -84,7 +84,7 @@ if "%network%" equ "1" (
 if /i "%*" == "" goto noArgs
 
 :: Set the args as a var (incase we update)
-set UpdateArgs=%*
+set "UpdateArgs=%*"
 
 :: Go to the correct function if one of the command line arguments is a valid one.
 :: Reserved arguments are put on top and doesn't have their slash variant.
@@ -137,7 +137,7 @@ if %debugMode% equ 1 (
 :: Various different sources...
 
 :: Warning prompt
-if /i "%isDuck" equ "0" (
+if /i "%isDuck%" equ "0" (
     call :MsgBox "This script will tweak your computer. If you think the script broke/changed something very important, remember that the DuckOS post script is provided AS IS, and doesn't come with ANY warranty! Do you wanna continue?"  "VBYesNo+VBQuestion+VBDefaultButton2" "Continue?"
     if errorlevel 6 ( goto begin ) else (
         echo Alright, no changes have been made. Press any key to exit.
@@ -229,7 +229,7 @@ if errorlevel 1 goto TrustedInstaller
 title Do not close this window, tweaking your computer!
 
 :: Send a message!
-if /i "%isDuck" equ "1" (
+if /i "%isDuck%" equ "1" (
     call :MsgBox "Welcome to DuckOS, a modification to Windows for enhanced privacy and performance! Thank you for downloading and using DuckOS, we are preparing DuckOS and will be available to use shortly..." 64+4096 "DuckOS Post Install Tweaks"
     call :MsgBox "You will be prompted with a few questions, then you can leave your computer running and let us do the rest." 64+4096 "DuckOS Post Install Tweaks"
 ) else (
@@ -340,7 +340,7 @@ reg add "HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\Sys
 :: Enable dark mode, disable transparency and disable Task View
 :: WE DON'T LIKE LIGHT MODE!
 title Do not close this window - [6/66] Windows appearence
-if /i "%isDuck" equ "1" (
+if /i "%isDuck%" equ "1" (
     echo %c_green%Enabling dark mode, disabling transparency and disabling Task View...
     %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "SystemUsesLightTheme" /t REG_DWORD /d "0" /f
     %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "AppsUseLightTheme" /t REG_DWORD /d "0" /f
@@ -593,7 +593,7 @@ if exist %windir%\DuckOS_Modules\Utils\7zip.exe (
 :: Detect if it's 1709
 reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v ReleaseID | find "1709"
 if errorlevel 0 (
-    if /i "%isDuck" equ "1" (
+    if /i "%isDuck%" equ "1" (
         echo %c_red%Installing OpenShell if it exists...
         if exist "%windir%\DuckOS_Modules\Utils\OpenShell.exe" start /wait "" "%windir%\DuckOS_Modules\Utils\OpenShell.exe" /qn ADDLOCAL=StartMenu
         echo %c_green%Done.
@@ -943,7 +943,6 @@ netsh int tcp set global timestamps=disabled
 netsh int tcp set heuristics disabled
 netsh int tcp set supplemental Internet congestionprovider=ctcp
 netsh int tcp set global rsc=disabled
-
 for /f "tokens=1" %%i in ('netsh int ip show interfaces ^| findstr [0-9]') do (
 	netsh int ip set interface %%i routerdiscovery=disabled store=persistent
 )
@@ -1110,7 +1109,7 @@ if /i "%isDuck%" equ "1" (
 )
 
 :: Add "Open Command Prompt here" to context menus
-if /i "%isDuck" equ "1" (
+if /i "%isDuck%" equ "1" (
     reg delete "HKCR\Directory\shell\cmd" /f
     reg delete "HKCR\Directory\Background\shell\cmd" /f
     reg add "HKCR\Directory\shell\runas" /v "" /t REG_SZ /d "Open Command Prompt here" /f
@@ -1183,14 +1182,8 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\SafeBoot\Minimal\MSIServer" /v ""
 :: Content Delivery Manager
 title Do not close this window - [39/66] Configuring Delivery Manager
 echo %c_cyan%Configuring Content Delivery Manager...
-
-for %%a in (310093 353698 314563 338389 338387 338388 338393) do (
-    %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-%%aEnabled" /t REG_DWORD /d "0" /f
-)
-
-for %%a in (RotatingLockScreenOverlayEnabled RotatingLockScreenEnabled SoftLandingEnabled SystemPaneSuggestionsEnabled SilentInstalledAppsEnabled ContentDeliveryAllowed) do (
-    %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "%%a" /t REG_DWORD /d "0" /f
-)
+for %%a in (310093 353698 314563 338389 338387 338388 338393) do ( %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-%%aEnabled" /t REG_DWORD /d "0" /f )
+for %%a in (RotatingLockScreenOverlayEnabled RotatingLockScreenEnabled SoftLandingEnabled SystemPaneSuggestionsEnabled SilentInstalledAppsEnabled ContentDeliveryAllowed) do ( %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "%%a" /t REG_DWORD /d "0" /f )
 
 echo %c_green%Done.
 
@@ -1422,7 +1415,7 @@ reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /v "
 echo %c_green%Done.
 
 :: Make the post install desktop folder read only with attributes
-if /i "%isDuck" equ "1" (
+if /i "%isDuck%" equ "1" (
     echo %c_gold%Making the post install desktop folder read only with attributes..
     if exist "%userprofile%\Desktop\DuckOS - Post Install Folder" attrib +r +a +s "%userprofile%\Desktop\DuckOS - Post Install Folder"
     echo %c_green%Done.
@@ -1477,9 +1470,7 @@ for %%i in (DEP, EmulateAtlThunks, SEHOP, ForceRelocateImages, RequireInfo, Bott
 powershell -ep bypass -mta %windir%\Temp\disable.ps1
 
 :: Set background apps priority below normal
-for %%i in (OriginWebHelperService.exe ShareX.exe EpicWebHelper.exe SocialClubHelper.exe steamwebhelper.exe Discord.exe) do (
-  reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\%%i\PerfOptions" /v "CpuPriorityClass" /t REG_DWORD /d "5" /f
-)
+for %%i in (OriginWebHelperService.exe ShareX.exe EpicWebHelper.exe SocialClubHelper.exe steamwebhelper.exe Discord.exe) do ( reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\%%i\PerfOptions" /v "CpuPriorityClass" /t REG_DWORD /d "5" /f )
 
 :: Correct Mitigation Values
 for /f "tokens=3 skip=2" %%a in ('reg query "HKLM\System\CurrentControlSet\Control\Session Manager\kernel" /v "MitigationAuditOptions"') do set mitigation_mask=%%a
@@ -1603,86 +1594,36 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "DisableTas
 
 :: NIC Settings - credits: imbiriy
 for /f %%a in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e972-e325-11ce-bfc1-08002be10318}" /v "*SpeedDuplex" /s ^| findstr  "HKEY"') do (
-    for /f %%i in ('reg query "%%a" /v "*ReceiveBuffers" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "*ReceiveBuffers" /t REG_SZ /d "1024" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "*TransmitBuffers" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "*TransmitBuffers" /t REG_SZ /d "1024" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "*DeviceSleepOnDisconnect" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "*DeviceSleepOnDisconnect" /t REG_SZ /d "0" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "*EEE" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "*EEE" /t REG_SZ /d "0" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "*ModernStandbyWoLMagicPacket" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "*ModernStandbyWoLMagicPacket" /t REG_SZ /d "0" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "*SelectiveSuspend" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "*SelectiveSuspend" /t REG_SZ /d "0" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "*WakeOnMagicPacket" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "*WakeOnMagicPacket" /t REG_SZ /d "0" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "*WakeOnPattern" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "*WakeOnPattern" /t REG_SZ /d "0" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "AutoPowerSaveModeEnabled" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "AutoPowerSaveModeEnabled" /t REG_SZ /d "0" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "EEELinkAdvertisement" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "EEELinkAdvertisement" /t REG_SZ /d "0" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "EeePhyEnable" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "EeePhyEnable" /t REG_SZ /d "0" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "EnableGreenEthernet" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "EnableGreenEthernet" /t REG_SZ /d "0" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "EnableModernStandby" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "EnableModernStandby" /t REG_SZ /d "0" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "GigaLite" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "GigaLite" /t REG_SZ /d "0" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "PowerDownPll" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "PowerDownPll" /t REG_SZ /d "0" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "PowerSavingMode" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "PowerSavingMode" /t REG_SZ /d "0" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "ReduceSpeedOnPowerDown" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "ReduceSpeedOnPowerDown" /t REG_SZ /d "0" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "S5WakeOnLan" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "S5WakeOnLan" /t REG_SZ /d "0" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "SavePowerNowEnabled" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "SavePowerNowEnabled" /t REG_SZ /d "0" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "ULPMode" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "ULPMode" /t REG_SZ /d "0" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "WakeOnLink" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "WakeOnLink" /t REG_SZ /d "0" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "WakeOnSlot" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "WakeOnSlot" /t REG_SZ /d "0" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "WakeUpModeCap" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "WakeUpModeCap" /t REG_SZ /d "0" /f >nul 2>&1
-    )
-    for /f %%i in ('reg query "%%a" /v "WakeUpModeCap" ^| findstr "HKEY"') do (
-        reg add "%%i" /v "PnPCapabilities" /t REG_SZ /d "24" /f >nul 2>&1
-    )
+    for /f %%i in ('reg query "%%a" /v "*ReceiveBuffers" ^| findstr "HKEY"') do ( reg add "%%i" /v "*ReceiveBuffers" /t REG_SZ /d "1024" /f )
+    for /f %%i in ('reg query "%%a" /v "*TransmitBuffers" ^| findstr "HKEY"') do ( reg add "%%i" /v "*TransmitBuffers" /t REG_SZ /d "1024" /f )
+    for /f %%i in ('reg query "%%a" /v "*DeviceSleepOnDisconnect" ^| findstr "HKEY"') do (  reg add "%%i" /v "*DeviceSleepOnDisconnect" /t REG_SZ /d "0" /f )
+    for /f %%i in ('reg query "%%a" /v "*EEE" ^| findstr "HKEY"') do (  reg add "%%i" /v "*EEE" /t REG_SZ /d "0" /f )
+    for /f %%i in ('reg query "%%a" /v "*ModernStandbyWoLMagicPacket" ^| findstr "HKEY"') do ( reg add "%%i" /v "*ModernStandbyWoLMagicPacket" /t REG_SZ /d "0" /f )
+    for /f %%i in ('reg query "%%a" /v "*SelectiveSuspend" ^| findstr "HKEY"') do ( reg add "%%i" /v "*SelectiveSuspend" /t REG_SZ /d "0" /f )
+    for /f %%i in ('reg query "%%a" /v "*WakeOnMagicPacket" ^| findstr "HKEY"') do ( reg add "%%i" /v "*WakeOnMagicPacket" /t REG_SZ /d "0" /f )
+    for /f %%i in ('reg query "%%a" /v "*WakeOnPattern" ^| findstr "HKEY"') do ( reg add "%%i" /v "*WakeOnPattern" /t REG_SZ /d "0" /f )
+    for /f %%i in ('reg query "%%a" /v "AutoPowerSaveModeEnabled" ^| findstr "HKEY"') do ( reg add "%%i" /v "AutoPowerSaveModeEnabled" /t REG_SZ /d "0" /f )
+    for /f %%i in ('reg query "%%a" /v "EEELinkAdvertisement" ^| findstr "HKEY"') do ( reg add "%%i" /v "EEELinkAdvertisement" /t REG_SZ /d "0" /f )
+    for /f %%i in ('reg query "%%a" /v "EeePhyEnable" ^| findstr "HKEY"') do ( reg add "%%i" /v "EeePhyEnable" /t REG_SZ /d "0" /f  )
+    for /f %%i in ('reg query "%%a" /v "EnableGreenEthernet" ^| findstr "HKEY"') do ( reg add "%%i" /v "EnableGreenEthernet" /t REG_SZ /d "0" /f )
+    for /f %%i in ('reg query "%%a" /v "EnableModernStandby" ^| findstr "HKEY"') do ( reg add "%%i" /v "EnableModernStandby" /t REG_SZ /d "0" /f )
+    for /f %%i in ('reg query "%%a" /v "GigaLite" ^| findstr "HKEY"') do ( reg add "%%i" /v "GigaLite" /t REG_SZ /d "0" /f  )
+    for /f %%i in ('reg query "%%a" /v "PowerDownPll" ^| findstr "HKEY"') do ( reg add "%%i" /v "PowerDownPll" /t REG_SZ /d "0" /f  )
+    for /f %%i in ('reg query "%%a" /v "PowerSavingMode" ^| findstr "HKEY"') do ( reg add "%%i" /v "PowerSavingMode" /t REG_SZ /d "0" /f  )
+    for /f %%i in ('reg query "%%a" /v "ReduceSpeedOnPowerDown" ^| findstr "HKEY"') do ( reg add "%%i" /v "ReduceSpeedOnPowerDown" /t REG_SZ /d "0" /f )
+    for /f %%i in ('reg query "%%a" /v "S5WakeOnLan" ^| findstr "HKEY"') do ( reg add "%%i" /v "S5WakeOnLan" /t REG_SZ /d "0" /f  )
+    for /f %%i in ('reg query "%%a" /v "SavePowerNowEnabled" ^| findstr "HKEY"') do ( reg add "%%i" /v "SavePowerNowEnabled" /t REG_SZ /d "0" /f )
+    for /f %%i in ('reg query "%%a" /v "ULPMode" ^| findstr "HKEY"') do ( reg add "%%i" /v "ULPMode" /t REG_SZ /d "0" /f )
+    for /f %%i in ('reg query "%%a" /v "WakeOnLink" ^| findstr "HKEY"') do ( reg add "%%i" /v "WakeOnLink" /t REG_SZ /d "0" /f )
+    for /f %%i in ('reg query "%%a" /v "WakeOnSlot" ^| findstr "HKEY"') do ( reg add "%%i" /v "WakeOnSlot" /t REG_SZ /d "0" /f )
+    for /f %%i in ('reg query "%%a" /v "WakeUpModeCap" ^| findstr "HKEY"') do ( reg add "%%i" /v "WakeUpModeCap" /t REG_SZ /d "0" /f )
+    for /f %%i in ('reg query "%%a" /v "WakeUpModeCap" ^| findstr "HKEY"') do ( reg add "%%i" /v "PnPCapabilities" /t REG_SZ /d "24" /f )
 ) >nul 2>&1
 
 :: Disable power saving on "Plug and Play" devices
 for /f %%i in ('wmic path Win32_NetworkAdapter get PNPDeviceID^| findstr /L "PCI\VEN_"') do (
 	for /f "tokens=3" %%a in ('reg query "HKLM\SYSTEM\CurrentControlSet\Enum\%%i" /v "Driver"') do (
-		for /f %%i in ('echo %%a ^| findstr "{"') do ( 
-			reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\%%i" /v "PnPCapabilities" /t REG_DWORD /d "24" /f > NUL 2>&1
-		)
+		for /f %%i in ('echo %%a ^| findstr "{"') do ( reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\%%i" /v "PnPCapabilities" /t REG_DWORD /d "24" /f )
 	)
 )
 echo %c_green%Done.
@@ -1753,7 +1694,7 @@ for /f "tokens=*" %%i in ('wmic PATH Win32_PnPEntity GET DeviceID ^| findstr "US
 )
 
 :: Deleting default, unnecessery powerplans..
-if /i "%isDuck" equ "1" (
+if /i "%isDuck%" equ "1" (
     echo Deleting default, unnecessery powerplans..
     powercfg -delete a1841308-3541-4fab-bc81-f71556f20b4a
     powercfg -delete 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
@@ -1935,7 +1876,7 @@ bcdedit /set hypervisorlaunchtype off
 :: Disable the Trusted Platform Module (TPM)
 bcdedit /set tpmbootentropy ForceDisable
 
-if /i "%isDuck" equ "1" (
+if /i "%isDuck%" equ "1" (
     :: Set the DuckOS' name to DuckOS.. so it can be easily identified when dualbooting.
     bcdedit /set {current} description DuckOS
     
@@ -1950,7 +1891,7 @@ if /i "%isDuck" equ "1" (
 )
 
 :: Disable Recovery
-if /i "%isDuck" equ "1" (
+if /i "%isDuck%" equ "1" (
     if exist %windir%\System32\reagentc.exe reagentc.exe /disable
     bcdedit /set {current} recoveryenabled no
 ) else (
@@ -1958,7 +1899,7 @@ if /i "%isDuck" equ "1" (
 )
 
 :: Disable Devices with DevManView
-if /i "%isDuck" equ "1" (
+if /i "%isDuck%" equ "1" (
     cd /d %windir%\DuckOS_Modules
     if exist %windir%\DuckOS_Modules\devmanview.exe (
         devmanview /disable "Composite Bus Enumerator"
@@ -2215,7 +2156,7 @@ reg add "HKLM\Software\Classes\.reg\ShellNew" /v "ItemName" /t REG_EXPAND_SZ /d 
 reg add "HKLM\Software\Classes\.reg\ShellNew" /v "NullFile" /t REG_SZ /d "" /f
 
 :: "Merge as TrustedInstaller" for registry files
-if /i "%isDuck" equ "1" (
+if /i "%isDuck%" equ "1" (
     reg add "HKCR\regfile\Shell\RunAs" /ve /t REG_SZ /d "Merge as TrustedInstaller" /f
     reg add "HKCR\regfile\Shell\RunAs" /v "HasLUAShield" /t REG_SZ /d "1" /f
     reg add "HKCR\regfile\Shell\RunAs\Command" /ve /t REG_SZ /d "%windir%\DuckOS_modules\nsudo.exe -U:T -P:E reg import "%%1"" /f

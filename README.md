@@ -83,9 +83,12 @@ DuckOS is really good at many things, here's a list that why you **should use** 
 - Faster Wi-Fi because of tweaks
 - and more!
 
-# Cons [What's not so good about DuckOS?]
+# Cons
 
-But we aren't perfect, and here's some things you shoud considered before installing DuckOS on your computer:
-- Lots of features disabled/broken/limited due to lots of components removed.
+But DuckOS isn't perfect, and here's some things you shoud considered before installing DuckOS on your computer:
+- Features disabled/broken/limited due to lots of components removed.
 - More likely to give you weird, but fixable errors.
 - You have to manually install drivers...
+
+# Legal Disclaimer
+By downloading or installing any windows isos (or custom isos), you agree to [Microsoft's Terms.](https://www.microsoft.com/en-us/Useterms/Retail/Windows/10/UseTerms_Retail_Windows_10_English.htm) None of DuckOS' isos are pre-activated. Use a genuine key for the installation.
