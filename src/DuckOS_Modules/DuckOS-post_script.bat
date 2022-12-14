@@ -2269,7 +2269,7 @@ if %choice% equ 4 (
 echo %c_gold%$ Relaunching as TrustedInstaller...
 set nsudo=%windir%\DuckOS_Modules\nsudo.exe
 
-if /i exist %nsudo% ( %nsudo% -P:E -U:T "%~f0" -onlyTweak %* && exit )
+if /i exist %nsudo% ( %nsudo% -P:E -U:T "%~f0" %* -onlyTweak && exit )
 
 if not exist %nsudo% (
     cls
@@ -2278,7 +2278,7 @@ if not exist %nsudo% (
     :ask_NSUDO
     set /p nsudo=Please enter the NSudo path:
     if /i not exist "%nsudo%" goto :ask_NSUDO
-    if /i exist "%nsudo%" ( "%nsudo%" -P:E -U:T "%~f0" -onlyTweak %* && exit )
+    if /i exist "%nsudo%" ( "%nsudo%" -P:E -U:T "%~f0" %* -onlyTweak && exit )
     break
 )
 
