@@ -603,7 +603,7 @@ if errorlevel 0 (
 :: Make the post script run on by default if it doesn't finish executing
 :: The asterisk at the beginning (*) makes it forcefully start even in safe mode.
 :: Why? People like to close the post script... and they say duckOS gives bad performance... so we make it start by default, but IF the script sucessfully runs, it deletes itself at the end.
-if "%isDuck%" equ "1" ( reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run" /v "*DuckOS Post Install Tweaks" /d "%~f0" /t REG_SZ /f )
+if "%isDuck%" equ "1" ( reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /v "*DuckOS Post Install Tweaks" /d "%~f0" /t REG_SZ /f )
 
 :: Debloat 7zip - security [fix the 0-day chm help exploit]
 cd /d %ProgramFiles%\7-zip
@@ -1064,9 +1064,11 @@ echo %c_cyan%Configuring some QoL keys...
 %currentuser% reg add "HKCU\Software\Microsoft\Input\TIPC" /v "Enabled" /t REG_DWORD /d "0" /f
 reg add "HKLM\Software\Policies\Microsoft\Windows\System" /v "UploadUserActivities" /t REG_DWORD /d "0" /f
 reg add "HKLM\Software\Policies\Microsoft\Windows\System" /v "PublishUserActivities" /t REG_DWORD /d "0" /f
-%currentuser% reg add "HKCU\Control Panel\International\User Profile" /v "HttpAcceptLanguageOptOut" /t REG_DWORD /d "1" /f
 reg add "HKLM\System\CurrentControlSet\Control\Diagnostics\Performance" /v "DisableDiagnosticTracing" /t REG_DWORD /d "1" /f
 reg add "HKLM\Software\Policies\Microsoft\Windows\WDI\{9c5a40da-b965-4fc3-8781-88dd50a6299d}" /v "ScenarioExecutionEnabled" /t REG_DWORD /d "0" /f
+
+:: Disable Website Access of Language List
+%currentuser% reg add "HKCU\Control Panel\International\User Profile" /v "HttpAcceptLanguageOptOut" /t REG_DWORD /d "1" /f
 
 :: Disable GPU Preemption
 :: Source: https://learn.microsoft.com/en-us/windows-hardware/drivers/display/gpu-preemption
@@ -1300,6 +1302,9 @@ echo %c_red%Disabling animations...
 %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v "VisualFXSetting" /t REG_DWORD /d "3" /f
 echo %c_green%Done.
 
+:: Disable administrative shares
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" /v "AutoShareWks" /t REG_DWORD /d 0 /f
+
 :: Disable Storage Sense
 title Do not close this window - [54/66] Disabling Storage Sense
 echo %c_red%Disabling Storage Sense..
@@ -1446,6 +1451,9 @@ for %%i in (lsass.exe sppsvc.exe SearchIndexer.exe fontdrvhost.exe sihost.exe ct
 :::::::::::::::::::::::
 :: PowerShell Tweaks ::
 :::::::::::::::::::::::
+
+:: Disable powershell telemetry
+setx POWERSHELL_TELEMETRY_OPTOUT 1
 
 :: Generate the script
 if exist %windir%\Temp\disable.ps1 ( del /f /q %windir%\Temp\disable.ps1 )
@@ -1920,10 +1928,13 @@ bcdedit /set tpmbootentropy ForceDisable
 if /i "%isDuck" equ "1" (
     :: Set the DuckOS' name to DuckOS.. so it can be easily identified when dualbooting.
     bcdedit /set {current} description DuckOS
+    
     :: Disable boot logo
     bcdedit /set {globalsettings} custom:16000067 true
+
     :: Disable spinning dots
     bcdedit /set {globalsettings} custom:16000068 true
+
     :: Disable boot messages
     bcdedit /set {globalsettings} custom:16000069 true
 )
@@ -1967,7 +1978,7 @@ if /i "%isDuck" equ "1" (
         devmanview /disable "WAN Miniport (SSTP)"
     )
 )
-if not exist %windir%\DuckOS_Modules\devmanview.exe ( echo $ DevManView is missing, cannot disable unnecessary devices in Device Management.. )
+if /i not exist "%windir%\DuckOS_Modules\devmanview.exe" ( echo $ DevManView is missing, cannot disable unnecessary devices in Device Management.. )
 
 ::::::::::::::
 :: Clean up ::
@@ -2029,8 +2040,57 @@ reg add "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate\AU" /v "AUOption
 reg add "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate" /v "SetAutoRestartNotificationDisable" /t REG_DWORD /d "1" /f
 reg add "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate" /v "DeferQualityUpdatesPeriodInDays" /t REG_DWORD /d "4" /f
 
+:: Do not show recently used files in Quick Access
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "ShowRecent" /d 0 /t "REG_DWORD" /f
+reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\HomeFolderDesktop\NameSpace\DelegateFolders\{3134ef9c-6b18-4996-ad04-ed5912e00eb5}" /f
+if not %PROCESSOR_ARCHITECTURE%==x86 ( reg delete "HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\HomeFolderDesktop\NameSpace\DelegateFolders\{3134ef9c-6b18-4996-ad04-ed5912e00eb5}" /f )
+
 :: Disable Speech Model Updates
 reg add "HKLM\Software\Policies\Microsoft\Speech" /v "AllowSpeechModelUpdate" /t REG_DWORD /d "0" /f
+
+:::::::::::::::::::::::::::::::::::::
+:: Privacy.sexy recommended tweaks ::
+:::::::::::::::::::::::::::::::::::::
+
+:: Disable Windows Tips
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v "DisableSoftLanding" /t REG_DWORD /d "1" /f
+
+:: Prevent the storage of the LAN Manager hash of passwords
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Lsa" /v "NoLMHash" /t REG_DWORD /d 1 /f
+
+:: Disable Windows Installer Always install with elevated privileges
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer" /v "AlwaysInstallElevated" /t REG_DWORD /d 0 /f
+
+:: Prevent WinRM from using Basic Authentication
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WinRM\Client" /v "AllowBasic" /t REG_DWORD /d 0 /f
+
+:: Enable camera on/off OSD notifications
+reg add "HKLM\SOFTWARE\Microsoft\OEM\Device\Capture" /v "NoPhysicalCameraLED" /d 1 /t REG_DWORD /f
+
+:: Clear regedit last key
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" /va /f
+reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Applets\Regedit" /va /f
+
+:: Clear regedit favorites
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit\Favorites" /va /f
+reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Applets\Regedit\Favorites" /va /f
+
+:: Refuse less secure authentication
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Lsa" /v "LmCompatibilityLevel" /t REG_DWORD /d 5 /f
+
+:: Turn off "Look For An App In The Store" option
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v "NoUseStoreOpenWith" /t REG_DWORD /d 1 /f
+
+:: Disable lock screen app notifications
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\System" /v "DisableLockScreenAppNotifications" /t REG_DWORD /d 1 /f
+
+:: Disable the Windows Connect Now wizard
+reg add "HKLM\Software\Policies\Microsoft\Windows\WCN\UI" /v "DisableWcnUi" /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WCN\Registrars" /v "DisableFlashConfigRegistrar" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WCN\Registrars" /v "DisableInBand802DOT11Registrar" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WCN\Registrars" /v "DisableUPnPRegistrar" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WCN\Registrars" /v "DisableWPDRegistrar" /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WCN\Registrars" /v "EnableRegistrars" /t REG_DWORD /d 0 /f
 
 :: Data Queue Sizes -- for both the keyboard and the mouse!
 reg add "HKLM\System\CurrentControlSet\Services\mouclass\Parameters" /v "MouseDataQueueSize" /t REG_DWORD /d "25" /f
@@ -2185,7 +2245,7 @@ powershell -NoProfile "$net=get-netconnectionprofile; Set-NetConnectionProfile -
 echo %c_green%Done, finalizing...
 
 :: Make the post script not run every time you start the computer again anymore, since tweaking is complete...
-if "%isDuck%" equ "1" ( reg delete "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run" /v "*DuckOS Post Install Tweaks" /f )
+if "%isDuck%" equ "1" ( reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /v "*DuckOS Post Install Tweaks" /f )
 
 :: Cancel any pending shutdowns, and restart in 2 seconds.. [with force option]
 :: If the argument -noRestart is selected, then we will restart..
@@ -2204,7 +2264,6 @@ exit
     >"%tempFile%" echo(WScript.Quit msgBox("%~1",%~2,"%~3") & cscript //nologo //e:vbscript "%tempFile%"
     set "exitCode=%errorlevel%" & del "%tempFile%" >nul 2>nul
     endlocal & exit /b %exitCode%
-
 
 :noArgs
 color 0a
