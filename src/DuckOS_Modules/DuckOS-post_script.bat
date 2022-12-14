@@ -824,7 +824,7 @@ reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /v "Memory reduct" 
 echo %c_green%Done.
 
 :: Create memreduct's configration file
-start "%windir%\DuckOS_Modules\Utils\memreduct.exe"
+start %windir%\DuckOS_Modules\Utils\memreduct.exe
 timeout 01 /nobreak
 taskkill /f /im memreduct.exe
 
