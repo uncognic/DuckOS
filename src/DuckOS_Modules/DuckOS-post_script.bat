@@ -773,28 +773,43 @@ echo %c_green%Importing a custom power plan based on your processor..
 :: Processor detection ::
 :::::::::::::::::::::::::
 
-:: Intel detection
-wmic cpu get name|find /i "Intel"
-set INTEL=%errorlevel%
+::::::::::::::::::::
+:: For Intel CPUs ::
+::::::::::::::::::::
 
-:: AMD detection
-wmic cpu get name|find /i "AMD"
-set AMD=%errorlevel%
-
-:: Checking the processor...
-if %INTEL% equ 0 (
+wmic cpu get name | findstr "Intel" >nul && (
     echo $ Intel processor detected, making sure power plan = idle OFF
     echo $ MIGHT CAUSE THE CPU % TO BE INACCURATE!
     powercfg -import "%windir%\DuckOS_Modules\Duck.pow" d6344778-a03d-4e00-a73a-dbc3f3f5f236
     powercfg /setactive d6344778-a03d-4e00-a73a-dbc3f3f5f236
-) else if %AMD% equ 0 (
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "FeatureSettingsOverride" /t REG_DWORD /d "0" /f
+)
+
+::::::::::::::::::
+:: For AMD CPUs ::
+::::::::::::::::::
+
+wmic cpu get name | findstr "AMD" >nul && (
     echo $ AMD processor detected, making sure the power plan = idle ON
     echo $ Also making sure some AMD unneeded services aren't gonna start...
     powercfg -import "%windir%\DuckOS_Modules\Duck_IDLE_ENABLED.pow" d6344778-a03d-4e00-a73a-dbc3f3f5f236
     powercfg /setactive d6344778-a03d-4e00-a73a-dbc3f3f5f236
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "FeatureSettingsOverride" /t REG_DWORD /d "64" /f
     for %%i in ("HKLM\SYSTEM\CurrentControlSet\Services\AMD Log Utility" "HKLM\SYSTEM\CurrentControlSet\Services\amdlog" "HKLM\SYSTEM\CurrentControlSet\Services\AMD External Events Utility") do ( reg add %%i /v Start /t REG_DWORD /d 4 /f )
 )
 echo %c_green%Done.
+
+::::::::::::::::::::
+:: For other CPUs ::
+::::::::::::::::::::
+
+wmic cpu get name | findstr "Intel" >nul || (
+    wmic cpu get name | findstr "AMD" >nul || (
+        echo $ Unknown CPU detected, applying the IDLE_OFF powerplan.
+        powercfg -import "%windir%\DuckOS_Modules\Duck.pow" d6344778-a03d-4e00-a73a-dbc3f3f5f236
+        powercfg /setactive d6344778-a03d-4e00-a73a-dbc3f3f5f236
+    )
+)
 
 :: MAKE THE CACHE CLEANER START ON STARTUP by modifying the shell value...
 title Do not close this window - [15/66] Cache Cleaner
@@ -1389,10 +1404,11 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "EnablePrefetcher" /t reg_DWORD /d "0" /f >NUL 2>&1
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "EnableSuperfetch" /t reg_DWORD /d "0" /f >NUL 2>&1
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters" /v "EnableSuperfetch" /t reg_DWORD /d "0" /f >NUL 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "FeatureSettingsOverrideMask" /t REG_DWORD /d 3 /f
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "FeatureSettingsOverrideMask" /t REG_DWORD /d "3" /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "FeatureSettings" /t REG_DWORD /d "0" /f >NUL 2>&1
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager" /v "ProtectionMode" /t reg_DWORD /d "0" /f >NUL 2>&1
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters" /v "EnableBoottrace" /t reg_DWORD /d "0" /f >NUL 2>&1
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "FeatureSettingsOverride" /t REG_DWORD /d "3" /f
 
 :: Set service host split threshold
 reg add "HKLM\System\CurrentControlSet\Control" /v "SvcHostSplitThresholdInKB" /t reg_DWORD /d "%ram%" /f >NUL 2>&1
@@ -1476,11 +1492,6 @@ reg add "HKLM\System\CurrentControlSet\Control\Session Manager\kernel" /v "Mitig
 
 :: ASLR - find ntoskrnl strings
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "MoveImages" /t REG_DWORD /d "0" /f >NUL 2>&1
-
-:: Spectre & Meltdown
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v FeatureSettings /t REG_DWORD /d "0" /f >NUL 2>&1
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v FeatureSettingsOverride /t REG_DWORD /d "3" /f >NUL 2>&1
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v FeatureSettingsOverrideMask /t REG_DWORD /d "3" /f >NUL 2>&1
 
 :: DWM
 reg add "HKCU\SOFTWARE\Microsoft\Windows\DWM" /v "EnableAeroPeek" /t REG_DWORD /d "0" /f >NUL 2>&1
