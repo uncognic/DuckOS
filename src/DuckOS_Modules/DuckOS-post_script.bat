@@ -375,10 +375,10 @@ sc config W32Time start=disabled
 %windir%\System32\SystemSettingsAdminFlows.exe SetInternetTime 1
 
 :: Turn on automatic time zone update
-%windir%\System32\SystemSettingsAdminFlows.exe SetAutoTimeZoneUpdate 1
+start "" "%windir%\System32\SystemSettingsAdminFlows.exe" SetAutoTimeZoneUpdate 1
 
 :: Finally, force sync the time with the internet time
-%windir%\System32\SystemSettingsAdminFlows.exe ForceTimeSync 1
+start "" "%windir%\System32\SystemSettingsAdminFlows.exe" ForceTimeSync 1
 
 :: Enable numlock on startup
 reg add "HKCU\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /d "2" /t REG_DWORD /f
@@ -960,7 +960,7 @@ echo %c_green%Done.
 :: IPv6, Client for Microsoft Networks, QoS Packet Scheduler, File and Printer Sharing
 title Do not close this window - [26/66] Disabling some network adapters...
 echo %c_red%Disabling some network adapters...
-powershell -NoProfile -Command "Disable-NetAdapterBinding -Name "*" -ComponentID ms_tcpip6, ms_msclient, ms_pacer, ms_server" >nul 2>&1
+powershell -Mta -NoProfile -Command "Disable-NetAdapterBinding -Name "*" -ComponentID ms_tcpip6, ms_msclient, ms_pacer, ms_server" >nul 2>&1
 
 :: Mitigate against HiveNightmare/SeriousSAM
 title Do not close this window - [27/66] Mitigating a security vulnerability...
@@ -1103,7 +1103,7 @@ reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProf
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" /v "SFIO Priority" /t REG_SZ /d "High" /f
 
 :: Remove "Open PowerShell window here" from Shift+Right-click context menus
-if /i "%isDuck" equ "1" (
+if /i "%isDuck%" equ "1" (
     reg delete "HKCR\Directory\Background\shell\Powershell" /f
     reg delete "HKCR\Directory\shell\Powershell" /f
     reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\Winlogon" /v "AutoRestartShell" /t REG_DWORD /d "1" /f
@@ -1482,7 +1482,6 @@ for %%i in (OriginWebHelperService.exe ShareX.exe EpicWebHelper.exe SocialClubHe
 )
 
 :: Correct Mitigation Values
-powershell -NoProfile -Command Set-ProcessMitigation -System -Disable CFG >NUL 2>&1
 for /f "tokens=3 skip=2" %%a in ('reg query "HKLM\System\CurrentControlSet\Control\Session Manager\kernel" /v "MitigationAuditOptions"') do set mitigation_mask=%%a
 for /L %%a in (0,1,9) do (
     set mitigation_mask=!mitigation_mask:%%a=2!
@@ -2007,7 +2006,7 @@ reg add "HKCR\CLSID\{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}\ShellFolder" /v "Attr
 :: tokens arg breaks path to just \Device instead of \Device Parameters
 :: Disable Power savings on drives
 for /f "tokens=*" %%i in ('reg query "HKLM\SYSTEM\CurrentControlSet\Enum" /s /f "StorPort"^| findstr "StorPort"') do reg add "%%i" /v "EnableIdlePowerManagement" /t REG_DWORD /d "0" /f
-powershell -NoProfile -Command "$devices = Get-WmiObject Win32_PnPEntity; $powerMgmt = Get-WmiObject MSPower_DeviceEnable -Namespace root\wmi; foreach ($p in $powerMgmt){$IN = $p.InstanceName.ToUpper(); foreach ($h in $devices){$PNPDI = $h.PNPDeviceID; if ($IN -like \"*$PNPDI*\"){$p.enable = $False; $p.psbase.put()}}}" >nul 2>nul
+powershell -mta -NoProfile -Command "$devices = Get-WmiObject Win32_PnPEntity; $powerMgmt = Get-WmiObject MSPower_DeviceEnable -Namespace root\wmi; foreach ($p in $powerMgmt){$IN = $p.InstanceName.ToUpper(); foreach ($h in $devices){$PNPDI = $h.PNPDeviceID; if ($IN -like \"*$PNPDI*\"){$p.enable = $False; $p.psbase.put()}}}" >nul 2>nul
 
 :: Windows Server Update Client ID
 sc stop wuauserv >nul 2>nul
