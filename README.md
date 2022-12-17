@@ -8,7 +8,6 @@
 <h4 align="center">An open modification of Windows 10, designed to reduce latency and increase performance.</h4>
 
 <p align="center">
-  <a href="https://github.com/DuckOS-GitHub/DuckOS/blob/main/src/DuckOS_Modules/DuckOS-post_script.bat"><img src="https://img.shields.io/badge/post%20install%20script-download-green" alt="Post Install Script"></a>
   <a href="https://discord.gg/8pDMf44t6R/"><img src="https://img.shields.io/discord/998645880368410694.svg?label=discord" alt="DuckOS Discord"></a>
 </p>
 <br>
