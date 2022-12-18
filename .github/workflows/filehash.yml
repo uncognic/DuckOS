@@ -24,7 +24,7 @@ jobs:
           (Get-FileHash '.\DuckOS-post_script.bat').hash | Out-File -FilePath $currentPath\utilhashes.md -Append
           Write-Host | Out-File -FilePath utilhashes.md -Append 
           cd $currentPath
-          Write-Host **DuckOS Build script hash [SHA256]** | Out-File -FilePath utilhashes.md -Append
+          Write-Host `n**DuckOS Build script hash [SHA256]** | Out-File -FilePath utilhashes.md -Append
           "**DuckOS Build script hash [SHA256]**" | Out-File -FilePath utilhashes.md -Append
           cd $currentPath\src\build_duckos
           (Get-FileHash '.\Build DuckOS.bat').hash | Out-File -FilePath $currentPath\utilhashes.md -Append   
