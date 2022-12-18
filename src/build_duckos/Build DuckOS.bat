@@ -120,9 +120,10 @@ if "%installType%"=="wim" (
     :: Convert from ESD to WIM and mount the install.wim file
     chcp 65001 >nul
     echo %c_gold%[  WARN  ] Converting from a highly compressed format (^ESD^) will need computer resources. You may want to close some programs to free up resources for this operation.
-    DISM /export-image /SourceImageFile:"%extractedDirectory%\Sources\install.esd" /SourceIndex:%index% /DestinationImageFile:"%extractedDirectory%\Sources\install.wim" /Compress:max /CheckIntegrity
+    start DISM /export-image /SourceImageFile:"%extractedDirectory%\Sources\install.esd" /SourceIndex:%index% /DestinationImageFile:"%extractedDirectory%\Sources\install.wim" /Compress:max /CheckIntegrity
     wmic process where name="dism.exe" CALL setpriority 32768 >nul
-    echo %c_green%[  INFO  ] Deleting install.esd..
+    echo %c_green%Press any key once DISM finishes its job. & pause >nul
+    echo [  INFO  ] Deleting install.esd..
     del /f /q "%extractedDirectory%\Sources\install.esd"
     echo [  DONE  ] Mounting install.wim..
     mkdir %TEMP%\DuckOS_Build_InProgress
