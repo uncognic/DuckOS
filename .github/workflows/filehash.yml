@@ -16,6 +16,9 @@ jobs:
       - name: Get hashes
         shell: pwsh
         run: |
+          If (Test-Path -Path utilhashes.md ) {
+             del utilhashes.md
+          }
           Write-Host **Post script hash [SHA256]** | Out-File -FilePath utilhashes.md
           "**Post script hash [SHA256]**" | Out-File -FilePath utilhashes.md -Append
           $currentPath = ($pwd).Path
@@ -23,7 +26,8 @@ jobs:
           (Get-FileHash '.\DuckOS-post_script.bat').hash | Out-File -FilePath $currentPath\utilhashes.md -Append
           Write-Host | Out-File -FilePath utilhashes.md -Append 
           cd $currentPath
-          Write-Host `n**DuckOS Build script hash [SHA256]** | Out-File -FilePath utilhashes.md -Append
+          (Get-Content utilhashes.md | Out-String) -replace "`n", "`r`n" | Out-File utilhashes.md
+          Write-Host **DuckOS Build script hash [SHA256]** | Out-File -FilePath utilhashes.md -Append
           "**DuckOS Build script hash [SHA256]**" | Out-File -FilePath utilhashes.md -Append
           cd $currentPath\src\build_duckos
           (Get-FileHash '.\Build DuckOS.bat').hash | Out-File -FilePath $currentPath\utilhashes.md -Append   
