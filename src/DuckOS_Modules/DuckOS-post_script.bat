@@ -16,7 +16,7 @@ REM =======
 title Do not close this window - [0/66] Preparing
 
 :: Set the post script version
-set version=0.461
+set version=0.50
 
 :: Set up colors in echo
 :: Some colors might not be used as of now, but we'll keep it.
@@ -62,8 +62,11 @@ echo ╚═╝     ╚══════╝╚══════╝╚═╝  �
 :: Check if connection to GitHub is possible.
 ping -n 1 raw.githubusercontent.com | findstr Reply >NUL && set network=1
 
+:: Check if -CFUExit is used in the command line arguments..
+for %%i in (%*) do ( if /i "%%i" equ "-CFUExit" set "CFUExit=1" )
+
 :: Compare it to the one on the internet.
-:: 1709 doesn't have curl, so we are gonna use powershell if curl doesnt exist
+:: 1709 doesn't have curl, so we are gonna use powershell if curl doesnt exist..
 if "%network%" equ "1" (
     if exist "%TEMP%\Post-Script_ver.txt" del /f /q "%TEMP%\Post-Script_ver.txt" >NUL
     if exist "%windir%\System32\curl.exe" ( curl --progress-bar https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/version.txt -o "%TEMP%\Post-Script_ver.txt" ) else ( powershell iwr -Method Get -Uri https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/src/Online_Updater/version.txt -OutFile %TEMP%\Post-Script_ver.txt )
@@ -73,6 +76,7 @@ if "%network%" equ "1" (
 ) else (
     if "%network%" equ "0" (
         echo No network connectivity detected, skipping update!
+        if "%CFUExit%" equ "1" ( exit 1 )
     )
 )
 
@@ -89,7 +93,6 @@ set "UpdateArgs=%*"
 :: Go to the correct function if one of the command line arguments is a valid one.
 :: Reserved arguments are put on top and doesn't have their slash variant.
 for %%i in (%*) do (
-    if /i "%%i" equ "-CFUExit" set "CFUExit=1"
     if /i "%%i" equ "-isDuck" set "isDuck=1"
     if /i "%%i" equ "-updateCM" if /i "%noUpdates%"=="1" goto :noUpdates
     if /i "%%i" equ "-debug" set "debugMode=1"
@@ -105,12 +108,12 @@ for %%i in (%*) do (
 :begin
 if %debugMode% equ 1 (
     choice /n /m "You've chosen to run the script in debug mode. Echo will be set to on to display all inputs. Continue with debug mode on? [Y/N]"
-        if errorlevel 2 (
+        if %errorlevel% equ 2 (
             echo Debug mode is now OFF.
             @echo off
             goto tweaks
         ) else (
-            if errorlevel 1 (
+            if %errorlevel% equ 1 (
 	        echo Alright.
 	        @echo on
 	        cls
@@ -157,7 +160,7 @@ setlocal EnableDelayedExpansion
 :checkPrivileges
 :: Sure, using DISM for elev check because we're cool
 DISM >NUL
-if errorlevel 0 (
+if %errorlevel% equ 0 (
     goto gotPrivileges
 ) else (
     chcp 65001 >nul
@@ -172,7 +175,7 @@ if errorlevel 0 (
     echo  ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
     echo.
     choice /n /m "Permission denied. Try again? [Y/N]"
-    if errorlevel 2 (
+    if %errorlevel% equ 2 (
         chcp 65001 >nul
         cls
         echo ███╗   ██╗ ██████╗     ██████╗ ███████╗██████╗ ███╗   ███╗██╗███████╗███████╗██╗ ██████╗ ███╗   ██╗
@@ -186,7 +189,7 @@ if errorlevel 0 (
         echo Press any key to close this window... & pause >nul
 	exit
     ) else (
-        if errorlevel 1 (
+        if %errorlevel% equ 1 (
             title Do not close this window - [0/66] Preparing
             echo Alright.
             goto getPrivileges
@@ -204,7 +207,7 @@ echo args = args ^& strArg ^& " "  >> "%vbsGetPrivileges%"
 echo Next >> "%vbsGetPrivileges%"
 echo UAC.ShellExecute "!batchPath!", args, "", "runas", 1 >> "%vbsGetPrivileges%"
 "%SystemRoot%\System32\WScript.exe" "%vbsGetPrivileges%" %*
-exit /b
+exit
 
 :gotPrivileges
 setlocal & pushd .
@@ -290,14 +293,14 @@ if errorlevel 7 (
     echo %c_green%Okay... Disabling webcam services...
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\swenum" /v "Start" /t REG_DWORD /d "4" /f
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Deny" /f
-    reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Deny" /f
-    reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam\NonPackaged" /v "Value" /t REG_SZ /d "Deny" /f
+    %currentuser% reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Deny" /f
+    %currentuser% reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam\NonPackaged" /v "Value" /t REG_SZ /d "Deny" /f
     if exist %windir%\DuckOS_Modules\devmanview.exe %windir%\DuckOS_Modules\devmanview.exe /disable "Plug and Play Software Device Enumerator"
 ) else if errorlevel 6 (
     echo %c_green%Got it, we will keep webcam services.
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Allow" /f
-    reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Allow" /f
-    reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam\NonPackaged" /v "Value" /t REG_SZ /d "Allow" /f
+    %currentuser% reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Allow" /f
+    %currentuser% reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam\NonPackaged" /v "Value" /t REG_SZ /d "Allow" /f
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\swenum" /v "Start" /t REG_DWORD /d "3" /f
     if exist %windir%\DuckOS_Modules\devmanview.exe %windir%\DuckOS_Modules\devmanview.exe /disable "Plug and Play Software Device Enumerator"
 )
@@ -346,7 +349,7 @@ if /i "%isDuck%" equ "1" (
     %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "AppsUseLightTheme" /t REG_DWORD /d "0" /f
     %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "EnableTransparency" /t REG_DWORD /d "0" /f
     %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowTaskViewButton" /t REG_DWORD /d "0" /f
-    echo %c_green%Done.
+    echo Done.
 ) else (
     echo %c_red%Appearance tweaks might not fit with you, so we're skipping it.
 )
@@ -381,7 +384,7 @@ start "" "%windir%\System32\SystemSettingsAdminFlows.exe" SetAutoTimeZoneUpdate 
 start "" "%windir%\System32\SystemSettingsAdminFlows.exe" ForceTimeSync 1
 
 :: Enable numlock on startup
-reg add "HKCU\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /d "2" /t REG_DWORD /f
+%currentuser% reg add "HKCU\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /d "2" /t REG_DWORD /f
 
 :: If DuckOS isn't detected, don't preinstall duckOS' preinstalled programs like 7zip and vcredist..
 if /i "%isDuck%" equ "0" ( goto :skipPrograms )
@@ -399,8 +402,8 @@ if exist %windir%\DuckOS_Modules\Utils\7zip.exe (
     echo Done.
     echo Making sure 7zip is the default format for zips...
     for %%i in (".001", ".7z", ".arj", ".bz2", ".bzip2", ".cab", ".cpio", ".deb", ".dmg", ".esd", ".fat", ".gz", ".gzip", ".hfs", ".iso", ".lha", ".lzh", ".lzma", ".ntfs", ".rar", ".rpm", ".squashfs", ".swm", ".tar", ".taz", ".tbz", ".tbz2", ".tgz", ".tpz", ".txz", ".vhd", ".wim", ".xar", ".xz", ".z", ".zip") do ( reg add "HKLM\Software\Classes\.%%~i" /ve /t REG_SZ /d "7-Zip.%%~i" /f >nul 2>&1 )
-    reg add "HKCU\Software\7-Zip\Options" /v "ContextMenu" /t REG_DWORD /d "2147488038" /f >nul 2>&1
-    reg add "HKCU\Software\7-Zip\Options" /v "ElimDupExtract" /t REG_DWORD /d "0" /f >nul 2>&1
+    %currentuser% reg add "HKCU\Software\7-Zip\Options" /v "ContextMenu" /t REG_DWORD /d "2147488038" /f >nul 2>&1
+    %currentuser% reg add "HKCU\Software\7-Zip\Options" /v "ElimDupExtract" /t REG_DWORD /d "0" /f >nul 2>&1
     reg add "HKLM\Software\Classes\7-Zip.001" /ve /t REG_SZ /d "001 Archive" /f >nul 2>&1
     reg add "HKLM\Software\Classes\7-Zip.001\DefaultIcon" /ve /t REG_SZ /d "C:\Program Files\7-Zip\7z.dll,9" /f >nul 2>&1
     reg add "HKLM\Software\Classes\7-Zip.001\shell" /ve /t REG_SZ /d "" /f >nul 2>&1
@@ -587,12 +590,12 @@ if exist %windir%\DuckOS_Modules\Utils\7zip.exe (
 )
 
 ::::::::::::::::::::
-:: Install OpenShell if the OS is 1709...
+:: Install OpenShell if the OS is 1803...
 ::::::::::::::::::::
 
-:: Detect if it's 1709
-reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v ReleaseID | find "1709"
-if errorlevel 0 (
+:: Detect if it's 1803
+reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v ReleaseID | find "1803"
+if %errorlevel% equ 0 (
     if /i "%isDuck%" equ "1" (
         echo %c_red%Installing OpenShell if it exists...
         if exist "%windir%\DuckOS_Modules\Utils\OpenShell.exe" start /wait "" "%windir%\DuckOS_Modules\Utils\OpenShell.exe" /qn ADDLOCAL=StartMenu
@@ -634,8 +637,9 @@ if exist %windir%\DuckOS_Modules\vcredist.exe (
 :: Install bleachbit
 if exist %WINDIR%\DuckOS_Modules\Utils\BleachBit-4.4.2-setup.exe (
     echo $ Would you like to install BleachBit? [Y/N]
+    echo What is BleachBit? BleachBit is a open sourced cache cleaner that cleans your system and frees disk space. The tool get's useful over time. 
     choice /n >nul
-    if errorlevel 1 (
+    if %errorlevel% equ "1" (
         echo %c_gold%Installing BleachBit..
         start /min /wait "" "%WINDIR%\DuckOS_Modules\Utils\BleachBit-4.4.2-setup.exe" /allusers /S
         echo %c_green%Done.
@@ -781,7 +785,7 @@ wmic cpu get name | findstr "Intel" >nul && (
     echo $ Intel processor detected, making sure power plan = idle OFF
     echo $ MIGHT CAUSE THE CPU % TO BE INACCURATE!
     powercfg -import "%windir%\DuckOS_Modules\Duck.pow" d6344778-a03d-4e00-a73a-dbc3f3f5f236
-    powercfg /setactive d6344778-a03d-4e00-a73a-dbc3f3f5f236
+    powercfg -setactive d6344778-a03d-4e00-a73a-dbc3f3f5f236
     reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "FeatureSettingsOverride" /t REG_DWORD /d "0" /f
 )
 
@@ -793,7 +797,7 @@ wmic cpu get name | findstr "AMD" >nul && (
     echo $ AMD processor detected, making sure the power plan = idle ON
     echo $ Also making sure some AMD unneeded services aren't gonna start...
     powercfg -import "%windir%\DuckOS_Modules\Duck_IDLE_ENABLED.pow" d6344778-a03d-4e00-a73a-dbc3f3f5f236
-    powercfg /setactive d6344778-a03d-4e00-a73a-dbc3f3f5f236
+    powercfg -setactive d6344778-a03d-4e00-a73a-dbc3f3f5f236
     reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "FeatureSettingsOverride" /t REG_DWORD /d "64" /f
     for %%i in ("HKLM\SYSTEM\CurrentControlSet\Services\AMD Log Utility" "HKLM\SYSTEM\CurrentControlSet\Services\amdlog" "HKLM\SYSTEM\CurrentControlSet\Services\AMD External Events Utility") do ( reg add %%i /v Start /t REG_DWORD /d 4 /f )
 )
@@ -825,7 +829,7 @@ echo %c_green%Done.
 
 :: Create memreduct's configration file
 start %windir%\DuckOS_Modules\Utils\memreduct.exe
-timeout 01 /nobreak
+timeout 2 /nobreak
 taskkill /f /im memreduct.exe
 
 :: Write memreduct's configuration file
@@ -1116,25 +1120,25 @@ if /i "%isDuck%" equ "1" (
     reg add "HKCR\Directory\shell\runas" /v "Icon" /t REG_SZ /d "cmd.exe" /f
     reg add "HKCR\Directory\shell\runas" /v "NeverDefault" /t REG_SZ /d "" /f
     reg add "HKCR\Directory\shell\runas" /v "NoWorkingDirectory" /t REG_SZ /d "" /f
-    reg add "HKCR\Directory\shell\runas" /v "Position" /t REG_SZ /d "Top" /f
+    reg add "HKCR\Directory\shell\runas" /v "Position" /t REG_SZ /d "Bottom" /f
     reg add "HKCR\Directory\shell\runas\command" /v "" /t REG_SZ /d "cmd.exe /s /k pushd \"%%V\"" /f
     reg add "HKCR\Directory\Background\shell\runas" /v "" /t REG_SZ /d "Open Command Prompt here" /f
     reg add "HKCR\Directory\Background\shell\runas" /v "Icon" /t REG_SZ /d "cmd.exe" /f
     reg add "HKCR\Directory\Background\shell\runas" /v "NeverDefault" /t REG_SZ /d "" /f
     reg add "HKCR\Directory\Background\shell\runas" /v "NoWorkingDirectory" /t REG_SZ /d "" /f
-    reg add "HKCR\Directory\Background\shell\runas" /v "Position" /t REG_SZ /d "Top" /f
+    reg add "HKCR\Directory\Background\shell\runas" /v "Position" /t REG_SZ /d "Bottom" /f
     reg add "HKCR\Directory\Background\shell\runas\command" /v "" /t REG_SZ /d "cmd.exe /s /k pushd \"%%V\"" /f
     reg add "HKCR\LibraryFolder\Shell\runas" /v "" /t REG_SZ /d "Open Command Prompt here" /f
     reg add "HKCR\LibraryFolder\Shell\runas" /v "Icon" /t REG_SZ /d "cmd.exe" /f
     reg add "HKCR\LibraryFolder\Shell\runas" /v "NeverDefault" /t REG_SZ /d "" /f
     reg add "HKCR\LibraryFolder\Shell\runas" /v "NoWorkingDirectory" /t REG_SZ /d "" /f
-    reg add "HKCR\LibraryFolder\Shell\runas" /v "Position" /t REG_SZ /d "Top" /f
+    reg add "HKCR\LibraryFolder\Shell\runas" /v "Position" /t REG_SZ /d "Bottom" /f
     reg add "HKCR\LibraryFolder\Shell\runas\command" /v "" /t REG_SZ /d "cmd.exe /s /k pushd \"%%V\"" /f
     reg add "HKCR\LibraryFolder\background\shell\runas" /v "" /t REG_SZ /d "Open Command Prompt here" /f
     reg add "HKCR\LibraryFolder\background\shell\runas" /v "Icon" /t REG_SZ /d "cmd.exe" /f
     reg add "HKCR\LibraryFolder\background\shell\runas" /v "NeverDefault" /t REG_SZ /d "" /f
     reg add "HKCR\LibraryFolder\background\shell\runas" /v "NoWorkingDirectory" /t REG_SZ /d "" /f
-    reg add "HKCR\LibraryFolder\background\shell\runas" /v "Position" /t REG_SZ /d "Top" /f
+    reg add "HKCR\LibraryFolder\background\shell\runas" /v "Position" /t REG_SZ /d "Bottom" /f
     reg add "HKCR\LibraryFolder\background\shell\runas\command" /v "" /t REG_SZ /d "cmd.exe /s /k pushd \"%%V\"" /f
 )
 
@@ -1456,6 +1460,9 @@ reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\Image File Execution 
 
 :: Set System Processes Priority below normal
 for %%i in (lsass.exe sppsvc.exe SearchIndexer.exe fontdrvhost.exe sihost.exe ctfmon.exe) do ( reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\%%i\PerfOptions" /v "CpuPriorityClass" /t REG_DWORD /d "5" /f )
+
+:: Disable NET Core CLI telemetry
+setx DOTNET_CLI_TELEMETRY_OPTOUT 1
 
 :::::::::::::::::::::::
 :: PowerShell Tweaks ::
@@ -1876,9 +1883,12 @@ bcdedit /set hypervisorlaunchtype off
 :: Disable the Trusted Platform Module (TPM)
 bcdedit /set tpmbootentropy ForceDisable
 
+:: Get the OS version 
+for /f "tokens=3" %%a in ('reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v ReleaseID ^| findstr /ri "REG_SZ"') do set OSVer=%%a
+
 if /i "%isDuck%" equ "1" (
     :: Set the DuckOS' name to DuckOS.. so it can be easily identified when dualbooting.
-    bcdedit /set {current} description DuckOS
+    bcdedit /set {current} description DuckOS %version% %OSVer%
     
     :: Disable boot logo
     bcdedit /set {globalsettings} custom:16000067 true
@@ -1895,7 +1905,7 @@ if /i "%isDuck%" equ "1" (
     if exist %windir%\System32\reagentc.exe reagentc.exe /disable
     bcdedit /set {current} recoveryenabled no
 ) else (
-    echo %c_red%Disabling recovery might be unsafe for your system, skipping.
+    echo %c_red%Disabling recovery isn't recommended for your system, skipping.
 )
 
 :: Disable Devices with DevManView
@@ -2003,6 +2013,12 @@ reg add "HKLM\Software\Policies\Microsoft\Speech" /v "AllowSpeechModelUpdate" /t
 :: Privacy.sexy recommended tweaks ::
 :::::::::::::::::::::::::::::::::::::
 
+:: Disable cloud speech recognition
+%currentuser% reg add "HKCU\Software\Microsoft\Speech_OneCore\Settings\OnlineSpeechPrivacy" /v "HasAccepted" /t "REG_DWORD" /d 0 /f
+
+:: Opt out from Windows privacy consent
+%currentuser% reg add "HKCU\SOFTWARE\Microsoft\Personalization\Settings" /v "AcceptedPrivacyPolicy" /t REG_DWORD /d 0 /f
+
 :: Disable Windows Tips
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v "DisableSoftLanding" /t REG_DWORD /d "1" /f
 
@@ -2019,12 +2035,12 @@ reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WinRM\Client" /v "AllowBasic" 
 reg add "HKLM\SOFTWARE\Microsoft\OEM\Device\Capture" /v "NoPhysicalCameraLED" /d 1 /t REG_DWORD /f
 
 :: Clear regedit last key
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" /va /f
-reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Applets\Regedit" /va /f
+%currentuser% reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit" /va /f
+%currentuser% reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Applets\Regedit" /va /f
 
 :: Clear regedit favorites
-reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit\Favorites" /va /f
-reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Applets\Regedit\Favorites" /va /f
+%currentuser% reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Applets\Regedit\Favorites" /va /f
+%currentuser% reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Applets\Regedit\Favorites" /va /f
 
 :: Refuse less secure authentication
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\Lsa" /v "LmCompatibilityLevel" /t REG_DWORD /d 5 /f
@@ -2087,6 +2103,7 @@ reg add "HKLM\Software\Policies\Microsoft\Windows\SettingSync" /v "DisableSyncOn
 
 :: Disable Feedback
 %currentuser% reg add "HKCU\Software\Microsoft\Siuf\Rules" /v "NumberOfSIUFInPeriod" /t REG_DWORD /d "0" /f
+%currentuser% reg delete "HKCU\SOFTWARE\Microsoft\Siuf\Rules" /v "PeriodInNanoSeconds" /f
 
 :: Hide "Meet Now" button. It's crap if we wanna be honest.
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "HideSCAMeetNow" /t REG_DWORD /d "1" /f
@@ -2144,8 +2161,8 @@ reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v "
 :: Disable DWM's AeroPeek
 :: Source: Winaero Tweaker
 %currentuser% reg add "HKCU\SOFTWARE\Microsoft\Windows\DWM" /v "EnableAeroPeek" /t REG_DWORD /d "0" /f
-reg add "HKLM\Software\Policies\Microsoft\Windows\DWM" /v "DisallowAnimations" /t REG_DWORD /d "1" /f
 %currentuser% reg add "HKCU\SOFTWARE\Microsoft\Windows\DWM" /v "Composition" /t REG_DWORD /d "0" /f
+reg add "HKLM\Software\Policies\Microsoft\Windows\DWM" /v "DisallowAnimations" /t REG_DWORD /d "1" /f
 
 :: Add batch (command prompt) files to the right-click "new file" menu
 reg add "HKLM\Software\Classes\.bat\ShellNew" /v "ItemName" /t REG_EXPAND_SZ /d "@%windir%\System32\acppage.dll,-6002" /f
@@ -2169,6 +2186,11 @@ sc config BluetoothUserService start=disabled >nul 2>&1
 sc config BTAGService start=disabled >nul 2>&1
 sc config BthAvctpSvc start=disabled >nul 2>&1
 sc config bthserv start=disabled >nul 2>&1
+
+:: Warn the user about the restart.
+echo %c_cyan%******************************************************
+echo %c_green%Your PC is going to be restarted twice to apply changes ^& fix common OS bugs
+echo %c_cyan%******************************************************
 
 :: Disable HPET and Synthethic Timer
 echo %c_red%Disabling HPET and Synthethic Timer...
@@ -2235,34 +2257,28 @@ echo %c_cyan%$ 3 - Launch the script in debug mode
 echo %c_cyan%$ 4 - Exit the script without making any changes to your device
 :askAgain
 set /p choice="Your choice: "
-if %choice% equ 1 ( goto :tweaks ) else (
-    echo.
-    echo $ Invalid choice. && goto askAgain
-)
+if %choice% equ 1 ( goto :tweaks )
 if %choice% equ 2 (
     set noRestart=1
     cls
     goto begin
-) else (
-    echo.
-    echo %c_red%$ Invalid choice. && goto askAgain
 )
 if %choice% equ 3 (
     set debugMode=1
     cls
     goto begin
-) else (
-    echo.
-    echo %c_red%$ Invalid choice. && goto askAgain
 )
 if %choice% equ 4 (
     cls
     echo $ You've chosen to exit the script. You may relaunch the script at any time.
     echo Press any key to exit. & pause >nul
     exit
-) else (
+)
+
+:: Check for invalid answers
+for %%i in (1 2 3 4) do (
     echo.
-    echo %c_red%$ Invalid choice. && goto askAgain
+    if not "%choice%" equ "%%i" ( echo %c_red%$ Invalid choice. && goto askAgain )
 )
 
 :TrustedInstaller
@@ -2303,19 +2319,19 @@ if "%changes%" equ "" ( break && goto :noArgs )
 
 :: Check for bug_fixes
 findstr /i "bug_fixes" %temp%\type.txt
-if errorlevel 0 ( set changes=Fixed bugs, which makes your experience better. Recommended to apply the tweaks. )
+if %errorlevel% equ 0 ( set changes=Fixed bugs, which makes your experience better. Recommended to apply the tweaks. )
 
 :: Check for feature_updates
 findstr /i "feature_update" %temp%\type.txt
-if errorlevel 0 ( set changes=Something NEW has been added. Recommended to apply the tweaks, might give performance. )
+if %errorlevel% equ 0 ( set changes=Something NEW has been added. Recommended to apply the tweaks, might give performance. )
 
 :: Check for os_updates
 findstr /i "os_update" %temp%\type.txt
-if errorlevel 0 ( set changes=Something were changed in the operating system. You aren't required to apply the tweaks. )
+if %errorlevel% equ 0 ( set changes=Something were changed in the operating system. You aren't required to apply the tweaks. )
 
 :: Check for profile picture/wallpaper updates
 findstr /i "img_updates" %temp%\type.txt
-if errorlevel 0 ( set changes=The wallpaper/profile pictures were changed. )
+if %errorlevel% equ 0 ( set changes=The wallpaper/profile pictures were changed. )
 
 :: The "Update found" screen.
 color 0e
@@ -2339,7 +2355,7 @@ echo %c_white%==================================================================
 echo.
 echo %c_cyan%$ %c_red%Would you like to update the post script and the DuckOS Toolbox? [Y/N]
 choice /n >nul
-if errorlevel 1 (
+if %errorlevel% equ 1 (
     echo Updating the DuckOS Toolbox..
     if not exist "%Windir%\DuckOS_Modules\DuckOS_Toolbox" md "%Windir%\DuckOS_Modules\DuckOS_Toolbox"
     if exist "%windir%\system32\curl.exe" ( curl -L --progress-bar https://github.com/DuckOS-GitHub/DuckOS/blob/main/src/DuckOS_Modules/DuckOS_Toolbox/DuckOS%20Toolbox.exe?raw=true -o "%Windir%\DuckOS_Modules\DuckOS_Toolbox\DuckOS Toolbox.exe" ) else (

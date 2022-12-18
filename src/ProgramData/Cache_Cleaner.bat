@@ -36,5 +36,3 @@ reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\Ope
 reg delete "HKCU\Software\Microsoft\Direct3D\MostRecentApplication" /va /f
 reg delete "HKLM\SOFTWARE\Microsoft\Direct3D\MostRecentApplication" /va /f
 del /f /s /q /a %LocalAppData%\Microsoft\Windows\Explorer\*.db
-
-if exist "%WINDIR%\DuckOS_Modules\DuckOS-post_script.bat" ( call "%WINDIR%\DuckOS_Modules\DuckOS-post_script.bat" -CFUExit )
