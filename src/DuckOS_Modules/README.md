@@ -3,7 +3,7 @@ Information about executables we use in our OS, DuckOS! Information below includ
 These are all to prove we don't copy files from other operating systems and that we download from safe sources, meaning there is no viruses!
 
 ## DuckOS resources
-[duckos_libraries](file:https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/utilhashes.md)
+[duckos_libraries](https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/utilhashes.md)
 
 ## DirectX
 
