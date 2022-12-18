@@ -16,15 +16,14 @@ jobs:
       - name: Get hashes
         shell: pwsh
         run: |
-          "**Post script hash [SHA256]**" | Out-File -FilePath utilhashes.md
+          Set-Content -Path $currentPath\utilhashes.md -Value '**Post script hash [SHA256]**'
           $currentPath = ($pwd).Path
           cd $currentPath\src\DuckOS_Modules
-          (Get-FileHash '.\DuckOS-post_script.bat').hash | Out-File -FilePath $currentPath\utilhashes.md
-          Write-Host "``n"| Out-File -FilePath utilhashes.md
+          (Get-FileHash '.\DuckOS-post_script.bat').hash | Set-Content -Path $currentPath\utilhashes.md
           cd $currentPath
-          "**DuckOS Build script hash [SHA256]**" | Out-File -FilePath utilhashes.md
+          Set-Content -Path $currentPath\utilhashes.md "**DuckOS Build script hash [SHA256]**"
           cd $currentPath\src\build_duckos
-          (Get-FileHash '.\Build DuckOS.bat').hash | Out-File -FilePath $currentPath\utilhashes.md        
+          (Get-FileHash '.\Build DuckOS.bat').hash | Set-Content -Path $currentPath\utilhashes.md        
 
       - name: Commit changes
         run: |
