@@ -1,0 +1,35 @@
+name: CheckHashes
+on:
+  push:
+    branches: [ "main" ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # Runs a set of commands using powershell
+      - name: Get hashes
+        shell: pwsh
+        run: |
+          Write-Host **Post script hash [SHA256]** | Out-File -FilePath utilhashes.md
+          $currentPath = ($pwd).Path
+          cd $currentPath\src\DuckOS_Modules
+          (Get-FileHash '.\DuckOS-post_script.bat').hash | Out-File -FilePath $currentPath\utilhashes.md
+          Write-Host | Out-File -FilePath utilhashes.md
+          cd $currentPath
+          Write-Host **DuckOS Build script hash [SHA256]** | Out-File -FilePath utilhashes.md
+          cd $currentPath\src\build_duckos
+          (Get-FileHash '.\Build DuckOS.bat').hash | Out-File -FilePath $currentPath\utilhashes.md        
+
+      - name: Commit changes
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions - check util hashes"
+          git add --all
+          git commit -m "Check util hashes"
+          git push
