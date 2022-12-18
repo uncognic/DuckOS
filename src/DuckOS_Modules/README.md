@@ -2,6 +2,9 @@
 Information about executables we use in our OS, DuckOS! Information below includes the SHA 256 hashes, file names, sizes, and sources!
 These are all to prove we don't copy files from other operating systems and that we download from safe sources, meaning there is no viruses!
 
+## DuckOS resources
+[duckos_libraries](https://raw.githubusercontent.com/DuckOS-GitHub/DuckOS/main/utilhashes.md)
+
 ## DirectX
 
 ### DirectX Setup Executable
