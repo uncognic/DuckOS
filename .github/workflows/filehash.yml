@@ -34,6 +34,6 @@ jobs:
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions - check util hashes"
-          git add --all
+          git add utilhashes.md
           git commit -m "Check util hashes"
           git push
