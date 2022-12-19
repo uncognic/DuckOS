@@ -1,14 +1,56 @@
-**Post script hash [SHA256]**
+## **Post script hash [SHA256]**
+
+
+
+
+
+
 
 3E13373298A26C0E413AD636B89B920A643A92E531ACB897676FF253EC3323BF
 
+
+
+
+
+
+
 Size in MB:
+
+
+
+
+
+
 
 0.163911819458008
 
 
-**DuckOS Build script hash [SHA256]**
+
+
+
+
+
+
+
+
+
+## **DuckOS Build script hash [SHA256]**
+
+
+
 4287ABC02FC5183435386A41E2E9F54B50FCC3E682E258299565F21B1C64D44A
+
+
+
+
+
+Size in MB:
+
+0.00950908660888672
+
+
+## **DuckOS Toolbox [SHA256]**
+C7B474D95E639EB445CF1FCD4F152F0AFBFBA3470CFF37098EBCAF6E463A7EA0
 
 Size in MB:
-0.00950908660888672
+4.06201171875
