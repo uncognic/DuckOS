@@ -79,6 +79,7 @@ Those features are:
 DuckOS is really good at many things, here's a list that why you **should use** DuckOS and **not** Windows 10 Original (*stock*):
 - Processes, while it doesn't matter as much, it's good too see that not much is running on your system.. which is a good sign of good component removing.
 - RAM Usage, matters, because Windows 10 wastes your RAM doing nothing, we made sure that doesn't happen on DuckOS by removing lots of components.
+- DuckOS only uses ~600 MB RAM by default!
 - CPU at 0% usage idle, but this really depends on the processor.
 - Less services
 - Less unneeded drivers
