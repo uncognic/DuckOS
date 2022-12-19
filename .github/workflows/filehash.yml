@@ -20,10 +20,10 @@ jobs:
              del utilhashes.md
           }
           Write-Host **Post script hash [SHA256]** | Out-File -FilePath utilhashes.md
-          "**Post script hash [SHA256]**" | Out-File -FilePath utilhashes.md -Append
           $currentPath = ($pwd).Path
           cd $currentPath\src\DuckOS_Modules
           (Get-FileHash '.\DuckOS-post_script.bat').hash | Out-File -FilePath $currentPath\utilhashes.md -Append
+          Write-Host Size in MB:;Write-Host((Get-Item '.\DuckOS-post_script.bat').length/1MB) | Out-File -FilePath $currentPath\utilhashes.md -Append
           Write-Host | Out-File -FilePath utilhashes.md -Append 
           cd $currentPath
           (Get-Content utilhashes.md | Out-String) -replace "`n", "`r`n" | Out-File utilhashes.md
@@ -31,6 +31,7 @@ jobs:
           "**DuckOS Build script hash [SHA256]**" | Out-File -FilePath utilhashes.md -Append
           cd $currentPath\src\build_duckos
           (Get-FileHash '.\Build DuckOS.bat').hash | Out-File -FilePath $currentPath\utilhashes.md -Append   
+          Write-Host Size in MB:;Write-Host((Get-Item '.\Build DuckOS.bat').length/1MB) | Out-File -FilePath $currentPath\utilhashes.md -Append
 
 
       - name: Commit changes
