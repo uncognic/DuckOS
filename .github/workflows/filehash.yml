@@ -19,7 +19,7 @@ jobs:
           If (Test-Path -Path utilhashes.md ) {
              del utilhashes.md
           }
-          "**Post script hash [SHA256]**" | Out-File -FilePath utilhashes.md
+          "## **Post script hash [SHA256]**" | Out-File -FilePath utilhashes.md
           $currentPath = ($pwd).Path
           cd $currentPath\src\DuckOS_Modules
           (Get-FileHash '.\DuckOS-post_script.bat').hash | Out-File -FilePath $currentPath\utilhashes.md -Append
@@ -28,13 +28,19 @@ jobs:
           Write-Host | Out-File -FilePath utilhashes.md -Append 
           cd $currentPath
           (Get-Content utilhashes.md | Out-String) -replace "`n", "`r`n" | Out-File utilhashes.md
-          Write-Host **DuckOS Build script hash [SHA256]** | Out-File -FilePath utilhashes.md -Append
-          "**DuckOS Build script hash [SHA256]**" | Out-File -FilePath utilhashes.md -Append
+          "## **DuckOS Build script hash [SHA256]**" | Out-File -FilePath utilhashes.md -Append
           cd $currentPath\src\build_duckos
           (Get-FileHash '.\Build DuckOS.bat').hash | Out-File -FilePath $currentPath\utilhashes.md -Append
           (Get-Content $currentPath\utilhashes.md | Out-String) -replace "`n", "`r`n" | Out-File $currentPath\utilhashes.md
           "Size in MB:" | Out-File -FilePath $currentPath\utilhashes.md -Append
           (Get-Item '.\Build DuckOS.bat').length/1MB | Out-File -FilePath $currentPath\utilhashes.md -Append
+          (Get-Content $currentPath\utilhashes.md | Out-String) -replace "`n", "`r`n" | Out-File $currentPath\utilhashes.md
+          cd $currentPath\src\DuckOS_Modules\DuckOS_Toolbox
+          "## **DuckOS Toolbox [SHA256]**" | Out-File -FilePath $currentPath\utilhashes.md -Append
+          (Get-FileHash '.\DuckOS Toolbox.exe').hash | Out-File -FilePath $currentPath\utilhashes.md -Append
+          (Get-Content $currentPath\utilhashes.md | Out-String) -replace "`n", "`r`n" | Out-File $currentPath\utilhashes.md
+          "Size in MB:" | Out-File -FilePath $currentPath\utilhashes.md -Append
+          (Get-Item '.\DuckOS Toolbox.exe').length/1MB | Out-File -FilePath $currentPath\utilhashes.md -Append
 
 
       - name: Commit changes
