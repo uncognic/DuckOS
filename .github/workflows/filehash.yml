@@ -41,6 +41,10 @@ jobs:
           (Get-Content $currentPath\utilhashes.md | Out-String) -replace "`n", "`r`n" | Out-File $currentPath\utilhashes.md
           "Size in MB:" | Out-File -FilePath $currentPath\utilhashes.md -Append
           (Get-Item '.\DuckOS Toolbox.exe').length/1MB | Out-File -FilePath $currentPath\utilhashes.md -Append
+          (Get-Content $currentPath\utilhashes.md | Out-String) -replace "`n", "`r`n" | Out-File $currentPath\utilhashes.md
+          (Get-Content $currentPath\utilhashes.md | Out-String) -replace "`n", "`r`n" | Out-File $currentPath\utilhashes.md
+          "Last checked by GitHub Actions on:" | Out-File -FilePath $currentPath\utilhashes.md -Append
+          Get-Date | Out-File -FilePath $currentPath\utilhashes.md -Append
 
 
       - name: Commit changes
