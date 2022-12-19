@@ -6,6 +6,30 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 3E13373298A26C0E413AD636B89B920A643A92E531ACB897676FF253EC3323BF
 
 
@@ -14,7 +38,55 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Size in MB:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -34,7 +106,55 @@ Size in MB:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## **DuckOS Build script hash [SHA256]**
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -44,13 +164,61 @@ Size in MB:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Size in MB:
+
+
+
+
+
+
 
 0.00950908660888672
 
 
+
+
+
+
+
+
+
+
+
 ## **DuckOS Toolbox [SHA256]**
+
+
+
 C7B474D95E639EB445CF1FCD4F152F0AFBFBA3470CFF37098EBCAF6E463A7EA0
+
+
+
+
+
+Size in MB:
+
+4.06201171875
+
+
 
-Size in MB:
-4.06201171875
+Last checked by GitHub Actions on:
+
+Monday, December 19, 2022 1:37:44 PM
+
