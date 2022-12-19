@@ -65,7 +65,7 @@ body:
   validations:
     required: true
 - type: dropdown
-  id: version
+  id: source
   attributes:
     label: ISO source
     description: What type of ISO did you use to install DuckOS?
