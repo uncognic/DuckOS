@@ -60,9 +60,18 @@ body:
     label: DuckOS Version
     description: What version of DuckOS did you replicate this bug on?
     options:
-      - 1709
       - 1803
-      - 21H2
+      - 22H2
+  validations:
+    required: true
+- type: dropdown
+  id: version
+  attributes:
+    label: ISO source
+    description: What type of ISO did you use to install DuckOS?
+    options:
+      - Precompiled
+      - User-built
   validations:
     required: true
 - type: textarea
