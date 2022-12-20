@@ -108,12 +108,12 @@ for %%i in (%*) do (
 :begin
 if %debugMode% equ 1 (
     choice /n /m "You've chosen to run the script in debug mode. Echo will be set to on to display all inputs. Continue with debug mode on? [Y/N]"
-        if %errorlevel% equ 2 (
+        if %errorlevel%==2 (
             echo Debug mode is now OFF.
             @echo off
             goto tweaks
         ) else (
-            if %errorlevel% equ 1 (
+            if %errorlevel%==1 (
 	        echo Alright.
 	        @echo on
 	        cls
@@ -140,7 +140,7 @@ if %debugMode% equ 1 (
 :: Various different sources...
 
 :: Warning prompt
-if /i "%isDuck%" equ "0" (
+if not "%isDuck%"=1 (
     call :MsgBox "This script will tweak your computer. If you think the script broke/changed something very important, remember that the DuckOS post script is provided AS IS, and doesn't come with ANY warranty! Do you wanna continue?"  "VBYesNo+VBQuestion+VBDefaultButton2" "Continue?"
     if errorlevel 6 ( goto begin ) else (
         echo Alright, no changes have been made. Press any key to exit.
@@ -160,7 +160,7 @@ setlocal EnableDelayedExpansion
 :checkPrivileges
 :: Sure, using DISM for elev check because we're cool
 DISM >NUL
-if %errorlevel% equ 0 (
+if %errorlevel%==0 (
     goto gotPrivileges
 ) else (
     chcp 65001 >nul
@@ -189,7 +189,7 @@ if %errorlevel% equ 0 (
         echo Press any key to close this window... & pause >nul
 	exit
     ) else (
-        if %errorlevel% equ 1 (
+        if %errorlevel%==1 (
             title Do not close this window - [0/66] Preparing
             echo Alright.
             goto getPrivileges
@@ -232,7 +232,7 @@ if errorlevel 1 goto TrustedInstaller
 title Do not close this window, tweaking your computer!
 
 :: Send a message!
-if /i "%isDuck%" equ "1" (
+if %isDuck%==1 (
     call :MsgBox "Welcome to DuckOS, a modification to Windows for enhanced privacy and performance! Thank you for downloading and using DuckOS, we are preparing DuckOS and will be available to use shortly..." 64+4096 "DuckOS Post Install Tweaks"
     call :MsgBox "You will be prompted with a few questions, then you can leave your computer running and let us do the rest." 64+4096 "DuckOS Post Install Tweaks"
 ) else (
@@ -246,7 +246,7 @@ cd %windir%\DuckOS_Modules
 cls
 
 :: Make the command prompt fullscreen if duckOS is detected...
-if /i "%isDuck%" equ "1" (
+if %isDuck%==1 (
     :: Kill explorer to make desktop black as well.
     taskkill /f /im explorer.exe
     echo:Set WshShell = WScript.CreateObject("WScript.Shell")>>%vbsFullScreen%
@@ -315,7 +315,7 @@ echo %c_green%Done.
 
 :: Import accent color registry file
 title Do not close this window - [4/66] Importing registry
-if /i "%isDuck%" equ "1" (
+if %isDuck%==1 (
     if exist %windir%\DuckOS_Modules\accent_color.reg ( %currentuser% "%WINDIR%\regedit.exe" /s %windir%\DuckOS_Modules\accent_color.reg )
 ) else (
     echo %c_green%******************************************************
@@ -343,7 +343,7 @@ reg add "HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\Sys
 :: Enable dark mode, disable transparency and disable Task View
 :: WE DON'T LIKE LIGHT MODE!
 title Do not close this window - [6/66] Windows appearence
-if /i "%isDuck%" equ "1" (
+if %isDuck%==1 (
     echo %c_green%Enabling dark mode, disabling transparency and disabling Task View...
     %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "SystemUsesLightTheme" /t REG_DWORD /d "0" /f
     %currentuser% reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "AppsUseLightTheme" /t REG_DWORD /d "0" /f
@@ -387,7 +387,7 @@ start "" "%windir%\System32\SystemSettingsAdminFlows.exe" ForceTimeSync 1
 %currentuser% reg add "HKCU\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /d "2" /t REG_DWORD /f
 
 :: If DuckOS isn't detected, don't preinstall duckOS' preinstalled programs like 7zip and vcredist..
-if /i "%isDuck%" equ "0" ( goto :skipPrograms )
+if not %isDuck%==0 ( goto :skipPrograms )
 
 ::::::::::::::
 :: Software ::
@@ -596,7 +596,7 @@ if exist %windir%\DuckOS_Modules\Utils\7zip.exe (
 :: Detect if it's 1803
 reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v ReleaseID | find "1803"
 if %errorlevel% equ 0 (
-    if /i "%isDuck%" equ "1" (
+    if %isDuck%==1 (
         echo %c_red%Installing OpenShell if it exists...
         if exist "%windir%\DuckOS_Modules\Utils\OpenShell.exe" start /wait "" "%windir%\DuckOS_Modules\Utils\OpenShell.exe" /qn ADDLOCAL=StartMenu
         echo %c_green%Done.
@@ -639,7 +639,7 @@ if exist %WINDIR%\DuckOS_Modules\Utils\BleachBit-4.4.2-setup.exe (
     echo $ Would you like to install BleachBit? [Y/N]
     echo What is BleachBit? BleachBit is a open sourced cache cleaner that cleans your system and frees disk space. The tool get's useful over time. 
     choice /n >nul
-    if %errorlevel% equ "1" (
+    if errorlevel 1 (
         echo %c_gold%Installing BleachBit..
         start /min /wait "" "%WINDIR%\DuckOS_Modules\Utils\BleachBit-4.4.2-setup.exe" /allusers /S
         echo %c_green%Done.
@@ -726,7 +726,7 @@ reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Device Metadata" /f >
 echo %c_green%Done.
 
 :: Skip some parts that should be exclusive only to DuckOS
-if /i %isDuck% equ 0 ( goto :notDuck )
+if not %isDuck%==1 ( goto :notDuck )
 
 ::::::::::::::::::
 :: Context Menu ::
@@ -829,7 +829,7 @@ echo %c_green%Done.
 
 :: Create memreduct's configration file
 start %windir%\DuckOS_Modules\Utils\memreduct.exe
-timeout 2 /nobreak
+timeout 2 /nobreak >nul
 taskkill /f /im memreduct.exe
 
 :: Write memreduct's configuration file
@@ -844,10 +844,11 @@ echo %c_gold%Writing memreduct configuration file...
 >>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:AutoreductIntervalEnable=true
 >>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:HotkeyCleanEnable=true
 >>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:SettingsLastPage=102
->>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:ReductMask2=39
+>>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:ReductMask2=63
 >>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:AutoreductIntervalValue=1
 >>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:TrayRoundCorners=true
->>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:TrayShowBorder=true
+>>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:TrayFont=System;8;400
+>>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:TrayShowBorder=false
 >>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:TrayUseTransparency=true
 >>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:TrayUseAntialiasing=false
 >>"%APPDATA%\Henry++\Mem Reduct\memreduct.ini" echo:BalloonCleanResults=false
@@ -1106,14 +1107,14 @@ reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProf
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" /v "SFIO Priority" /t REG_SZ /d "High" /f
 
 :: Remove "Open PowerShell window here" from Shift+Right-click context menus
-if /i "%isDuck%" equ "1" (
+if %isDuck%==1 (
     reg delete "HKCR\Directory\Background\shell\Powershell" /f
     reg delete "HKCR\Directory\shell\Powershell" /f
     reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\Winlogon" /v "AutoRestartShell" /t REG_DWORD /d "1" /f
 )
 
 :: Add "Open Command Prompt here" to context menus
-if /i "%isDuck%" equ "1" (
+if %isDuck%==1 (
     reg delete "HKCR\Directory\shell\cmd" /f
     reg delete "HKCR\Directory\Background\shell\cmd" /f
     reg add "HKCR\Directory\shell\runas" /v "" /t REG_SZ /d "Open Command Prompt here" /f
@@ -1423,7 +1424,7 @@ reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /v "
 echo %c_green%Done.
 
 :: Make the post install desktop folder read only with attributes
-if /i "%isDuck%" equ "1" (
+if %isDuck%==1 (
     echo %c_gold%Making the post install desktop folder read only with attributes..
     if exist "%userprofile%\Desktop\DuckOS - Post Install Folder" attrib +r +a +s "%userprofile%\Desktop\DuckOS - Post Install Folder"
     echo %c_green%Done.
@@ -1705,7 +1706,7 @@ for /f "tokens=*" %%i in ('wmic PATH Win32_PnPEntity GET DeviceID ^| findstr "US
 )
 
 :: Deleting default, unnecessery powerplans..
-if /i "%isDuck%" equ "1" (
+if %isDuck%==1 (
     echo Deleting default, unnecessery powerplans..
     powercfg -delete a1841308-3541-4fab-bc81-f71556f20b4a
     powercfg -delete 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
@@ -1714,7 +1715,7 @@ if /i "%isDuck%" equ "1" (
 echo %c_green%Done.
 
 title Do not close this window - [65/66] Configuring services
-if %isDuck% equ 1 (
+if %isDuck%==1 (
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\3ware" /v "Start" /t REG_DWORD /d "4" /f
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\ADP80XX" /v "Start" /t REG_DWORD /d "4" /f
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\AMDPPM" /v "Start" /t REG_DWORD /d "4" /f
@@ -1890,7 +1891,7 @@ bcdedit /set tpmbootentropy ForceDisable
 :: Get the OS version 
 for /f "tokens=3" %%a in ('reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v ReleaseID ^| findstr /ri "REG_SZ"') do set OSVer=%%a
 
-if /i "%isDuck%" equ "1" (
+if %isDuck%==1 (
     :: Set the DuckOS' name to DuckOS.. so it can be easily identified when dualbooting.
     bcdedit /set {current} description DuckOS %version% %OSVer%
     
@@ -1905,7 +1906,7 @@ if /i "%isDuck%" equ "1" (
 )
 
 :: Disable Recovery
-if /i "%isDuck%" equ "1" (
+if %isDuck%==1 (
     if exist %windir%\System32\reagentc.exe reagentc.exe /disable
     bcdedit /set {current} recoveryenabled no
 ) else (
@@ -1913,7 +1914,7 @@ if /i "%isDuck%" equ "1" (
 )
 
 :: Disable Devices with DevManView
-if /i "%isDuck%" equ "1" (
+if %isDuck%==1 (
     cd /d %windir%\DuckOS_Modules
     if exist %windir%\DuckOS_Modules\devmanview.exe (
         devmanview /disable "Composite Bus Enumerator"
@@ -2177,7 +2178,7 @@ reg add "HKLM\Software\Classes\.reg\ShellNew" /v "ItemName" /t REG_EXPAND_SZ /d 
 reg add "HKLM\Software\Classes\.reg\ShellNew" /v "NullFile" /t REG_SZ /d "" /f
 
 :: "Merge as TrustedInstaller" for registry files
-if /i "%isDuck%" equ "1" (
+if %isDuck%==1 (
     reg add "HKCR\regfile\Shell\RunAs" /ve /t REG_SZ /d "Merge as TrustedInstaller" /f
     reg add "HKCR\regfile\Shell\RunAs" /v "HasLUAShield" /t REG_SZ /d "1" /f
     reg add "HKCR\regfile\Shell\RunAs\Command" /ve /t REG_SZ /d "%windir%\DuckOS_modules\nsudo.exe -U:T -P:E reg import "%%1"" /f
