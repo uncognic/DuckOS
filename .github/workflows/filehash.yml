@@ -23,7 +23,6 @@ jobs:
               echo:Hash of "%%i" in **SHA256**: >>%currentdir%\utilhashes.md
               certutil -hashfile "%%i" SHA256 >>%currentdir%\utilhashes.md
               echo:Size of "*%%i*": >>%currentdir%\utilhashes.md
-              powershell (Get-Item '.\%%i').length/1MB >>%currentdir%\utilhashes.md
 
 
       - name: Commit changes
