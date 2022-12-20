@@ -16,7 +16,7 @@ jobs:
       - name: Get hashes
         shell: cmd
         run: |
-          set "CurrentDir=%~dp0"
+          set CurrentDir=%CD%
           cd src\DuckOS_Modules
           for %%i in (*.exe) do (
               echo:## "%%i" >%currentdir%\utilhashes.md
