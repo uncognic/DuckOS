@@ -14,37 +14,15 @@ jobs:
 
       # Runs a set of commands using powershell
       - name: Get hashes
-        shell: pwsh
+        shell: cmd
         run: |
-          If (Test-Path -Path utilhashes.md ) {
-             del utilhashes.md
-          }
-          "## **Post script hash [SHA256]**" | Out-File -FilePath utilhashes.md
-          $currentPath = ($pwd).Path
-          cd $currentPath\src\DuckOS_Modules
-          (Get-FileHash '.\DuckOS-post_script.bat').hash | Out-File -FilePath $currentPath\utilhashes.md -Append
-          "Size in MB:" | Out-File -FilePath $currentPath\utilhashes.md -Append
-          (Get-Item '.\DuckOS-post_script.bat').length/1MB | Out-File -FilePath $currentPath\utilhashes.md -Append
-          Write-Host | Out-File -FilePath utilhashes.md -Append 
-          cd $currentPath
-          (Get-Content utilhashes.md | Out-String) -replace "`n", "`r`n" | Out-File utilhashes.md
-          "## **DuckOS Build script hash [SHA256]**" | Out-File -FilePath utilhashes.md -Append
-          cd $currentPath\src\build_duckos
-          (Get-FileHash '.\Build DuckOS.bat').hash | Out-File -FilePath $currentPath\utilhashes.md -Append
-          (Get-Content $currentPath\utilhashes.md | Out-String) -replace "`n", "`r`n" | Out-File $currentPath\utilhashes.md
-          "Size in MB:" | Out-File -FilePath $currentPath\utilhashes.md -Append
-          (Get-Item '.\Build DuckOS.bat').length/1MB | Out-File -FilePath $currentPath\utilhashes.md -Append
-          (Get-Content $currentPath\utilhashes.md | Out-String) -replace "`n", "`r`n" | Out-File $currentPath\utilhashes.md
-          cd $currentPath\src\DuckOS_Modules\DuckOS_Toolbox
-          "## **DuckOS Toolbox [SHA256]**" | Out-File -FilePath $currentPath\utilhashes.md -Append
-          (Get-FileHash '.\DuckOS Toolbox.exe').hash | Out-File -FilePath $currentPath\utilhashes.md -Append
-          (Get-Content $currentPath\utilhashes.md | Out-String) -replace "`n", "`r`n" | Out-File $currentPath\utilhashes.md
-          "Size in MB:" | Out-File -FilePath $currentPath\utilhashes.md -Append
-          (Get-Item '.\DuckOS Toolbox.exe').length/1MB | Out-File -FilePath $currentPath\utilhashes.md -Append
-          (Get-Content $currentPath\utilhashes.md | Out-String) -replace "`n", "`r`n" | Out-File $currentPath\utilhashes.md
-          (Get-Content $currentPath\utilhashes.md | Out-String) -replace "`n", "`r`n" | Out-File $currentPath\utilhashes.md
-          "Last checked by GitHub Actions on:" | Out-File -FilePath $currentPath\utilhashes.md -Append
-          Get-Date | Out-File -FilePath $currentPath\utilhashes.md -Append
+          set "CurrentDir=%~dp0"
+          for %%i in (src\DuckOS_Modules\*.exe) do (
+              echo:## "%%i" >%currentdir%\utilhashes.md
+              echo:Hash of "%%i" in **SHA256**: >>%currentdir%\utilhashes.md
+              certutil -hashfile "%%i" SHA256 >>%currentdir%\utilhashes.md
+              FOR %%A IN ("%%i") DO set size=%%~zA
+              echo:Size of "*%%i*": %size% >>%currentdir%\utilhashes.md
 
 
       - name: Commit changes
