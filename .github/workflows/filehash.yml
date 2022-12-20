@@ -17,12 +17,13 @@ jobs:
         shell: cmd
         run: |
           set "CurrentDir=%~dp0"
-          for %%i in (src\DuckOS_Modules\*.exe) do (
+          cd src\DuckOS_Modules
+          for %%i in (*.exe) do (
               echo:## "%%i" >%currentdir%\utilhashes.md
               echo:Hash of "%%i" in **SHA256**: >>%currentdir%\utilhashes.md
               certutil -hashfile "%%i" SHA256 >>%currentdir%\utilhashes.md
-              FOR %%A IN ("%%i") DO set size=%%~zA
-              echo:Size of "*%%i*": %size% >>%currentdir%\utilhashes.md
+              echo:Size of "*%%i*": >>%currentdir%\utilhashes.md
+              powershell (Get-Item '.\%%i').length/1MB >>%currentdir%\utilhashes.md
 
 
       - name: Commit changes
