@@ -140,7 +140,7 @@ if %debugMode% equ 1 (
 :: Various different sources...
 
 :: Warning prompt
-if not "%isDuck%"=1 (
+if not %isDuck%==1 (
     call :MsgBox "This script will tweak your computer. If you think the script broke/changed something very important, remember that the DuckOS post script is provided AS IS, and doesn't come with ANY warranty! Do you wanna continue?"  "VBYesNo+VBQuestion+VBDefaultButton2" "Continue?"
     if errorlevel 6 ( goto begin ) else (
         echo Alright, no changes have been made. Press any key to exit.
@@ -160,7 +160,7 @@ setlocal EnableDelayedExpansion
 :checkPrivileges
 :: Sure, using DISM for elev check because we're cool
 DISM >NUL
-if %errorlevel%==0 (
+if errorlevel 0 (
     goto gotPrivileges
 ) else (
     chcp 65001 >nul
@@ -189,7 +189,7 @@ if %errorlevel%==0 (
         echo Press any key to close this window... & pause >nul
 	exit
     ) else (
-        if %errorlevel%==1 (
+        if errorlevel 1 (
             title Do not close this window - [0/66] Preparing
             echo Alright.
             goto getPrivileges
