@@ -215,7 +215,7 @@ cd /d %~dp0
 if '%1'=='ELEV' (del "%vbsGetPrivileges%" 1>nul 2>nul & shift /1)
 
 :: Set a variable.. that we will use later... that points into an executable.
-set currentuser=%windir%\DuckOS_Modules\nsudo.exe -U:C -P:E -Wait
+set currentuser=%windir%\DuckOS_Modules\nsudo.exe -U:C -P:E -ShowWindowMode:Hide -Wait
 
 :: Make the script faster by putting a higher priority on all cmd related processes.
 echo %c_green%Making processes have higher priorities for faster execution.
