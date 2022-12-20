@@ -247,7 +247,6 @@ cls
 
 :: Make the command prompt fullscreen if duckOS is detected...
 if %isDuck%==1 (
-    :: Kill explorer to make desktop black as well.
     taskkill /f /im explorer.exe
     echo:Set WshShell = WScript.CreateObject("WScript.Shell")>>%vbsFullScreen%
     echo:WshShell.SendKeys "{F11}">>%vbsFullScreen%
@@ -386,9 +385,6 @@ start "" "%windir%\System32\SystemSettingsAdminFlows.exe" ForceTimeSync 1
 :: Enable numlock on startup
 %currentuser% reg add "HKCU\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /d "2" /t REG_DWORD /f
 
-:: Skip "Enable all folders in this PC" if DuckOS isn't detected.
-if "%isDuck%" equ "0" ( goto :skipallfolders )
-
 :::::::::::::::::::::::::::::::::::
 :: Enable all folders in This PC ::
 :::::::::::::::::::::::::::::::::::
@@ -450,8 +446,6 @@ reg add "HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyC
 :: but.. delete 3D objects from the explorer..
 reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}" /f
 reg delete "HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}" /f
-
-:skipallfolders
 
 :: If DuckOS isn't detected, don't preinstall duckOS' preinstalled programs like 7zip and vcredist..
 if not %isDuck%==0 ( goto :skipPrograms )
