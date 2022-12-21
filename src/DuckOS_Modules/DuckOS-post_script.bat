@@ -2268,6 +2268,9 @@ bcdedit /set useplatformtick yes >nul 2>&1
 :: Finish ::
 ::::::::::::
 
+:: Hide settings items
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "SettingsPageVisibility" /d "hide:tabletmode;autoplay;network-dialup;maps;sync;speech;gaming-gamemode;gaming-broadcasting;easeofaccess-highcontrast;easeofaccess-magnifier;easeofaccess-narrator;privacy-appdiagnostics;privacy-feedback;privacy-contacts;privacy-radios;windowsupdate;troubleshoot;recovery;findmydevice;windowsinsider;holographic" /t REG_SZ /f
+
 :: Do not reduce sounds while in a call..
 %currentuser% reg add "HKCU\SOFTWARE\Microsoft\Multimedia\Audio" /v "UserDuckingPreference" /t REG_DWORD /d "3" /f
 
