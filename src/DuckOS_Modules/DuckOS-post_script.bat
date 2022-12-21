@@ -41,7 +41,7 @@ set "CFUExit=0"
 
 :: VBS script variables
 set "vbsGetPrivileges=%temp%\getPriv_DuckPS.vbs"
-set "vbsFullScreen=%temp%\fullscreen_DuckPS.vbs"
+set "vbsFullScreen=%temp%\fullScreen_DuckPS.vbs"
 
 :: Force the window to go maximized and clear the screen.
 cls
