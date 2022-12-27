@@ -1,5 +1,4 @@
 name: Check Util Hashes
-description: Generates and updates the hashes of the executables in the DuckOS_Modules directory
 
 on:
   push:
