@@ -17,7 +17,7 @@ jobs:
       - name: Generate hashes
         shell: cmd
         run: |
-          set CurrentDir=%CD%
+          for /f "delims=" %%a in ('cd') do set "CurrentDir=%%a"
           cd src\DuckOS_Modules
           echo "# Util Hashes" > %currentdir%\utilhashes.md
           for %%i in (*.exe) do (
