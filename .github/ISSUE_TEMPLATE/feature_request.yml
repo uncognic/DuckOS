@@ -1,0 +1,29 @@
+name: Feature request
+description: Suggest an idea for this project
+labels: feature
+assignees: fikinoob
+body:
+- type: markdown
+  attributes:
+    value: |
+      Thanks for taking the time to fill out this feature request for DuckOS! Please fill out the following form to your best ability to help us understand your feature request and significantly improve the chance of getting added.
+      For anything else than a feature request, use: [our Discord server](https://dsc.gg/duckos).
+- type: textarea
+  attributes:
+    label: Is your feature request related to a problem? Please describe.
+    description: A clear and concise description of what the problem is.
+    placeholder: When I open ... it hangs/freezes
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: What feature do you want to see added?
+    description: A clear and concise description of your feature request.
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Are there any alternatives?
+    description: List any alternatives/temporary fixes you might have tried.
+  validations:
+    required: true
